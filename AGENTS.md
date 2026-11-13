@@ -14,9 +14,8 @@ Project context: [README.md](README.md). Tasks and decisions: [PLAN.md](PLAN.md)
 1. **The tools decide style.** Prettier formats, ESLint lints, TypeScript strict mode types. Run them before every commit. Never hand-format around them, and never change their config without the whole team agreeing.
 2. **Only touch what your task needs.** Do not reformat, rename, reorganise, or "clean up" code outside your change. Unrelated diffs cause merge conflicts for the other two people.
 3. **Follow existing patterns.** Before adding a file, open a neighbouring one and copy its structure, naming, and error handling. Do not introduce a second way of doing something the codebase already does.
-4. **Claim before you build.** Say in team chat (or assign the GitHub issue) what you are starting, so two people never build the same thing.
-5. **No new dependencies without saying so.** A new package changes the shared lockfile. Mention it in the PR and in team chat. Prefer what is already installed.
-6. **`main` always runs.** If your change breaks the app, fix or revert before anything else.
+4. **No new dependencies without saying so.** A new package changes the shared lockfile. Mention it in the commit message and in team chat. Prefer what is already installed.
+5. **`main` always runs.** If your change breaks the app, fix or revert before anything else.
 
 ## Commands
 
@@ -49,7 +48,7 @@ Several people will want to edit these files. Keep changes small and merge them 
 
 | File                                                      | Rule                                                                                                                                                                               |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/shared/src/api/*` (API schemas)                 | Adding a field is fine. Renaming or removing one breaks the other side: announce it in team chat first and fix both sides in the same PR                                           |
+| `packages/shared/src/api/*` (API schemas)                 | Adding a field is fine. Renaming or removing one breaks the other side: announce it in team chat first and fix both sides in the same commit                                       |
 | `packages/shared/src/taxonomy.ts`                         | The only place categories, subcategories, and baskets are defined. Never retype these ids elsewhere. After a change, rerun `npm run data:prepare` and tell the team to do the same |
 | `apps/server/src/routes/index.ts`, `apps/web/src/App.tsx` | Registration only: one line per route or section. Put logic in its own file                                                                                                        |
 | `package-lock.json`                                       | Never edit by hand. On a merge conflict, take `main`'s version and rerun `npm install`                                                                                             |
@@ -58,11 +57,11 @@ Several people will want to edit these files. Keep changes small and merge them 
 
 ## Git workflow
 
-- Branch from an up-to-date `main`. Name branches `<yourname>/<short-topic>`, for example `ville/category-pie`.
-- Keep branches short-lived: hours, not days. Merge small pieces often.
-- Before pushing: `git pull --rebase origin main`, run format, lint, and typecheck, start the app.
-- Open a pull request and **squash and merge**. Ask a teammate to review changes to shared hotspots. Other reviews are optional.
-- Never commit directly to `main`, except for trivial docs fixes. Never force-push `main`.
+- Work directly on `main`. No feature branches, no pull requests.
+- Before every commit and push: `git pull --rebase origin main`, then run format, lint, and typecheck, and start the app. This applies to AI agents too.
+- Commit small pieces and push often, so everyone rebases on small changes.
+- On a rebase conflict, resolve it keeping both sides' intent. If unsure, ask the person who wrote the other change.
+- Never force-push `main`.
 
 ### Commit messages
 
@@ -114,5 +113,5 @@ These keep numbers consistent everywhere.
 - Do what was asked and nothing more. No drive-by refactors, extra features, or new documentation files unless requested.
 - Do not change configs, the lockfile, API schemas, or `taxonomy.ts` as a side effect. If the task seems to need it, say so and ask your user first.
 - Run format, lint, and typecheck on your changes before reporting done. Say honestly if something fails or was not run.
-- Do not commit, push, or open pull requests unless your user asks.
+- Do not commit or push unless your user asks. When you do, run `git pull --rebase origin main` first.
 - Do not invent dataset columns, API fields, model ids, or benchmark figures. Check the code, `docs/data.md`, or the source. If you cannot verify something, say so.

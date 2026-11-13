@@ -27,30 +27,22 @@ Keep these as the core of the pitch:
 
 Deployment is a hard requirement (peer review and commenting), and the plan currently leaves it to the end. Instead:
 
-- [ ] As soon as the two scaffolds are merged, deploy a walking skeleton: server with `/health`, built web app served by the same server
-- [ ] Redeploy automatically on every merge to `main`
+- [ ] As soon as the two scaffolds are on `main`, deploy a walking skeleton: server with `/health`, built web app served by the same server
+- [ ] Deploy manually through the hosting service's dashboard or CLI. No automatic deploy on every push: we push often, and a deploy per push is too heavy
 - [ ] Everyone tests on their own phone from day one
 
-### 2. Change the hosting approach
+### 2. Hosting and the database
 
-PLAN.md proposes running `npm run data` in the hosting build step. That will likely fail or be painfully slow:
+Hosting platform: **decided by the team tomorrow.** Railway is the current candidate, and it can also host the database.
 
-- Every deploy downloads 362 MB from GitHub's LFS media host, which is slow and counts against LFS bandwidth limits.
-- Building DuckDB over 3.6M rows on a small free instance risks running out of memory.
+Agreed: do not run `npm run data` in the hosting build step. Every deploy would download 362 MB from GitHub's LFS media host, and building DuckDB over 3.6M rows on a small instance risks running out of memory.
 
-Proposal:
+Instead:
 
-- [ ] Add a `data:demo` step to the pipeline that writes a small `data/processed/demo.duckdb` with only the demo users' transactions plus the precomputed `peer_benchmarks` (and any other aggregate tables). Expected size: a few MB
-- [ ] Ship that file with the deploy (baked into the Docker image, or downloaded from a GitHub release asset at build time). It stays out of git, in line with the data rules
-- [ ] The server reads the database path from an env variable, so local dev uses the full database and production the demo one
-
-Platform notes for the peer-review period:
-
-- Render's free tier sleeps when idle. Reviewers would wait 30–60 s on first load. Use a small paid instance, or Fly.io with one machine always running.
-- The chat endpoint is public and unauthenticated, so anyone can spend our Gemini quota:
-  - [ ] Per-IP rate limit on `POST /api/users/:id/chat`
-  - [ ] Spending cap on the API key, or the paid tier with a budget alert
-  - [ ] A friendly "the coach is busy, try again in a minute" fallback when Gemini returns a rate-limit error
+- [ ] Build `data/processed/coach.duckdb` locally once, as today
+- [ ] After the backend is deployed, upload the processed database to the host once (for example a Railway volume) and open it read-only from there
+- [ ] The server reads the database path from an env variable, so local dev and the deployed server can point to different files
+- [ ] The database stays out of git, in line with the data rules
 
 ### 3. Draw an explicit MVP line
 
@@ -76,15 +68,18 @@ Phases 2 and 3 hold about 30 tasks, which is too many for three people in one ha
 6. Home-buying readiness
 7. PSD2 multi-bank mock
 
-**Owners.** Give each track one fixed owner instead of "pick tasks":
+No fixed owners or task claiming. Anyone picks the next unticked item. Git discipline (below) handles conflicts.
 
-| Track               | Scope                                                 |
-| ------------------- | ----------------------------------------------------- |
-| Server and insights | `db/`, `insights/`, action rules, tests, deployment   |
-| AI coach            | Gemini spike, tools, prompts, summary, evaluation set |
-| Frontend            | Mobile frame, all sections, chat UI                   |
+### 4. Git workflow (changed)
 
-### 4. Technical points to fix early
+Simplified after review, and already updated in [AGENTS.md](../AGENTS.md):
+
+- Everyone, people and agents, commits straight to `main`. No feature branches and no pull requests.
+- Before every commit and push: `git pull --rebase origin main`, then format, lint, and typecheck.
+- Commit small and push often, so others rebase on small changes.
+- Never force-push `main`.
+
+### 5. Technical points to fix early
 
 - [ ] **Run the Gemini spike first.** Whether function tools and Google Search work in one request decides the coach design. Do it in the first hour.
 - [ ] **TypeScript 7 and ESLint.** `package.json` uses `typescript ^7.0.2`. Check that `typescript-eslint` supports TS 7 before the ESLint setup task. If not, pin TypeScript 5.x or use lint rules that do not need type information. Not verified yet.
@@ -92,13 +87,13 @@ Phases 2 and 3 hold about 30 tasks, which is too many for three people in one ha
 - [ ] **Transportation has two rows per month.** In `monthly_category`, taxis are overridden to the `everyday` basket, so transportation appears once under `mandatory_regular` and once under `everyday`. That is intended, but per-category charts must sum across baskets. Add a line to [data.md](data.md).
 - [ ] **Age bands are defined twice.** The SQL `CASE` in [prepare.ts](../scripts/data/prepare.ts) repeats `ageBandOf` from `dataset.ts`. Generate it from `AGE_BANDS` so there is one source. Low priority.
 
-### 5. Pitch and demo
+### 6. Pitch and demo
 
 - Make sure one demo user is 18–24. The brief stresses financial literacy for young adults.
 - Let the coach explain the concept behind an action in one or two plain sentences (for example why to keep a buffer for irregular costs). That is the "pedagogical angle" S-Pankki asked for.
 
 ## Next steps
 
-1. Team agrees on sections 1–3 (15 minutes).
-2. Move accepted items into PLAN.md as tasks with owners.
+1. Team picks the hosting platform and agrees on the MVP line (15 minutes).
+2. Move accepted items into PLAN.md as tasks.
 3. Start Phase 0: Gemini spike, scaffolds, walking-skeleton deploy.

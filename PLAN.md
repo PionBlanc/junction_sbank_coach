@@ -8,21 +8,21 @@ Done so far: dataset download and preprocessing pipeline (`npm run data`), share
 
 ### Stack (TypeScript everywhere, Gemini for AI)
 
-| Area            | Recommendation                                                                                                        | Why                                                                                                                                             |
-| --------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Repo            | npm workspaces: `apps/web`, `apps/server`, `packages/shared`                                                          | One install, one lockfile, shared types without publishing anything                                                                             |
-| App type        | Mobile-first web app                                                                                                  | S-Pankki accepts a web app embeddable in a mobile app. Fastest to build and demo by link                                                        |
-| Frontend        | React + TypeScript + Vite                                                                                             | Everyone and every AI agent knows it                                                                                                            |
-| Styling         | Tailwind CSS                                                                                                          | No arguments over CSS structure                                                                                                                 |
-| Charts          | Recharts                                                                                                              | Covers bars, pie, and comparison charts with little code                                                                                        |
-| Server state    | TanStack Query                                                                                                        | Caching and loading states for free                                                                                                             |
-| Server          | Hono on Node.js                                                                                                       | Small and fast. **Hono RPC** gives the frontend a typed client generated from the route definitions, so request and response types cannot drift |
-| Validation      | Zod, schemas in `packages/shared`                                                                                     | One schema validates on the server and types the client                                                                                         |
-| Data engine     | DuckDB (`@duckdb/node-api`) over `data/processed/coach.duckdb`                                                        | Already built and tested: 3.6M rows, per-user queries in about 30 ms                                                                            |
-| AI              | Gemini through the Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/react`)                                            | Streaming chat, typed tool calling, and the `useChat` hook for the frontend. Gemini has built-in Google Search grounding for the deal finder    |
-| Lint and format | ESLint (typescript-eslint) + Prettier                                                                                 | Prettier is already configured                                                                                                                  |
-| Tests           | Vitest                                                                                                                | Same config style as Vite                                                                                                                       |
-| Hosting         | One Node service (Render or Fly.io) that serves the API and the built frontend, with `npm run data` in the build step | One deploy, and the 105 MB database file stays next to the server                                                                               |
+| Area            | Recommendation                                                                                                                                                                           | Why                                                                                                                                             |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repo            | npm workspaces: `apps/web`, `apps/server`, `packages/shared`                                                                                                                             | One install, one lockfile, shared types without publishing anything                                                                             |
+| App type        | Mobile-first web app                                                                                                                                                                     | S-Pankki accepts a web app embeddable in a mobile app. Fastest to build and demo by link                                                        |
+| Frontend        | React + TypeScript + Vite                                                                                                                                                                | Everyone and every AI agent knows it                                                                                                            |
+| Styling         | Tailwind CSS                                                                                                                                                                             | No arguments over CSS structure                                                                                                                 |
+| Charts          | Recharts                                                                                                                                                                                 | Covers bars, pie, and comparison charts with little code                                                                                        |
+| Server state    | TanStack Query                                                                                                                                                                           | Caching and loading states for free                                                                                                             |
+| Server          | Hono on Node.js                                                                                                                                                                          | Small and fast. **Hono RPC** gives the frontend a typed client generated from the route definitions, so request and response types cannot drift |
+| Validation      | Zod, schemas in `packages/shared`                                                                                                                                                        | One schema validates on the server and types the client                                                                                         |
+| Data engine     | DuckDB (`@duckdb/node-api`) over `data/processed/coach.duckdb`                                                                                                                           | Already built and tested: 3.6M rows, per-user queries in about 30 ms                                                                            |
+| AI              | Gemini through the Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/react`)                                                                                                               | Streaming chat, typed tool calling, and the `useChat` hook for the frontend. Gemini has built-in Google Search grounding for the deal finder    |
+| Lint and format | ESLint (typescript-eslint) + Prettier                                                                                                                                                    | Prettier is already configured                                                                                                                  |
+| Tests           | Vitest                                                                                                                                                                                   | Same config style as Vite                                                                                                                       |
+| Hosting         | One Node service that serves the API and the built frontend. Platform to be decided (Railway is the candidate). The processed database is uploaded to the host once, not built at deploy | One deploy, and the 105 MB database file stays next to the server                                                                               |
 
 Gemini notes, to check in the setup spike below:
 
@@ -48,12 +48,12 @@ Tasks:
 
 - [ ] Create the GitHub repo, push this skeleton, add everyone as collaborators, protect `main` against force pushes
 - [ ] Each person: `npm install`, `npm run data`, copy `.env.example` to `.env` and add a key
-- [ ] Scaffold `apps/web` (Vite React TS, Tailwind, TanStack Query, Recharts) in one PR
-- [ ] Scaffold `apps/server` (Hono, `@hono/node-server`, DuckDB connection, `/health` route) in one PR
+- [ ] Scaffold `apps/web` (Vite React TS, Tailwind, TanStack Query, Recharts) in one commit
+- [ ] Scaffold `apps/server` (Hono, `@hono/node-server`, DuckDB connection, `/health` route) in one commit
 - [ ] Add ESLint at the root and the `lint`, `dev`, and `test` scripts. Update the README commands table
-- [ ] Optional: GitHub Action that runs `format:check`, `lint`, `typecheck`, and `test` on pull requests
+- [ ] Optional: GitHub Action that runs `format:check`, `lint`, `typecheck`, and `test` on every push to `main`
 
-Do the two scaffolds first and merge them before parallel feature work starts. Most merge conflicts in hackathons come from three people scaffolding at once.
+Do the two scaffolds first and push them before parallel feature work starts. Most merge conflicts in hackathons come from three people scaffolding at once.
 
 ## Phase 1: API contract
 
@@ -75,7 +75,7 @@ Proposed endpoints:
 
 ## Phase 2: Build features
 
-Pick tasks from the lists below. Before starting one, say which one in team chat (or assign the GitHub issue to yourself) so two people never build the same thing.
+Pick tasks from the lists below.
 
 ### Insights (server, deterministic)
 
@@ -152,5 +152,5 @@ Build in this order. Stop when time runs out.
 | Search and function tools cannot be combined           | Separate search call wrapped as a tool (see Phase 0 spike)                                                                             |
 | No merchant names or subscriptions in the data         | Advice is built on categories, MCC subcategories, balances, and timing, which the data supports well. Be upfront about it in the pitch |
 | Benchmark categories do not match Statistics Finland's | Compare only categories that map cleanly. Peer benchmark covers the rest                                                               |
-| Merge conflicts                                        | Scaffold first, small PRs, claim tasks before starting, shared-file rules in AGENTS.md                                                 |
+| Merge conflicts                                        | Scaffold first, small commits, pull --rebase before every push, shared-file rules in AGENTS.md                                         |
 | Savings estimates look invented                        | Every action shows the inputs behind its estimate                                                                                      |
