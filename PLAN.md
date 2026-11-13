@@ -1,0 +1,156 @@
+# Plan
+
+Actionable steps, in order. Tick boxes as you go. Items marked **Decide** need a team decision. Each has a recommendation, so if nobody objects, take the recommendation and move on.
+
+Done so far: dataset download and preprocessing pipeline (`npm run data`), shared taxonomy, repo conventions. See [docs/data.md](docs/data.md) for what the data contains.
+
+## Phase 0: Decisions and setup (first 1–2 hours, together)
+
+### Stack (TypeScript everywhere, Gemini for AI)
+
+| Area            | Recommendation                                                                                                        | Why                                                                                                                                             |
+| --------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repo            | npm workspaces: `apps/web`, `apps/server`, `packages/shared`                                                          | One install, one lockfile, shared types without publishing anything                                                                             |
+| App type        | Mobile-first web app                                                                                                  | S-Pankki accepts a web app embeddable in a mobile app. Fastest to build and demo by link                                                        |
+| Frontend        | React + TypeScript + Vite                                                                                             | Everyone and every AI agent knows it                                                                                                            |
+| Styling         | Tailwind CSS                                                                                                          | No arguments over CSS structure                                                                                                                 |
+| Charts          | Recharts                                                                                                              | Covers bars, pie, and comparison charts with little code                                                                                        |
+| Server state    | TanStack Query                                                                                                        | Caching and loading states for free                                                                                                             |
+| Server          | Hono on Node.js                                                                                                       | Small and fast. **Hono RPC** gives the frontend a typed client generated from the route definitions, so request and response types cannot drift |
+| Validation      | Zod, schemas in `packages/shared`                                                                                     | One schema validates on the server and types the client                                                                                         |
+| Data engine     | DuckDB (`@duckdb/node-api`) over `data/processed/coach.duckdb`                                                        | Already built and tested: 3.6M rows, per-user queries in about 30 ms                                                                            |
+| AI              | Gemini through the Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/react`)                                            | Streaming chat, typed tool calling, and the `useChat` hook for the frontend. Gemini has built-in Google Search grounding for the deal finder    |
+| Lint and format | ESLint (typescript-eslint) + Prettier                                                                                 | Prettier is already configured                                                                                                                  |
+| Tests           | Vitest                                                                                                                | Same config style as Vite                                                                                                                       |
+| Hosting         | One Node service (Render or Fly.io) that serves the API and the built frontend, with `npm run data` in the build step | One deploy, and the 105 MB database file stays next to the server                                                                               |
+
+Gemini notes, to check in the setup spike below:
+
+- **Model:** use the current Gemini Flash model for chat (fast, generous free tier). Look up the exact model id and free-tier rate limits in Google AI Studio. Keep the id in one config constant.
+- **Search plus tools:** some Gemini models do not allow Google Search grounding and our own function tools in the same request. If that is the case, wrap search in our own `searchDeals` tool that makes a separate Gemini call with grounding enabled.
+- **Free-tier terms:** Google may use free-tier prompts to improve its products. That is acceptable because the data is synthetic, but never send real personal data.
+- **Rate limits:** cache the page summary per user and month so the demo does not burn requests.
+
+Tasks:
+
+- [ ] Confirm the stack. Update this file and [AGENTS.md](AGENTS.md) if anything changes
+- [ ] Spike (30 min, one person): one Gemini call with one function tool and Google Search in the same request. Write the result in this file
+
+### Decide: other open questions
+
+- [ ] **UI language.** Recommendation: English UI and code, since judging is in English. The coach answers in the language the user writes in, so a Finnish demo also works
+- [ ] **Demo users.** Recommendation: pick 2–3 customers with clearly different profiles (a young restaurant-heavy spender, a family with high housing costs, someone who often overdraws) and add a user switcher. No login. Query `docs/data.md` tables to find them
+- [ ] **Subscriptions.** The dataset has none, so the "three streaming services" example cannot come from real data. Recommendation: build the recurring-payment detector anyway (it finds nothing today but works on real data), and do not fake subscriptions in the demo. If the team wants the example anyway, add a clearly labelled demo-only fixture for one demo user and say so in the pitch
+- [ ] **Groceries basket.** Currently `mandatory_regular` (needs, recurring). Alternative: `everyday`. One-line change in [taxonomy.ts](packages/shared/src/taxonomy.ts), then rerun `npm run data:prepare`
+- [ ] **App name.** Replace the working title in the README
+
+### Setup
+
+- [ ] Create the GitHub repo, push this skeleton, add everyone as collaborators, protect `main` against force pushes
+- [ ] Each person: `npm install`, `npm run data`, copy `.env.example` to `.env` and add a key
+- [ ] Scaffold `apps/web` (Vite React TS, Tailwind, TanStack Query, Recharts) in one PR
+- [ ] Scaffold `apps/server` (Hono, `@hono/node-server`, DuckDB connection, `/health` route) in one PR
+- [ ] Add ESLint at the root and the `lint`, `dev`, and `test` scripts. Update the README commands table
+- [ ] Optional: GitHub Action that runs `format:check`, `lint`, `typecheck`, and `test` on pull requests
+
+Do the two scaffolds first and merge them before parallel feature work starts. Most merge conflicts in hackathons come from three people scaffolding at once.
+
+## Phase 1: API contract
+
+- [ ] Agree on the endpoints and write their Zod schemas in `packages/shared/src/api/`
+- [ ] Server returns hard-coded sample data from every endpoint first, so frontend work is never blocked
+
+Proposed endpoints:
+
+| Endpoint                               | Returns                                                           |
+| -------------------------------------- | ----------------------------------------------------------------- |
+| `GET /api/users`                       | Demo users for the switcher                                       |
+| `GET /api/users/:id/overview?month=`   | Income, basket totals, savings, key numbers                       |
+| `GET /api/users/:id/categories?month=` | Spending per category and subcategory, with basket                |
+| `GET /api/users/:id/benchmark?month=`  | User vs. peers (and average Finn when available) per category     |
+| `GET /api/users/:id/actions`           | Ranked action points with estimated monthly saving                |
+| `GET /api/users/:id/summary`           | AI-written summary text (cached)                                  |
+| `PUT /api/users/:id/preferences`       | Categories marked "worth it to me"                                |
+| `POST /api/users/:id/chat`             | Streamed chat (AI SDK UI message stream), may include chart specs |
+
+## Phase 2: Build features
+
+Pick tasks from the lists below. Before starting one, say which one in team chat (or assign the GitHub issue to yourself) so two people never build the same thing.
+
+### Insights (server, deterministic)
+
+- [ ] Overview and category aggregates from `monthly_category`
+- [ ] Peer benchmark from `peer_benchmarks`, matched on the user's age band
+- [ ] Average-Finn benchmark: Statistics Finland Household Budget Survey (Kotitalouksien kulutus) through the StatFin PxWeb API. Check the latest year, convert to monthly per-person euros, map to our categories where they match cleanly, and save as a small JSON file in `packages/shared` with source and year
+- [ ] Safe to spend this week: balance now + expected income before next payday − upcoming regular payments (housing, utilities) − irregular buffer, divided by days to payday. Payday and regular payments are detectable from the data
+- [ ] Action-point engine: one function per rule, each returns zero or more actions with id, title, explanation, `savingPerMonthEur`, category, and the inputs behind the estimate. Drop "worth it" categories, rank by saving
+
+Action rules in priority order (all supported by the data):
+
+1. Category clearly above peers (above p75 for the age band)
+2. Taxis (subcategory `taxi`) compared with public transport
+3. Frequent small purchases in restaurants and cafés, annualised
+4. Utility bills above peers → deal finder in chat
+5. Overdraft risk → safe-to-spend and buffer advice
+6. Idle balance → move to savings
+7. Recurring payment detector (subscriptions, for real-world data)
+
+### AI coach (server)
+
+- [ ] Chat route with the AI SDK `streamText`, Gemini model, streaming to the client
+- [ ] Tools, all calling the deterministic insight functions:
+  - `queryTransactions` (date range, category, subcategory, amount range; capped number of rows)
+  - `getSpendingSummary` (by category, basket, or month)
+  - `compareToPeers`
+  - `simulateWhatIf` (for example restaurants −20% → monthly, yearly, and 5-year effect)
+  - `getSafeToSpend`
+  - `renderChart` (returns a chart spec the frontend draws: MyData-style free exploration)
+  - web search for deals (see the Gemini notes in Phase 0)
+- [ ] System prompt in its own file: plain language, no jargon, every number comes from a tool, respect "worth it" categories, explain the three baskets when relevant, say it is guidance and not regulated investment advice
+- [ ] Page summary generation, cached per user and month
+- [ ] Evaluation set: 10–15 questions (start with the four from the challenge brief) with expected numbers. Rerun after every prompt or tool change
+
+### Frontend
+
+- [ ] Mobile frame (design at 390 px wide), user switcher, month switcher
+- [ ] Summary card
+- [ ] Money flow chart (income, three baskets, savings)
+- [ ] Category pie chart with drill-down to subcategories
+- [ ] You vs. others chart
+- [ ] Action list with checkboxes and running total
+- [ ] "Worth it to me" toggle on categories
+- [ ] Chat: `useChat` streaming, suggested starter questions, charts rendered from `renderChart` tool results
+- [ ] Loading, empty, and error states for every section
+
+## Phase 3: Features that make it stand out
+
+Build in this order. Stop when time runs out.
+
+1. **Safe to spend this week** (named in the challenge brief) with an overdraft early warning
+2. **What-if simulator** (named in the brief) in chat and as a slider on a category
+3. **Deal finder**: an action point opens chat with a prepared question. The coach searches the web and compares with what the user pays
+4. **Irregular-cost buffer**: "Surprise costs have averaged 140 €/month over the past year. Set that aside." This teaches the second basket
+5. **Spender persona** card
+6. **Home-buying readiness** using the mortgage outcome data
+7. **Multi-bank (PSD2) view**: mock a second account to show the concept
+
+## Phase 4: Demo and pitch (reserve the last 4–5 hours)
+
+- [ ] Feature freeze. Only bug fixes after this point
+- [ ] Deploy and test on real phones
+- [ ] 2–3 minute demo script around one demo user: summary → baskets → you vs. others → tick two actions → ask a what-if question → deal search
+- [ ] Pre-warm caches so the summary and first chat answer appear fast
+- [ ] Record a backup video of the demo
+- [ ] Pitch points: first Finnish bank chat over your own data, three-basket pedagogy, trustworthy numbers (deterministic maths, AI only explains), MyData-style free exploration, ready to embed in S-mobiili as a web view
+
+## Risks
+
+| Risk                                                   | Mitigation                                                                                                                             |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| AI states wrong numbers                                | Numbers only from tools. Evaluation set rerun after changes                                                                            |
+| Gemini free-tier rate limits during the demo           | Cache the summary, keep chat answers short, have a second API key ready                                                                |
+| Search and function tools cannot be combined           | Separate search call wrapped as a tool (see Phase 0 spike)                                                                             |
+| No merchant names or subscriptions in the data         | Advice is built on categories, MCC subcategories, balances, and timing, which the data supports well. Be upfront about it in the pitch |
+| Benchmark categories do not match Statistics Finland's | Compare only categories that map cleanly. Peer benchmark covers the rest                                                               |
+| Merge conflicts                                        | Scaffold first, small PRs, claim tasks before starting, shared-file rules in AGENTS.md                                                 |
+| Savings estimates look invented                        | Every action shows the inputs behind its estimate                                                                                      |
