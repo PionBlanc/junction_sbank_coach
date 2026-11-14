@@ -1,7 +1,11 @@
 import type { DuckDBConnection } from '@duckdb/node-api';
 import type { DeckCard } from '@coach/shared';
 import { getPeerTotalMedian } from '../../db/peers.ts';
-import { getBasketTotals, getCategoryTotals } from '../../db/spending.ts';
+import {
+  getBasketTotals,
+  getCategoryTotals,
+  getIncomeAndSpendingByMonth,
+} from '../../db/spending.ts';
 import { LAST_MONTH, MONTHS_IN_YEAR, YEAR_FROM_MONTH, addMonths, round2 } from '../helpers.ts';
 import { getPeerComparison } from '../peers.ts';
 import { getSafeToSpend } from '../safe-to-spend.ts';
@@ -9,6 +13,7 @@ import { getSpendingSummary } from '../spending-summary.ts';
 import { basketsCard } from './baskets.ts';
 import { biggestChangeCard } from './biggest-change.ts';
 import { biggestGapCard } from './biggest-gap.ts';
+import { incomeVsSpendingCard } from './income-vs-spending.ts';
 import { peerTotalCard } from './peer-total.ts';
 import { safeToSpendCard } from './safe-to-spend.ts';
 import { periodText } from './text.ts';
@@ -20,7 +25,10 @@ const TREND_MONTHS = 6;
 /** Months compared on the biggest-change card, against the same months a year earlier. */
 const CHANGE_MONTHS = 3;
 
-/** Runs every card rule in deck order and drops the ones whose story does not hold. */
+/**
+ * Runs every card rule in deck order and drops the ones whose story does not hold.
+ * Income vs. spending and where the money goes are the key cards: they stay in the first three.
+ */
 export async function getCards(db: DuckDBConnection, customerId: string): Promise<DeckCard[]> {
   const safeToSpend = await getSafeToSpend(db, customerId);
 
@@ -32,6 +40,18 @@ export async function getCards(db: DuckDBConnection, customerId: string): Promis
   const trendMonthly = Array.from({ length: TREND_MONTHS }, (_, i) => {
     const month = addMonths(trendFrom, i);
     return { month, totalEur: trend.monthly.find((m) => m.month === month)?.totalEur ?? 0 };
+  });
+
+  const incomeSpending = await getIncomeAndSpendingByMonth(
+    db,
+    customerId,
+    YEAR_FROM_MONTH,
+    LAST_MONTH,
+  );
+  const yearMonthly = Array.from({ length: MONTHS_IN_YEAR }, (_, i) => {
+    const month = addMonths(YEAR_FROM_MONTH, i);
+    const row = incomeSpending.find((m) => m.month === month);
+    return { month, incomeEur: row?.incomeEur ?? 0, spendingEur: row?.spendingEur ?? 0 };
   });
 
   const yearCategories = await getCategoryTotals(db, customerId, YEAR_FROM_MONTH, LAST_MONTH);
@@ -57,8 +77,9 @@ export async function getCards(db: DuckDBConnection, customerId: string): Promis
 
   const cards = [
     safeToSpendCard(safeToSpend),
-    trendCard(trendMonthly),
+    incomeVsSpendingCard(yearMonthly),
     whereItGoesCard(yearCategories),
+    trendCard(trendMonthly),
     basketsCard(yearBaskets),
     peerTotalCard(youMonthlyEur, peerTotal, peers.ageBand),
     biggestGapCard(peers),

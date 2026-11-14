@@ -93,3 +93,29 @@ export async function getBasketTotals(
   );
   return new Map(rows.map((r) => [String(r.basket), Number(r.total_eur)]));
 }
+
+export type MonthIncomeSpending = { month: string; incomeEur: number; spendingEur: number };
+
+/** Income and spending per month over a month range. Months without any rows are absent. */
+export async function getIncomeAndSpendingByMonth(
+  db: DuckDBConnection,
+  customerId: string,
+  fromMonth: string,
+  toMonth: string,
+): Promise<MonthIncomeSpending[]> {
+  const rows = await queryRows(
+    db,
+    `SELECT month,
+       coalesce(sum(total_eur) FILTER (WHERE basket = 'income'), 0) AS income_eur,
+       coalesce(sum(total_eur) FILTER (WHERE basket IN (${SPENDING_BASKETS_SQL})), 0) AS spending_eur
+     FROM monthly_category
+     WHERE customer_id = $customerId AND month BETWEEN $fromMonth AND $toMonth
+     GROUP BY month ORDER BY month`,
+    { customerId, fromMonth, toMonth },
+  );
+  return rows.map((r) => ({
+    month: String(r.month),
+    incomeEur: Number(r.income_eur),
+    spendingEur: Number(r.spending_eur),
+  }));
+}

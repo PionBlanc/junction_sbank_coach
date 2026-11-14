@@ -6,7 +6,7 @@ type SimpleBarsProps = { bars: { label: string; valueEur: number; highlight: boo
 /** A few bars with their values printed on top. The highlighted bar is the point of the card. */
 export function SimpleBars(props: SimpleBarsProps) {
   return (
-    <div className="h-48">
+    <div className="h-40">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={props.bars} margin={{ top: 24, right: 4, bottom: 0, left: 4 }}>
           <XAxis

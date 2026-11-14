@@ -1,5 +1,5 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
-import { formatPct } from '../../lib/format.ts';
+import { formatEur, formatPct } from '../../lib/format.ts';
 
 type SimpleDonutProps = { slices: { label: string; valueEur: number; sharePct: number }[] };
 
@@ -11,12 +11,12 @@ function sliceStyle(index: number): { fill: string; opacity: number } {
   return { fill: 'var(--color-chart-rest)', opacity: REST_OPACITY[index - 1] ?? 0.2 };
 }
 
-/** A donut with the biggest share in the middle and a short list of the slices under it. */
+/** A donut with the biggest share in the middle and each slice's euros a month under it. */
 export function SimpleDonut(props: SimpleDonutProps) {
   const top = props.slices[0];
   return (
-    <div className="flex flex-col gap-3">
-      <div className="relative h-44">
+    <div className="flex flex-col gap-2">
+      <div className="relative h-32">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -55,7 +55,7 @@ export function SimpleDonut(props: SimpleDonutProps) {
                 style={{ background: style.fill, opacity: style.opacity }}
               />
               <span className="truncate">{slice.label}</span>
-              <span className="ml-auto">{formatPct(slice.sharePct)}</span>
+              <span className="ml-auto">{formatEur(slice.valueEur)}</span>
             </li>
           );
         })}

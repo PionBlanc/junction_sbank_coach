@@ -5,8 +5,10 @@ import { getPeerTotalMedian } from '../../db/peers.ts';
 import { basketsCard } from './baskets.ts';
 import { biggestChangeCard } from './biggest-change.ts';
 import { biggestGapCard } from './biggest-gap.ts';
+import { incomeVsSpendingCard } from './income-vs-spending.ts';
 import { peerTotalCard } from './peer-total.ts';
 import { safeToSpendCard } from './safe-to-spend.ts';
+import { periodText } from './text.ts';
 import { trendCard } from './trend.ts';
 import { whereItGoesCard } from './where-it-goes.ts';
 
@@ -33,6 +35,37 @@ describe('safeToSpendCard', () => {
   it('says plainly when bills are larger than the balance', () => {
     const card = safeToSpendCard({ ...data, availableEur: -120, perDayEur: 0, safeThisWeekEur: 0 });
     expect(card.sentence).toBe('The bills due before payday are 120 € more than your balance.');
+  });
+});
+
+describe('incomeVsSpendingCard', () => {
+  it('counts the months where spending was larger than income', () => {
+    const card = incomeVsSpendingCard([
+      { month: '2026-07', incomeEur: 2000, spendingEur: 2500 },
+      { month: '2026-08', incomeEur: 2000, spendingEur: 1800 },
+      { month: '2026-09', incomeEur: 2000, spendingEur: 2100 },
+    ]);
+    expect(card?.sentence).toBe('You spent more than you earned in 2 of the last 3 months.');
+    expect(card?.chart).toMatchObject({ type: 'incomeVsSpending' });
+  });
+
+  it('says so when income covered every month', () => {
+    const card = incomeVsSpendingCard([
+      { month: '2026-08', incomeEur: 2000, spendingEur: 1900 },
+      { month: '2026-09', incomeEur: 2000, spendingEur: 1500 },
+    ]);
+    expect(card?.sentence).toBe('Your income covered your spending in all of the last 2 months.');
+  });
+
+  it('has nothing to say without data', () => {
+    expect(incomeVsSpendingCard([])).toBeNull();
+  });
+});
+
+describe('periodText', () => {
+  it('names both years when the period crosses a new year', () => {
+    expect(periodText('2026-07', '2026-09')).toBe('Jul–Sep 2026');
+    expect(periodText('2025-10', '2026-09')).toBe('Oct 2025–Sep 2026');
   });
 });
 

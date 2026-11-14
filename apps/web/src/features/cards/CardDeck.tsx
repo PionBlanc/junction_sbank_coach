@@ -138,7 +138,7 @@ export function CardDeck() {
         onPointerCancel={onPointerEnd}
       >
         <div
-          className="flex items-start"
+          className="flex"
           style={{
             transform: `translateX(calc(${-index * 100}% + ${dragX}px))`,
             transition: dragging ? 'none' : 'transform 250ms ease-out',
@@ -147,7 +147,7 @@ export function CardDeck() {
           {slides.map((slide, i) => (
             <div
               key={slide.key}
-              className="grid w-full shrink-0 px-1"
+              className="grid h-120 w-full shrink-0 overflow-y-auto px-1"
               aria-hidden={i !== index}
               inert={i !== index}
             >

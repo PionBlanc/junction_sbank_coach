@@ -57,6 +57,8 @@ First version: 6–8 cards. Each is one deterministic rule on the server. Ordere
 | 8   | You vs. the average Finn   | 2 bars: you, average Finn         | "You spend 20% more on food than the average Finn."               | **Blocked:** needs the Statistics Finland benchmark JSON (PLAN.md Phase 2, not built) |
 | 9   | Mortgage / housing         | 2 bars or one number              | "Your housing costs are 44% of your income."                      | Housing share: ready. **Mortgage-specific cards: see open questions**                 |
 
+Added after the first build: an **income and spending** card (income and spending bars for each of the last 12 months, "You spent more than you earned in 9 of the last 12 months."). Income and spending and where the money goes (now with euros per category) are the key cards and always sit in the first three. All cards have the same fixed height; the action list scrolls inside its card.
+
 Deck order: start with something calm and useful (safe to spend, or the trend), put comparisons in the middle, end with a card that leads to action ("Ways to free up money", which can be the existing action list in card form). Max about 8 cards per user.
 
 ## How it works

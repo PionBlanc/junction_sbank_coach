@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { categoryIdSchema } from './common.ts';
+import { categoryIdSchema, monthSchema } from './common.ts';
 
 /** The one simple chart on a card. Values are printed on the marks, so no axes or legend. */
 export const cardChartSchema = z.discriminatedUnion('type', [
@@ -20,6 +20,13 @@ export const cardChartSchema = z.discriminatedUnion('type', [
     ),
   }),
   z.object({ type: z.literal('stat'), valueEur: z.number(), caption: z.string() }),
+  z.object({
+    type: z.literal('incomeVsSpending'),
+    /** Oldest month first. */
+    months: z.array(
+      z.object({ month: monthSchema, incomeEur: z.number(), spendingEur: z.number() }),
+    ),
+  }),
 ]);
 export type CardChart = z.infer<typeof cardChartSchema>;
 

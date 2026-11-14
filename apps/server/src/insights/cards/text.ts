@@ -36,9 +36,12 @@ export function shortMonthText(month: string): string {
   return SHORT_MONTHS[Number(month.slice(5, 7)) - 1] ?? month;
 }
 
-/** ('2026-07', '2026-09') → "Jul–Sep 2026". */
+/** ('2026-07', '2026-09') → "Jul–Sep 2026", ('2025-10', '2026-09') → "Oct 2025–Sep 2026". */
 export function periodText(fromMonth: string, toMonth: string): string {
-  return `${shortMonthText(fromMonth)}–${shortMonthText(toMonth)} ${toMonth.slice(0, 4)}`;
+  const fromYear = fromMonth.slice(0, 4);
+  const toYear = toMonth.slice(0, 4);
+  const from = shortMonthText(fromMonth) + (fromYear === toYear ? '' : ` ${fromYear}`);
+  return `${from}–${shortMonthText(toMonth)} ${toYear}`;
 }
 
 /** "2026-09-30" → "30 September". */
