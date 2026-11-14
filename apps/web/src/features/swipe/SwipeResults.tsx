@@ -1,6 +1,5 @@
 import type { Action } from '@coach/shared';
 import { useState } from 'react';
-import { Card } from '../../components/Card.tsx';
 import { useCoachChat } from '../../lib/chat-context.ts';
 import { formatEur } from '../../lib/format.ts';
 import { useSwipes } from '../../lib/swipe-context.ts';
@@ -25,32 +24,42 @@ export function SwipeResults(props: SwipeResultsProps) {
   const monthlyEur = matches.reduce((sum, a) => sum + a.savingPerMonthEur, 0);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {/* The headline the swipe total was counting up to. */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 rounded-lg bg-ink p-6 text-card">
         {matches.length > 0 ? (
           <>
+<<<<<<< Updated upstream
             <p className="text-title font-semibold text-ink">
               You could save up to <span className="text-positive">{formatEur(monthlyEur)}</span> a
               month
+=======
+            <p className="text-small font-semibold text-card/75">You could free up</p>
+            <p className="flex flex-wrap items-baseline gap-x-2">
+              <span className="font-display text-poster font-extrabold text-lime font-stretch-75%">
+                +{formatEur(monthlyEur)}
+              </span>
+              <span className="text-body font-semibold">a month</span>
+>>>>>>> Stashed changes
             </p>
           </>
         ) : (
-          <p className="text-title font-semibold text-ink">No saving ideas picked this time</p>
+          <p className="font-display text-headline font-bold">No saving ideas picked this time</p>
         )}
-        <p className="text-small text-muted">
+        <p className="text-small text-card/75">
           You picked {matches.length} of {props.actions.length} saving ideas.
         </p>
       </div>
 
       {matches.length > 0 && (
-        <Card title="Your top monthly saving opportunities">
-          <div className="flex flex-col divide-y divide-line">
+        <section className="flex flex-col gap-4">
+          <h2 className="font-display text-title font-bold">Your picks, biggest first</h2>
+          <div className="flex flex-col divide-y divide-line border-y border-line">
             {matches.map((action) => (
-              <p key={action.id} className="flex gap-4 py-2 text-small first:pt-0">
+              <p key={action.id} className="flex items-baseline gap-4 py-3 text-small">
                 <span aria-hidden>{action.emoji}</span>
                 <span className="flex-1">{action.title}</span>
-                <span className="font-semibold whitespace-nowrap text-positive">
+                <span className="font-semibold whitespace-nowrap">
                   ~{formatEur(action.savingPerMonthEur)}/month
                 </span>
               </p>
@@ -58,34 +67,19 @@ export function SwipeResults(props: SwipeResultsProps) {
           </div>
           <button
             type="button"
-            className="flex h-11 items-center justify-center gap-2 rounded-md bg-brand text-small font-semibold text-card disabled:opacity-40"
+            className="h-14 rounded-full bg-ink px-4 text-body font-semibold text-lime disabled:opacity-40"
             disabled={busy}
             onClick={() =>
               ask('Help me turn the saving ideas I picked into a plan I can start this week.')
             }
           >
-            <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>
-              <path d="M10 2c-4.42 0-8 2.91-8 6.5 0 1.88.98 3.57 2.55 4.76-.12 1.06-.53 2.1-1.24 2.98a.5.5 0 0 0 .45.81c1.7-.17 3.1-.78 4.12-1.6.68.14 1.39.22 2.12.22 4.42 0 8-2.91 8-6.5S14.42 2 10 2Z" />
-            </svg>
             Make a plan with my coach
           </button>
           <button
             type="button"
-            className="flex h-11 items-center justify-center gap-2 rounded-md border border-line text-small font-semibold"
+            className="h-14 rounded-full border border-line bg-card px-4 text-body font-semibold"
             onClick={() => setShowWhatIf(true)}
           >
-            <svg
-              viewBox="0 0 20 20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="size-5"
-              aria-hidden
-            >
-              <path d="M3 15l5-5 3 3 6-6M13 7h4v4" />
-            </svg>
             See how {formatEur(monthlyEur)} a month can grow
           </button>
           {showWhatIf && (
@@ -94,18 +88,26 @@ export function SwipeResults(props: SwipeResultsProps) {
               onClose={() => setShowWhatIf(false)}
             />
           )}
-        </Card>
+        </section>
       )}
 
       {/* Collapsed: the picked ideas are the point. The rest is there if the user wants to look. */}
       {swipedNo.length > 0 && (
-        <details className="rounded-md border border-line bg-card px-4">
-          <summary className="flex min-h-11 cursor-pointer items-center text-small text-brand">
+        <details className="group border-y border-line">
+          <summary className="flex min-h-11 cursor-pointer items-center justify-between text-small font-semibold">
             Ideas you skipped ({swipedNo.length})
+            <svg
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="size-5 group-open:rotate-180"
+              aria-hidden
+            >
+              <path d="M4.3 7.3a1 1 0 0 1 1.4 0L10 11.6l4.3-4.3a1 1 0 1 1 1.4 1.4l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 0 1 0-1.4Z" />
+            </svg>
           </summary>
           <div className="flex flex-col divide-y divide-line">
             {swipedNo.map((action) => (
-              <p key={action.id} className="flex gap-4 py-2 text-small first:pt-0">
+              <p key={action.id} className="flex gap-4 py-3 text-small first:pt-0">
                 <span aria-hidden>{action.emoji}</span>
                 <span className="flex-1">{action.title}</span>
               </p>
@@ -119,7 +121,7 @@ export function SwipeResults(props: SwipeResultsProps) {
 
       <button
         type="button"
-        className="flex h-11 items-center justify-center gap-2 rounded-md text-small text-muted"
+        className="flex h-11 items-center justify-center gap-2 text-small font-semibold text-muted"
         onClick={reset}
       >
         <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden>

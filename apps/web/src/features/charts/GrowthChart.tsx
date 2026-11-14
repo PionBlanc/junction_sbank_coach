@@ -47,7 +47,7 @@ export function GrowthChart(props: GrowthChartProps) {
             Invested
           </span>
           {!props.chartOnly && (
-            <span className="text-title font-semibold text-ink">
+            <span className="font-display text-title font-extrabold text-ink">
               ~{formatEur(last.investedEur)}
             </span>
           )}
@@ -58,7 +58,9 @@ export function GrowthChart(props: GrowthChartProps) {
             Saved
           </span>
           {!props.chartOnly && (
-            <span className="text-title font-semibold text-ink">{formatEur(last.savedEur)}</span>
+            <span className="font-display text-title font-extrabold text-ink">
+              {formatEur(last.savedEur)}
+            </span>
           )}
         </p>
       </div>

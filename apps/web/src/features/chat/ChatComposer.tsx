@@ -35,8 +35,8 @@ export function ChatComposer(props: ChatComposerProps) {
           aria-label="Ask your financial advisor about your money"
           className={
             props.docked
-              ? 'h-14 w-full bg-card pr-8 pl-10 text-body placeholder:font-semibold placeholder:text-ink focus-visible:outline-none'
-              : 'h-11 w-full rounded-md border border-line bg-card px-4 text-body placeholder:text-subtle focus-visible:-outline-offset-1'
+              ? 'h-14 w-full bg-transparent pr-8 pl-10 text-body text-card placeholder:font-semibold placeholder:text-card focus-visible:outline-none'
+              : 'h-12 w-full rounded-full border border-line bg-card px-5 text-body placeholder:text-subtle focus-visible:-outline-offset-1'
           }
           placeholder={props.docked ? 'Chat with your financial advisor' : 'Ask about your money…'}
           value={input}
@@ -45,7 +45,7 @@ export function ChatComposer(props: ChatComposerProps) {
         />
         {/* Points up: the chat slides open from the bottom. */}
         {props.docked && !showSend && (
-          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center text-brand">
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center text-lime">
             <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>
               <path d="M15.7 12.7a1 1 0 0 1-1.4 0L10 8.4l-4.3 4.3a1 1 0 0 1-1.4-1.4l5-5a1 1 0 0 1 1.4 0l5 5a1 1 0 0 1 0 1.4Z" />
             </svg>
@@ -56,7 +56,7 @@ export function ChatComposer(props: ChatComposerProps) {
         <button
           type="submit"
           aria-label="Send"
-          className="flex size-11 shrink-0 items-center justify-center rounded-md bg-brand text-card transition-opacity disabled:opacity-40"
+          className="flex size-12 shrink-0 items-center justify-center rounded-full bg-ink text-lime transition-opacity disabled:opacity-40"
           disabled={!canSend}
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>

@@ -156,9 +156,11 @@ export function SwipeDeck() {
 
   if (actions.isPending) {
     return (
-      <Card>
-        <div className="h-120 animate-pulse rounded-sm bg-fill" aria-busy aria-label="Loading" />
-      </Card>
+      <div
+        className="min-h-104 flex-1 animate-pulse rounded-lg bg-fill"
+        aria-busy
+        aria-label="Loading"
+      />
     );
   }
   if (actions.isError) {
@@ -192,39 +194,49 @@ export function SwipeDeck() {
   const stamp = Math.min(1, Math.abs(dragX) / STAMP_FULL_PX);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-1 flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <p className="flex items-baseline justify-between gap-4">
-          <span className="text-title font-semibold text-ink">
-            {swipes.length} / {all.length}
-          </span>
-          <span
-            ref={totalRef}
-            className="inline-block text-title font-semibold text-positive"
-            aria-label={`${formatEur(freedEur)} a month freed up`}
-          >
-            +{formatEur(Math.max(0, freedEur - inFlightEur))}
-          </span>
-        </p>
+        <div className="flex items-baseline justify-between gap-4">
+          <p className="flex items-baseline gap-2">
+            <span
+              ref={totalRef}
+              className="inline-block font-display text-display font-extrabold text-positive font-stretch-75%"
+              aria-label={`${formatEur(freedEur)} a month freed up`}
+            >
+              +{formatEur(Math.max(0, freedEur - inFlightEur))}
+            </span>
+            <span className="text-small text-muted">a month freed up</span>
+          </p>
+          <p className="text-small font-semibold text-muted">
+            {swipes.length} of {all.length}
+          </p>
+        </div>
+        {/* One mark per idea: green for the ones picked, grey for the ones skipped. */}
         <div
-          className="h-1.5 overflow-hidden rounded-sm bg-fill"
+          className="flex gap-1"
           role="progressbar"
           aria-label="Ideas reviewed"
           aria-valuemin={0}
           aria-valuemax={all.length}
           aria-valuenow={swipes.length}
         >
-          <div
-            className="h-full bg-brand transition-[width]"
-            style={{ width: `${(swipes.length / all.length) * 100}%` }}
-          />
+          {all.map((action, index) => {
+            const done = swipes[index];
+            const colour = !done ? 'bg-fill' : done.liked ? 'bg-brand' : 'bg-subtle';
+            return <span key={action.id} className={`h-1.5 flex-1 rounded-full ${colour}`} />;
+          })}
         </div>
       </div>
 
-      <div ref={deckRef} className="relative h-120">
+      <div ref={deckRef} className="relative min-h-104 flex-1">
         {next && (
           <div key={next.id} className="absolute inset-0 scale-95 transition-transform" inert>
-            <OpportunityCard action={next} likeOpacity={0} passOpacity={0} />
+            <OpportunityCard
+              action={next}
+              index={all.indexOf(next)}
+              likeOpacity={0}
+              passOpacity={0}
+            />
           </div>
         )}
         <div
@@ -241,22 +253,23 @@ export function SwipeDeck() {
         >
           <OpportunityCard
             action={top}
+            index={all.indexOf(top)}
             likeOpacity={leaving === 'right' ? 1 : dragX > 0 ? stamp : 0}
             passOpacity={leaving === 'left' ? 1 : dragX < 0 ? stamp : 0}
           />
         </div>
-        {!introSeen && <SwipeIntro onStart={() => setIntroSeen(true)} />}
+        {!introSeen && <SwipeIntro count={all.length} onStart={() => setIntroSeen(true)} />}
         {match && (
           <div
-            className="pointer-events-none absolute inset-x-4 top-4 flex items-center gap-4 rounded-md bg-brand p-4 text-card"
+            className="pointer-events-none absolute inset-x-4 top-1/2 flex -translate-y-1/2 -rotate-2 items-center gap-4 rounded-md border-2 border-ink bg-card p-4 text-ink"
             role="status"
           >
             <span className="text-display" aria-hidden>
               {match.emoji}
             </span>
             <p className="flex flex-col">
-              <span className="text-title font-semibold">It’s a match!</span>
-              <span className="text-small">
+              <span className="font-display text-title font-extrabold">It’s a match!</span>
+              <span className="text-small font-semibold text-positive">
                 +{formatEur(match.savingPerMonthEur)} a month freed up
               </span>
             </p>
@@ -264,11 +277,12 @@ export function SwipeDeck() {
         )}
       </div>
 
-      <div className="flex items-center justify-center gap-4">
+      {/* Named buttons under the thumb, for those who would rather tap than swipe. */}
+      <div className="flex items-center gap-2">
         <button
           type="button"
           aria-label="Take back the last swipe"
-          className="flex size-11 items-center justify-center rounded-full border border-line bg-card text-muted disabled:opacity-40"
+          className="flex size-14 shrink-0 items-center justify-center rounded-full border border-line bg-card text-ink disabled:opacity-40"
           disabled={swipes.length === 0}
           onClick={undo}
         >
@@ -278,26 +292,18 @@ export function SwipeDeck() {
         </button>
         <button
           type="button"
-          aria-label="No thanks"
-          className="flex size-14 items-center justify-center rounded-full border border-line bg-card text-muted"
+          className="h-14 flex-1 rounded-full border border-line bg-card text-body font-semibold text-ink"
           onClick={() => decide(false)}
         >
-          <svg viewBox="0 0 20 20" fill="currentColor" className="size-7" aria-hidden>
-            <path d="M5.3 5.3a1 1 0 0 1 1.4 0L10 8.6l3.3-3.3a1 1 0 1 1 1.4 1.4L11.4 10l3.3 3.3a1 1 0 0 1-1.4 1.4L10 11.4l-3.3 3.3a1 1 0 0 1-1.4-1.4L8.6 10 5.3 6.7a1 1 0 0 1 0-1.4Z" />
-          </svg>
+          No thanks
         </button>
         <button
           type="button"
-          aria-label="Let's do it"
-          className="flex size-14 items-center justify-center rounded-full bg-brand text-card"
+          className="h-14 flex-1 rounded-full bg-ink text-body font-semibold text-lime"
           onClick={() => decide(true)}
         >
-          <svg viewBox="0 0 24 24" fill="currentColor" className="size-7" aria-hidden>
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
+          Let&apos;s do it
         </button>
-        {/* Keeps the two main buttons centred, opposite the undo button. */}
-        <span className="size-11" />
       </div>
     </div>
   );

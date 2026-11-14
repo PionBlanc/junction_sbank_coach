@@ -9,7 +9,9 @@ export function SafeToSpendCard(props: SafeToSpendCardProps) {
   const { data } = props;
   return (
     <Card title="Safe to spend this week">
-      <p className="text-display font-semibold">{formatEur(data.safeThisWeekEur)}</p>
+      <p className="font-display text-poster font-extrabold font-stretch-75%">
+        {formatEur(data.safeThisWeekEur)}
+      </p>
       <p className="text-small text-muted">
         {formatEur(data.perDayEur)} a day · payday in {data.daysToPayday} days (
         {formatDay(data.nextPaydayDate)})

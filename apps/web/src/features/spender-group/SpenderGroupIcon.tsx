@@ -1,6 +1,6 @@
 import type { SpenderGroupId } from '@coach/shared';
 
-/** Line and solid shapes on a 24 × 24 grid, drawn in white on the brand colour. */
+/** Line and solid shapes on a 24 × 24 grid, drawn in lime on ink. */
 const ICONS: Record<SpenderGroupId, { stroke: string[]; fill: string[] }> = {
   foodie: {
     stroke: ['M7.5 4v5.5a2 2 0 0 0 4 0V4', 'M9.5 4v16', 'M16.5 20V4c-1.8 1.2-2.5 3.8-2.5 7.5h2.5'],
@@ -48,20 +48,20 @@ export function SpenderGroupIcon(props: SpenderGroupIconProps) {
   const icon = ICONS[props.groupId];
   const size = props.size === 'lg' ? 'size-16' : props.size === 'sm' ? 'size-9' : 'size-11';
   return (
-    <span aria-hidden className={`flex shrink-0 rounded-lg bg-brand ${size}`}>
+    <span aria-hidden className={`flex shrink-0 rounded-full bg-ink ${size}`}>
       <svg viewBox="0 0 24 24" className="size-full">
         {icon.stroke.map((d) => (
           <path
             key={d}
             d={d}
-            className="fill-none stroke-card"
+            className="fill-none stroke-lime"
             strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
         ))}
         {icon.fill.map((d) => (
-          <path key={d} d={d} className="fill-card" />
+          <path key={d} d={d} className="fill-lime" />
         ))}
       </svg>
     </span>

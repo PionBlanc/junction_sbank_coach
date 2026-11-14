@@ -69,8 +69,8 @@ export function Chat() {
       <div
         className={
           open
-            ? 'fixed inset-x-0 bottom-0 z-40 mx-auto flex h-[85dvh] max-w-[390px] flex-col rounded-t-lg bg-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl'
-            : 'sticky bottom-0 -mx-4 mt-auto -mb-4 rounded-t-lg border-t border-line bg-card px-4 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]'
+            ? 'fixed inset-x-0 bottom-0 z-40 mx-auto flex h-[85dvh] max-w-[390px] flex-col rounded-t-lg bg-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))]'
+            : 'sticky bottom-0 -mx-4 mt-auto -mb-4 rounded-t-lg bg-ink px-5 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]'
         }
       >
         {open && (
@@ -107,7 +107,7 @@ export function Chat() {
                     return (
                       <p
                         key={key}
-                        className="max-w-[80%] self-end rounded-lg bg-fill px-4 py-2 text-small whitespace-pre-wrap"
+                        className="max-w-[80%] self-end rounded-md rounded-br-sm bg-ink px-4 py-2 text-small whitespace-pre-wrap text-card"
                       >
                         {part.text}
                       </p>

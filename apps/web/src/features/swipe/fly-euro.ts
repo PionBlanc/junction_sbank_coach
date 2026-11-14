@@ -3,7 +3,7 @@ const FLY_MS = 650;
 type Point = { x: number; y: number };
 
 /**
- * A green € coin that flies from one point on screen to another, then calls `onLand`.
+ * A lime € coin that flies from one point on screen to another, then calls `onLand`.
  * Drawn straight into the page, so it can cross the deck and the header.
  */
 export function flyEuro(from: Point, to: Point, onLand: () => void) {
@@ -11,7 +11,7 @@ export function flyEuro(from: Point, to: Point, onLand: () => void) {
   coin.textContent = '€';
   coin.setAttribute('aria-hidden', 'true');
   coin.className =
-    'pointer-events-none fixed z-50 flex size-9 items-center justify-center rounded-full bg-positive text-body font-bold text-card shadow-lg';
+    'pointer-events-none fixed z-50 flex size-9 items-center justify-center rounded-full bg-lime font-display text-body font-extrabold text-ink';
   coin.style.left = `${from.x}px`;
   coin.style.top = `${from.y}px`;
   document.body.append(coin);

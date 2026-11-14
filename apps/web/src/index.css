@@ -1,25 +1,53 @@
 @import 'tailwindcss';
 
+/*
+  Fonts: Bricolage Grotesque (display) and Figtree (text), both under the SIL Open Font License 1.1,
+  taken from Google Fonts. Served from here so the demo does not depend on a font CDN.
+*/
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('./fonts/bricolage-grotesque.woff2') format('woff2');
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Figtree';
+  src: url('./fonts/figtree.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+}
+
 /* Theme tokens. Components use these through Tailwind classes, never raw colours. */
 @theme {
-  /* Colour: one brand, neutral greys, and green/red only for money going up or down. */
-  --color-surface: #f6f7f9;
+  /* Type: display for headlines and big amounts, sans for everything else. */
+  --font-sans: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Figtree', ui-sans-serif, system-ui, sans-serif;
+
+  /*
+    Colour: three greens and green-tinted neutrals. Ink (forest) is the text and the dark blocks,
+    lime is "yes" and freed-up money on a dark block, brand is S green: links and money going up
+    on a light background. Red only for money going down.
+  */
+  --color-surface: #f2f5ef;
   --color-card: #ffffff;
-  --color-fill: #eef0f3;
-  --color-line: #e3e6eb;
-  --color-ink: #14181f;
-  --color-muted: #5b6472;
-  --color-subtle: #8a929e;
+  --color-fill: #e4ebe0;
+  --color-line: #d3dccf;
+  --color-ink: #0d3324;
+  --color-muted: #4d5f55;
+  --color-subtle: #7d8b82;
   --color-brand: #00873e;
+  --color-lime: #c3f56e;
+  --color-mint: #d6f0dc;
   --color-positive: #00873e;
   --color-negative: #c2372b;
 
   /* Charts: dark for the point of the chart, greys for the rest. */
-  --color-chart-focus: #1f2a37;
-  --color-chart-rest-1: #8a929e;
-  --color-chart-rest-2: #aeb5bf;
-  --color-chart-rest-3: #cdd2d9;
-  --color-chart-rest-4: #e3e6eb;
+  --color-chart-focus: #0d3324;
+  --color-chart-rest-1: #7d8b82;
+  --color-chart-rest-2: #a5b1a9;
+  --color-chart-rest-3: #c7d0c9;
+  --color-chart-rest-4: #dfe5df;
 
   /* Pie slices by size, biggest first. Checked for colour blindness and for dark text on top. */
   --color-chart-slice-1: #2a78d6;
@@ -45,16 +73,22 @@
   --text-title--line-height: 1.625rem;
   --text-amount: 1.75rem;
   --text-amount--line-height: 2rem;
+  --text-headline: 1.625rem;
+  --text-headline--line-height: 1.875rem;
   --text-display: 2.5rem;
   --text-display--line-height: 2.75rem;
-  /* Fills most of its container: the box it sits in must set container-type: size. */
-  --text-emoji: min(60cqw, 60cqh);
-  --text-emoji--line-height: 1;
+  /* The one number a screen is about: a swipe card's saving, the total at the end. */
+  --text-poster: 4.5rem;
+  --text-poster--line-height: 4rem;
 
-  /* Radii: bars and legend marks, controls and cards, chat bubbles. */
+  /* The emoji on a swipe card's sticker: the box around the sticker must set container-type: size. */
+  --text-sticker: min(55cqh, 25cqw);
+  --text-sticker--line-height: 1;
+
+  /* Radii: bars and legend marks, controls and chat bubbles, cards and sheets. */
   --radius-sm: 2px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-md: 12px;
+  --radius-lg: 24px;
 }
 
 @layer base {
