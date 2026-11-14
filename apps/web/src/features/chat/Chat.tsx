@@ -1,6 +1,8 @@
+import { CHART_TOOLS, drawChartInputSchema } from '@coach/shared';
 import { getToolName, isToolUIPart } from 'ai';
 import { useEffect, useRef } from 'react';
 import { useCoachChat } from '../../lib/chat-context.ts';
+import { ChartSuggestions } from './ChartSuggestions.tsx';
 import { ChatComposer } from './ChatComposer.tsx';
 import { CoachAvatar } from './CoachAvatar.tsx';
 import { CoachGreeting } from './CoachGreeting.tsx';
@@ -18,6 +20,21 @@ export function Chat() {
   const waiting = busy && (lastMessage?.role !== 'assistant' || status === 'submitted');
   const asked = messages.flatMap((m) =>
     m.role === 'user' ? m.parts.flatMap((p) => (p.type === 'text' ? [p.text] : [])) : [],
+  );
+
+  // Tool calls in order, so a drawChart call can find the result it points to.
+  const toolParts = messages.flatMap((message) => message.parts.filter(isToolUIPart));
+  // Offer a chart for each result in the latest answer that was not drawn.
+  const lastToolParts =
+    lastMessage?.role === 'assistant' ? lastMessage.parts.filter(isToolUIPart) : [];
+  const suggestions = CHART_TOOLS.filter(
+    (name) =>
+      lastToolParts.some((p) => getToolName(p) === name && p.state === 'output-available') &&
+      !lastToolParts.some(
+        (p) =>
+          getToolName(p) === 'drawChart' &&
+          drawChartInputSchema.safeParse(p.input).data?.result === name,
+      ),
   );
 
   // Keep the newest message in view inside the chat, without moving the card above it.
@@ -70,13 +87,21 @@ export function Chat() {
                     </div>
                   );
                 }
+                // Data tool results stay hidden. A drawChart call shows the one it points to.
                 if (isToolUIPart(part) && part.state === 'output-available') {
+                  if (getToolName(part) !== 'drawChart') return null;
+                  const parsed = drawChartInputSchema.safeParse(part.input);
+                  if (!parsed.success) return null;
+                  const source = toolParts
+                    .slice(0, toolParts.indexOf(part))
+                    .findLast((p) => getToolName(p) === parsed.data.result);
+                  if (source?.state !== 'output-available') return null;
                   return (
                     <ToolCard
                       key={key}
-                      toolName={getToolName(part)}
-                      input={part.input}
-                      output={part.output}
+                      toolName={getToolName(source)}
+                      input={source.input}
+                      output={source.output}
                     />
                   );
                 }
@@ -84,6 +109,9 @@ export function Chat() {
               }),
             )}
 
+            {!busy && suggestions.length > 0 && (
+              <ChartSuggestions tools={suggestions} onPick={ask} />
+            )}
             {waiting && <TypingIndicator />}
             {!busy && !error && messages.length > 0 && <NextQuestions asked={asked} onAsk={ask} />}
             {error && (

@@ -168,14 +168,29 @@ export function SwipeDeck() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="flex items-baseline justify-between gap-4 text-caption text-muted">
-        <span>
-          {swipes.length + 1} / {all.length}
-        </span>
-        <span className="text-small font-semibold text-positive">
-          +{formatEur(freedEur)}/month freed up
-        </span>
-      </p>
+      <div className="flex flex-col gap-2">
+        <p className="flex items-baseline justify-between gap-4">
+          <span className="text-title font-semibold text-ink">
+            {swipes.length + 1} / {all.length}
+          </span>
+          <span className="text-small font-semibold text-positive">
+            +{formatEur(freedEur)}/month freed up
+          </span>
+        </p>
+        <div
+          className="h-1.5 overflow-hidden rounded-sm bg-fill"
+          role="progressbar"
+          aria-label="Ideas reviewed"
+          aria-valuemin={1}
+          aria-valuemax={all.length}
+          aria-valuenow={swipes.length + 1}
+        >
+          <div
+            className="h-full bg-brand transition-[width]"
+            style={{ width: `${((swipes.length + 1) / all.length) * 100}%` }}
+          />
+        </div>
+      </div>
 
       <div ref={deckRef} className="relative h-120">
         {next && (

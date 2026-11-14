@@ -22,7 +22,6 @@ export function SwipeResults(props: SwipeResultsProps) {
 
   // The one sum the frontend is allowed to do: the selected action points.
   const monthlyEur = matches.reduce((sum, a) => sum + a.savingPerMonthEur, 0);
-  const weeklyEur = matches.reduce((sum, a) => sum + a.savingPerWeekEur, 0);
 
   return (
     <div className="flex flex-col gap-4">
@@ -55,8 +54,7 @@ export function SwipeResults(props: SwipeResultsProps) {
             ))}
           </div>
           <p className="text-small">
-            Together: <span className="font-semibold">{formatEur(monthlyEur)}/month</span>. That is
-            +{formatEur(weeklyEur)} a week on your safe to spend.
+            Together: <span className="font-semibold">{formatEur(monthlyEur)}/month</span>.
           </p>
           <button
             type="button"

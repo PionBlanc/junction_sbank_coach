@@ -15,6 +15,7 @@ import { swipeProfilePrompt } from './prompts/swipe-profile.ts';
 import { SYSTEM_PROMPT } from './prompts/system.ts';
 import { compareToPeersTool } from './tools/compare-to-peers.ts';
 import { getMonthlyBreakdownTool } from './tools/get-monthly-breakdown.ts';
+import { drawChartTool } from './tools/draw-chart.ts';
 import { getSafeToSpendTool } from './tools/get-safe-to-spend.ts';
 import { getSpendingSummaryTool } from './tools/get-spending-summary.ts';
 import { simulateWhatIfTool } from './tools/simulate-what-if.ts';
@@ -47,6 +48,7 @@ export async function streamCoachReply(
       getSafeToSpend: getSafeToSpendTool(db, customerId),
       compareToPeers: compareToPeersTool(db, customerId),
       simulateWhatIf: simulateWhatIfTool(db, customerId),
+      drawChart: drawChartTool(),
     },
     stopWhen: isStepCount(5),
   });
