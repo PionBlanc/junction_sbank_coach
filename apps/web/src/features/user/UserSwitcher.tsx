@@ -18,7 +18,7 @@ export function UserSwitcher() {
       >
         {DEMO_CUSTOMERS.map((customer) => (
           <option key={customer.customerId} value={customer.customerId}>
-            {customer.persona}
+            {customer.persona} ({customer.customerId})
           </option>
         ))}
       </select>
