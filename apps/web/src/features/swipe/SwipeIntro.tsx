@@ -12,8 +12,7 @@ export function SwipeIntro(props: SwipeIntroProps) {
       aria-label="How swiping works"
     >
       <div className="flex w-full flex-col gap-4 rounded-lg bg-card p-4 shadow-xl">
-        <h2 className="text-title font-semibold">Swipe your savings</h2>
-        <p className="text-small text-muted">Ideas picked from your own last 12 months.</p>
+        <h2 className="text-title font-semibold">We have personalized saving ideas for you!</h2>
         <p className="flex items-center gap-4 text-small">
           <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-card">
             <svg viewBox="0 0 24 24" fill="currentColor" className="size-5" aria-hidden>
@@ -21,17 +20,8 @@ export function SwipeIntro(props: SwipeIntroProps) {
             </svg>
           </span>
           <span>
-            <span className="font-semibold">Swipe right</span> if you are down to try it.
-          </span>
-        </p>
-        <p className="flex items-center gap-4 text-small">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-line text-muted">
-            <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>
-              <path d="M5.3 5.3a1 1 0 0 1 1.4 0L10 8.6l3.3-3.3a1 1 0 1 1 1.4 1.4L11.4 10l3.3 3.3a1 1 0 0 1-1.4 1.4L10 11.4l-3.3 3.3a1 1 0 0 1-1.4-1.4L8.6 10 5.3 6.7a1 1 0 0 1 0-1.4Z" />
-            </svg>
-          </span>
-          <span>
-            <span className="font-semibold">Swipe left</span> if it is worth it to you. You keep it.
+            <span className="font-semibold">Swipe right</span> if you are down to trying it, and see
+            how much you can save!
           </span>
         </p>
         <button
@@ -40,7 +30,7 @@ export function SwipeIntro(props: SwipeIntroProps) {
           onClick={props.onStart}
           autoFocus
         >
-          Start swiping
+          Start swiping!
         </button>
       </div>
     </div>

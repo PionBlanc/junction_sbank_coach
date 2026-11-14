@@ -6,7 +6,7 @@ export function UserSwitcher() {
   const { userId, setUserId } = useUser();
   return (
     <header className="flex items-center justify-between gap-4">
-      <h1 className="text-title font-semibold">Coach</h1>
+      <h1 className="text-title font-semibold">Select user</h1>
       <select
         aria-label="Demo customer"
         className="h-11 max-w-[70%] min-w-0 truncate rounded-md text-small text-muted"
