@@ -14,7 +14,7 @@ export function WhatIfDialog(props: WhatIfDialogProps) {
   return (
     <dialog
       ref={ref}
-      aria-label="What this becomes"
+      aria-label="Saved vs. invested"
       className="m-auto w-[min(358px,calc(100vw-2rem))] bg-transparent p-0 backdrop:bg-ink/60"
       onClose={props.onClose}
       // A click on the dimmed backdrop lands on the dialog itself and closes it.

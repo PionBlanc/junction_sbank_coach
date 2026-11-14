@@ -41,10 +41,9 @@ export function WhatIfCard(props: WhatIfCardProps) {
   }
 
   const data = whatIf.data;
-  const tenYears = data.series.at(-1);
   const title = props.categoryId
     ? `What if: ${formatPct(cutPct)} less on ${CATEGORIES[props.categoryId].label.toLowerCase()}`
-    : `What if: ${formatEur(data.monthlyEur)} a month set aside`;
+    : `${formatEur(data.monthlyEur)} a month: saved vs. invested`;
 
   return (
     <Card title={title}>
@@ -64,27 +63,24 @@ export function WhatIfCard(props: WhatIfCardProps) {
           ))}
         </div>
       )}
-      <p>
-        Frees up <span className="text-title font-semibold">{formatEur(data.monthlyEur)}</span> a
-        month
-        {data.baseMonthlyEur !== null && (
-          <span className="text-small text-muted">
-            {' '}
-            (you spend {formatEur(data.baseMonthlyEur)} a month, 12-month average)
-          </span>
-        )}
+      {/* Without a category, the title already names the amount. */}
+      {props.categoryId && (
+        <p>
+          Frees up <span className="text-title font-semibold">{formatEur(data.monthlyEur)}</span> a
+          month
+          {data.baseMonthlyEur !== null && (
+            <span className="text-small text-muted">
+              {' '}
+              (you spend {formatEur(data.baseMonthlyEur)} a month, 12-month average)
+            </span>
+          )}
+        </p>
+      )}
+      <p className="text-small">
+        Money you save grows only by what you add. Invested money also earns returns, and those
+        returns earn more over time.
       </p>
       <GrowthChart series={data.series} />
-      <p className="flex gap-4 text-caption text-muted">
-        <span className="flex items-center gap-2">
-          <span className="size-2 rounded-sm bg-chart-focus" />
-          invested
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="size-2 rounded-sm bg-chart-rest-2" />
-          saved
-        </span>
-      </p>
       <p className="text-small">
         In 5 years: <span className="font-semibold">{formatEur(data.fiveYearSavedEur)}</span> saved
         {data.fiveYearHousingMonths !== null && (
@@ -92,15 +88,11 @@ export function WhatIfCard(props: WhatIfCardProps) {
         )}
         .
       </p>
-      {tenYears && (
-        <p className="text-caption text-muted">
-          Invested for 10 years it could be about {formatEur(tenYears.investedEur)} (between{' '}
-          {formatEur(tenYears.investedLowEur)} and {formatEur(tenYears.investedHighEur)}). This
-          assumes a return of {formatPct(data.returnPct)} a year (range{' '}
-          {formatPct(data.returnLowPct)} to {formatPct(data.returnHighPct)}). An example, not a
-          promise.
-        </p>
-      )}
+      <p className="text-caption text-muted">
+        Invested assumes a return of {formatPct(data.returnPct)} a year. The shaded band is{' '}
+        {formatPct(data.returnLowPct)} to {formatPct(data.returnHighPct)}. An example, not a
+        promise.
+      </p>
     </Card>
   );
 }

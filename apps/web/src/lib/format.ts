@@ -15,6 +15,12 @@ export function formatEur(value: number): string {
   return EUR.format(value);
 }
 
+/** 15000 → "15k €", 2500 → "2,5k €". Short axis ticks for narrow phone charts. */
+export function formatEurShort(value: number): string {
+  if (Math.abs(value) < 1000) return formatEur(value);
+  return `${NUMBER.format(value / 1000)}k €`;
+}
+
 /** 1234.5 → "1 234,50 €". For breakdown rows, where the cents matter. */
 export function formatEurCents(value: number): string {
   return EUR_CENTS.format(value);
