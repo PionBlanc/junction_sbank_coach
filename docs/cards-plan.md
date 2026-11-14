@@ -39,7 +39,7 @@ Rules for every card:
 - **One sentence**, at most about 90 characters. It names the comparison and the direction. Numbers in it come from the server.
 - **Source line** under the sentence: period ("last 12 months") and benchmark ("people your age" or "average Finn"), as AGENTS.md requires.
 - **One or two questions** under the source line, as tappable chips. Short, specific to the card, and answerable by the coach's existing tools.
-- **Only true and relevant cards are shown.** A card rule returns nothing when its story does not hold for this user (no "your taxis" card for someone with no taxi rides).
+- **Only true and relevant cards are shown.** A card rule returns nothing when its story does not hold for this user (no "biggest category vs. peers" card for someone who spends less than peers everywhere). Stories are built on categories: subcategory, merchant, and personal timing patterns are random in this dataset, see [data.md](data.md).
 
 ## Card catalogue
 
@@ -62,7 +62,7 @@ Added after the first build: an **income and spending** card (income and spendin
 Deck order: every card has an importance score from 0 to 1, and the deck is sorted by it (`insights/cards/importance.ts`).
 
 - **Always 1, shown first:** the spending breakdown cards (income and spending, where your money goes, three baskets), and safe to spend when the bills before payday are bigger than the balance.
-- **Scored by difference from a benchmark:** `diff = user / benchmark - 1`, spending more counts double, then `raw / (1 + raw)` so the score stays below 1. Benchmarks: people your age (you vs. people your age, biggest category vs. peers), the median person's weekend and after-payday patterns (weekends, after payday), and the same months a year earlier (biggest change).
+- **Scored by difference from a benchmark:** `diff = user / benchmark - 1`, spending more counts double, then `raw / (1 + raw)` so the score stays below 1. Benchmarks: people your age (you vs. people your age, biggest category vs. peers), the median person's weekend and after-payday patterns (weekends, after payday), and the same months a year earlier (biggest change). Caveat from [data.md](data.md): a user's weekend and after-payday shares are not stable personal traits (year-to-year correlation 0.12 and 0.02), so a high score on those two cards is mostly chance and they should not outrank the category cards.
 - **Fixed:** safe to spend 0.5 when nothing is wrong, millionaire 0.3.
 - Ties keep the catalogue order. The action list is always the last slide.
 

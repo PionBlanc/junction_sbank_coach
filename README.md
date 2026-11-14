@@ -37,7 +37,7 @@ One scrolling mobile page, top to bottom:
 Example action points:
 
 - "You spend 340 €/month on restaurants, 70% more than others your age. Cooking at home twice more a week would save about 90 €/month."
-- "You took 9 taxi rides last month (310 €). Swapping half of them for public transport saves about 120 €/month."
+- "You eat out 9 times a month and the average bill is 38 €. Cooking two of those meals at home saves about 75 €/month."
 - "Your utility bills are in the top quarter for your age group. Here are cheaper electricity contracts." → chat with web search
 - "You spend 25% of your income on travelling. Do you get personal value from it? Two fewer trips a year would save about 300 €/month."
 
@@ -60,13 +60,16 @@ Example chat questions (from the challenge brief):
 
 Candidates for the action-point engine and the chat, chosen to fit what the dataset actually contains. Prioritised in [PLAN.md](PLAN.md).
 
+What the data supports, in one line: per **category**, how much a user spends, how often, and how big a typical purchase is are real personal traits. Which subcategory or merchant a purchase lands in, and personal timing habits, are random in this synthetic data. Details in [docs/data.md](docs/data.md).
+
 - **Safe to spend / safe to save**: income minus upcoming mandatory payments minus a buffer, per week. 69% of the customers in the data dip below zero at some point, so this matters
-- **Overdraft early warning**: "At your current pace you will hit zero on the 24th, six days before payday"
+- **Overdraft early warning**: "At your current pace you will hit zero on the 24th, six days before payday". Salary is late (26th–31st) in about one month in five, and the balance is more often negative before a late salary
 - **Irregular-cost buffer**: use the user's own history of irregular costs to suggest a monthly amount to set aside
-- **Small-purchase annualiser**: "Your 3 € café visits add up to 640 € a year"
+- **Small-purchase annualiser**: "Your restaurant and café visits under 15 € add up to 640 € a year" (per category, not per subcategory)
 - **Idle money**: a balance that has sat unused on the current account for months could earn interest in savings
 - **What-if simulator**: "20% less dining out" over 1, 5, and 10 years, with and without investing the difference
-- **Payday effect**: spending in the first week after salary compared with the last week before it
+- **Payday effect**: spending in the first days after salary compared with the rest of the month. The bump is real but the same for everyone, so frame it as general advice, not as the user's habit
+- **Skipped housing payment**: some users miss a housing payment when the balance is low at the start of the month. A strong distress signal
 - **Deal finder**: web search for cheaper electricity, phone, and insurance offers
 - **Spender persona**: a friendly one-line profile based on spending patterns
 - **Home-buying readiness**: the dataset includes real mortgage application outcomes. Show how far the user's saving pace is from a typical approved application

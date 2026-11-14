@@ -114,6 +114,7 @@ These keep numbers consistent everywhere.
 - **Percentages over the API:** fractions (`0.25`), field names end in `Pct`.
 - **Dates over the API:** ISO strings (`2026-09-30`). Months as `YYYY-MM`.
 - **Categories, subcategories, baskets:** always their ids from `taxonomy.ts`. Labels come from the same file.
+- **Personal claims are built on categories, not subcategories.** Which subcategory (MCC) or merchant a purchase gets is random in this dataset, so "you take a lot of taxis" or "you are a café regular" says nothing about the user. Subcategory totals are fine to show as sums when asked. Payday and weekend patterns are the same for everyone. See "What is real signal and what is noise" in [docs/data.md](docs/data.md).
 - **Spending** means baskets `mandatory_regular`, `mandatory_irregular`, `everyday`. Salary sweeps (`transfer`) and investments are never spending.
 - **Benchmarks** are labelled with their source: "people your age" (peer data) or "average Finn" (Statistics Finland).
 - JSON field names over the API are `camelCase`. Database column names stay `snake_case`. Convert in the query layer.

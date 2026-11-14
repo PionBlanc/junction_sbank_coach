@@ -45,7 +45,7 @@ Tasks:
 
   | Customer    | Persona       | Age | Income | Spending | Story for the demo                                                                     |
   | ----------- | ------------- | --- | ------ | -------- | -------------------------------------------------------------------------------------- |
-  | `CUST00164` | Young diner   | 23  | 2 501  | 3 395    | Restaurants 638 €/month (a quarter of income), 8 taxi rides a year, spends over income |
+  | `CUST00164` | Young diner   | 23  | 2 501  | 3 395    | Restaurants 638 €/month (a quarter of income), spends over income                      |
   | `CUST03802` | Housing-heavy | 41  | 3 198  | 3 683    | Housing 1 419 €/month (44% of income), groceries 845 €, never overdrawn                |
   | `CUST04092` | Tight budget  | 26  | 1 821  | 1 869    | Overdrawn on 62 days in the last year, lowest balance −416 €: safe-to-spend and buffer |
 
@@ -107,10 +107,10 @@ Everything else in Phases 2 and 3 is stretch.
 - [ ] Safe to spend this week: balance now + expected income before next payday − upcoming regular payments (housing, utilities) − irregular buffer, divided by days to payday. Payday and regular payments are detectable from the data
 - [ ] Action-point engine: one function per rule, each returns zero or more actions with id, title, explanation, `savingPerMonthEur`, category, and the inputs behind the estimate. Drop "worth it" categories, rank by saving
 
-Action rules in priority order (all supported by the data):
+Action rules in priority order (all supported by the data). Rules work on categories: subcategory and merchant labels are random in this dataset, so a rule like "taxis compared with public transport" describes chance, not the user (see [docs/data.md](docs/data.md)):
 
 1. Category clearly above peers (above p75 for the age band)
-2. Taxis (subcategory `taxi`) compared with public transport
+2. Frequent purchases or a large typical purchase in a category (count and median purchase size are stable personal traits)
 3. Frequent small purchases in restaurants and cafés, annualised
 4. Utility bills above peers → deal finder in chat
 5. Overdraft risk → safe-to-spend and buffer advice
@@ -167,12 +167,13 @@ Build in this order. Stop when time runs out.
 
 ## Risks
 
-| Risk                                                   | Mitigation                                                                                                                             |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| AI states wrong numbers                                | Numbers only from tools. Evaluation set rerun after changes                                                                            |
-| Gemini free-tier rate limits during the demo           | Cache the summary, keep chat answers short, have a second API key ready                                                                |
-| Search and function tools cannot be combined           | Separate search call wrapped as a tool (see Phase 0 spike)                                                                             |
-| No merchant names or subscriptions in the data         | Advice is built on categories, MCC subcategories, balances, and timing, which the data supports well. Be upfront about it in the pitch |
-| Benchmark categories do not match Statistics Finland's | Compare only categories that map cleanly. Peer benchmark covers the rest                                                               |
-| Merge conflicts                                        | Scaffold first, small commits, pull --rebase before every push, shared-file rules in AGENTS.md                                         |
-| Savings estimates look invented                        | Every action shows the inputs behind its estimate                                                                                      |
+| Risk                                                   | Mitigation                                                                                                                    |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| AI states wrong numbers                                | Numbers only from tools. Evaluation set rerun after changes                                                                   |
+| Gemini free-tier rate limits during the demo           | Cache the summary, keep chat answers short, have a second API key ready                                                       |
+| Search and function tools cannot be combined           | Separate search call wrapped as a tool (see Phase 0 spike)                                                                    |
+| No merchant names or subscriptions in the data         | Advice is built on categories, balances, income, and housing, which the data supports well. Be upfront about it in the pitch  |
+| Subcategory and merchant labels are random             | Show subcategory totals only as sums. No personal claims, personas, or savings rules built on a subcategory. See docs/data.md |
+| Benchmark categories do not match Statistics Finland's | Compare only categories that map cleanly. Peer benchmark covers the rest                                                      |
+| Merge conflicts                                        | Scaffold first, small commits, pull --rebase before every push, shared-file rules in AGENTS.md                                |
+| Savings estimates look invented                        | Every action shows the inputs behind its estimate                                                                             |
