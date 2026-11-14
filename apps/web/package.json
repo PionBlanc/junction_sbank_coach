@@ -9,8 +9,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/react": "^4.0.177",
     "@coach/server": "*",
     "@tanstack/react-query": "^5.107.1",
+    "ai": "^7.0.173",
     "hono": "^4.13.18",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
