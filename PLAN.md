@@ -61,7 +61,7 @@ Tasks:
 - [x] Scaffold `apps/web` (Vite React TS, Tailwind, TanStack Query, Recharts)
 - [x] Scaffold `apps/server` (Hono, `@hono/node-server`, DuckDB connection, `/api/health` route, serves the built web app)
 - [x] Add ESLint at the root and the `lint`, `dev`, and `test` scripts. Update the README commands table
-- [ ] Deploy the skeleton to Railway following [docs/railway-deploy.md](docs/railway-deploy.md). Open the URL on a phone
+- [x] Deploy the skeleton to Railway following [docs/railway-deploy.md](docs/railway-deploy.md). Open the URL on a phone
 - [ ] Optional: GitHub Action that runs `format:check`, `lint`, `typecheck`, and `test` on every push to `main`
 
 Deploy early. After that, every push to `main` redeploys, which is one more reason to keep `main` working.

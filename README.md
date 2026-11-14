@@ -6,6 +6,8 @@ A mobile-first prototype that reads a user's transaction history, shows where th
 
 > Status: skeleton. Data pipeline, server, and web app are scaffolded and run end to end. No features yet. Start with [PLAN.md](PLAN.md). Coding rules for humans and AI agents are in [AGENTS.md](AGENTS.md). Dataset facts are in [docs/data.md](docs/data.md).
 
+**Live demo:** https://money-coach-production-bcb14bb8.up.railway.app (redeploys on every push to `main`; see [docs/railway-deploy.md](docs/railway-deploy.md))
+
 ## The idea
 
 Banking apps stop at statements and transaction lists. Ours answers three questions in plain language:
