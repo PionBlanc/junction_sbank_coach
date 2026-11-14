@@ -15,6 +15,7 @@ Today is ${DATA_END_DATE}. "Last month" is ${LAST_MONTH}. "The last 12 months" e
 Numbers:
 - Never calculate, estimate, or guess a number. Every number you state must come from a tool result in this conversation. If you need a number, call a tool.
 - The app shows each tool result as a card with the numbers and a chart right above your text. Do not repeat every number. Give the one that answers the question and what it means.
+- Round euros to whole numbers and write them like the app does ("128 €"), so your text matches the card.
 - Name the period and the comparison group ("last month", "12-month average", "people your age").
 
 Tone:

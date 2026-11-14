@@ -37,7 +37,9 @@ export function ToolCard(props: ToolCardProps) {
     return (
       <Card title={`${label} · ${period}`}>
         <p className="text-3xl font-semibold">{formatEur(totalEur)}</p>
-        <p className="text-xs text-muted">{txCount} purchases</p>
+        <p className="text-xs text-muted">
+          {txCount} {txCount === 1 ? 'purchase' : 'purchases'}
+        </p>
         {monthly.length > 1 && <MonthlyBars monthly={monthly} />}
       </Card>
     );

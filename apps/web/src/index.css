@@ -9,6 +9,8 @@
   --color-brand: #00873e;
   --color-positive: #1f8a4c;
   --color-negative: #c2372b;
+  --color-line: #e3e6eb;
+  --shadow-dock: 0 -4px 16px rgb(20 24 31 / 0.08);
   --color-basket-regular: #3b5b92;
   --color-basket-irregular: #d39b2a;
   --color-basket-everyday: #2a9d8f;

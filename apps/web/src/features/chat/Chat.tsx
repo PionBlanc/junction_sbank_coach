@@ -1,8 +1,11 @@
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, getToolName, isToolUIPart } from 'ai';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useUser } from '../../lib/user-context.ts';
+import { ChatComposer } from './ChatComposer.tsx';
+import { CoachAvatar } from './CoachAvatar.tsx';
 import { ToolCard } from './ToolCard.tsx';
+import { TypingIndicator } from './TypingIndicator.tsx';
 
 const SUGGESTED_QUESTIONS = [
   'What is safe for me to spend this week?',
@@ -19,120 +22,148 @@ export function Chat() {
   );
   const { messages, sendMessage, status, error } = useChat({ transport });
   const [open, setOpen] = useState(false);
-  const [input, setInput] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
   const busy = status === 'submitted' || status === 'streaming';
+  const lastMessage = messages.at(-1);
+  // Show dots until the coach's reply has something on screen.
+  const waiting = busy && (lastMessage?.role !== 'assistant' || status === 'submitted');
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ block: 'end' });
-  }, [messages, open]);
+    endRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }, [messages, open, waiting]);
 
   function ask(question: string) {
     if (busy || question.trim() === '') return;
     setOpen(true);
-    setInput('');
     void sendMessage({ text: question });
   }
 
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    ask(input);
+  const chips = (
+    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
+      {SUGGESTED_QUESTIONS.map((question) => (
+        <button
+          key={question}
+          type="button"
+          className="h-9 shrink-0 rounded-full border border-line bg-card px-3 text-xs text-ink disabled:opacity-40"
+          disabled={busy}
+          onClick={() => ask(question)}
+        >
+          {question}
+        </button>
+      ))}
+    </div>
+  );
+
+  const composer = <ChatComposer disabled={busy} onSend={ask} onFocus={() => setOpen(true)} />;
+
+  if (!open) {
+    return (
+      <div className="fixed inset-x-0 bottom-0 z-10 mx-auto flex max-w-[390px] flex-col gap-3 rounded-t-2xl bg-card px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-dock">
+        <div className="flex items-center gap-2 text-xs font-semibold text-muted">
+          <CoachAvatar />
+          Ask your coach
+        </div>
+        {chips}
+        {composer}
+      </div>
+    );
   }
 
   return (
-    <div
-      className={
-        open
-          ? 'fixed inset-0 z-10 mx-auto flex max-w-[390px] flex-col bg-surface'
-          : 'fixed inset-x-0 bottom-0 z-10 mx-auto max-w-[390px] bg-card shadow-sm'
-      }
-    >
-      {open && (
-        <>
-          <div className="flex items-center justify-between bg-card px-4 shadow-sm">
-            <h2 className="font-semibold">Coach</h2>
-            <button
-              type="button"
-              className="h-11 text-sm text-brand"
-              onClick={() => setOpen(false)}
-            >
-              Close
-            </button>
-          </div>
-          <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
-            {messages.length === 0 && (
-              <p className="text-sm text-muted">
-                Ask anything about your own money. Every number comes from your transactions.
-              </p>
-            )}
-            {messages.map((message) =>
-              message.parts.map((part, index) => {
-                const key = `${message.id}-${index}`;
-                if (part.type === 'text') {
-                  return (
-                    <p
-                      key={key}
-                      className={`max-w-[85%] rounded-xl px-3 py-2 text-sm whitespace-pre-wrap ${
-                        message.role === 'user'
-                          ? 'self-end bg-brand text-card'
-                          : 'self-start bg-card shadow-sm'
-                      }`}
-                    >
-                      {part.text}
-                    </p>
-                  );
-                }
-                if (isToolUIPart(part) && part.state === 'output-available') {
-                  return (
-                    <ToolCard
-                      key={key}
-                      toolName={getToolName(part)}
-                      input={part.input}
-                      output={part.output}
-                    />
-                  );
-                }
-                return null;
-              }),
-            )}
-            {busy && <p className="text-sm text-muted">Looking at your data…</p>}
-            {error && (
-              <p className="text-sm text-negative">The coach could not answer. Please try again.</p>
-            )}
-            <div ref={endRef} />
-          </div>
-        </>
-      )}
-      <div className="flex flex-col gap-2 bg-card p-3">
-        <div className="flex gap-2 overflow-x-auto">
-          {SUGGESTED_QUESTIONS.map((question) => (
-            <button
-              key={question}
-              type="button"
-              className="h-11 shrink-0 rounded-full bg-surface px-3 text-xs"
-              disabled={busy}
-              onClick={() => ask(question)}
-            >
-              {question}
-            </button>
-          ))}
+    <div className="fixed inset-0 z-10 mx-auto flex max-w-[390px] flex-col bg-surface">
+      <header className="flex items-center gap-3 bg-card px-4 py-2 shadow-sm">
+        <CoachAvatar size="md" />
+        <div className="flex flex-1 flex-col">
+          <h2 className="font-semibold">Your money coach</h2>
+          <p className="text-xs text-muted">Every number comes from your own transactions</p>
         </div>
-        <form className="flex gap-2" onSubmit={handleSubmit}>
-          <input
-            className="h-11 flex-1 rounded-lg bg-surface px-3 text-sm"
-            placeholder="Ask about your money…"
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            onFocus={() => setOpen(true)}
-          />
-          <button
-            type="submit"
-            className="h-11 rounded-lg bg-brand px-4 text-sm font-semibold text-card"
-            disabled={busy}
-          >
-            Send
-          </button>
-        </form>
+        <button
+          type="button"
+          aria-label="Close chat"
+          className="flex size-11 items-center justify-center rounded-full text-muted hover:bg-surface"
+          onClick={() => setOpen(false)}
+        >
+          <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>
+            <path d="M5.3 5.3a1 1 0 0 1 1.4 0L10 8.6l3.3-3.3a1 1 0 1 1 1.4 1.4L11.4 10l3.3 3.3a1 1 0 0 1-1.4 1.4L10 11.4l-3.3 3.3a1 1 0 0 1-1.4-1.4L8.6 10 5.3 6.7a1 1 0 0 1 0-1.4Z" />
+          </svg>
+        </button>
+      </header>
+
+      <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
+        {messages.length === 0 && (
+          <>
+            <div className="flex items-end gap-2">
+              <CoachAvatar />
+              <p className="max-w-[80%] rounded-2xl rounded-bl-md bg-card px-4 py-3 text-sm shadow-sm">
+                Hi! Ask me anything about your money. I look at your own transactions and show you
+                the numbers.
+              </p>
+            </div>
+            <p className="mt-2 text-xs font-semibold tracking-wide text-muted uppercase">
+              Try asking
+            </p>
+            {SUGGESTED_QUESTIONS.map((question) => (
+              <button
+                key={question}
+                type="button"
+                className="min-h-11 rounded-xl border border-line bg-card px-4 py-2 text-left text-sm"
+                onClick={() => ask(question)}
+              >
+                {question}
+              </button>
+            ))}
+          </>
+        )}
+
+        {messages.map((message) =>
+          message.parts.map((part, index) => {
+            const key = `${message.id}-${index}`;
+            if (part.type === 'text' && message.role === 'user') {
+              return (
+                <p
+                  key={key}
+                  className="max-w-[80%] self-end rounded-2xl rounded-br-md bg-brand px-4 py-2 text-sm whitespace-pre-wrap text-card"
+                >
+                  {part.text}
+                </p>
+              );
+            }
+            if (part.type === 'text' && part.text.trim() !== '') {
+              return (
+                <div key={key} className="flex items-end gap-2">
+                  <CoachAvatar />
+                  <p className="max-w-[80%] rounded-2xl rounded-bl-md bg-card px-4 py-3 text-sm whitespace-pre-wrap shadow-sm">
+                    {part.text}
+                  </p>
+                </div>
+              );
+            }
+            if (isToolUIPart(part) && part.state === 'output-available') {
+              return (
+                <ToolCard
+                  key={key}
+                  toolName={getToolName(part)}
+                  input={part.input}
+                  output={part.output}
+                />
+              );
+            }
+            return null;
+          }),
+        )}
+
+        {waiting && <TypingIndicator />}
+        {error && (
+          <p className="rounded-xl bg-card px-4 py-3 text-sm text-negative shadow-sm">
+            The coach could not answer just now. Please try again.
+          </p>
+        )}
+        <div ref={endRef} />
+      </div>
+
+      <div className="flex flex-col gap-3 bg-card px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-dock">
+        {messages.length > 0 && !busy && chips}
+        {composer}
       </div>
     </div>
   );
