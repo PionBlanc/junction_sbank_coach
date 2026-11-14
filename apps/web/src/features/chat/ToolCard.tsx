@@ -4,11 +4,14 @@ import {
   largestPurchasesSchema,
   excelExportSchema,
   balanceHistorySchema,
+  basketTrendSchema,
   categorySplitSchema,
   incomeVsSpendingSchema,
   overviewSchema,
   peerComparisonSchema,
+  purchaseSizesSchema,
   safeToSpendSchema,
+  savingIdeasSchema,
   spenderGroupSchema,
   spendingSummarySchema,
   whatIfQuerySchema,
@@ -16,8 +19,10 @@ import {
 } from '@coach/shared';
 import { Card } from '../../components/Card.tsx';
 import { categorySliceColour } from '../../lib/chart-colours.ts';
-import { formatEur, formatMonth, formatPct, formatShortDay } from '../../lib/format.ts';
+import { formatEur, formatMonth, formatShortDay } from '../../lib/format.ts';
+import { SavingIdeasList } from '../actions/SavingIdeasList.tsx';
 import { BalanceLine } from '../charts/BalanceLine.tsx';
+import { BasketTrendBars } from '../charts/BasketTrendBars.tsx';
 import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
 import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
@@ -44,16 +49,10 @@ export function ToolCard(props: ToolCardProps) {
   if (props.toolName === 'getIncomeVsSpending') {
     const parsed = incomeVsSpendingSchema.safeParse(props.output);
     if (!parsed.success) return unreadable;
-    const { fromMonth, toMonth, months, totalLeftEur, monthsOverspent } = parsed.data;
+    const { fromMonth, toMonth, months } = parsed.data;
     return (
       <Card title={`Income and spending · ${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`}>
         <IncomeSpendingBars months={months} />
-        <p className="text-small">
-          {totalLeftEur >= 0
-            ? `Left over in total: ${formatEur(totalLeftEur)}.`
-            : `In total ${formatEur(-totalLeftEur)} more went out than came in.`}{' '}
-          Spending was larger than income in {monthsOverspent} of {months.length} months.
-        </p>
       </Card>
     );
   }
@@ -61,22 +60,9 @@ export function ToolCard(props: ToolCardProps) {
   if (props.toolName === 'getYearOverYear') {
     const parsed = yearOverYearSchema.safeParse(props.output);
     if (!parsed.success) return unreadable;
-    const { label, months, thisYearTotalEur, lastYearTotalEur, changeEur, changePct } = parsed.data;
-    const first = months[0];
-    const last = months.at(-1);
-    const period =
-      first && last ? ` · ${formatMonth(first.month)} to ${formatMonth(last.month)}` : '';
     return (
-      <Card title={`${label}: this year against last year${period}`}>
-        <YearOverYearBars months={months} />
-        <p className="text-small">
-          This year {formatEur(thisYearTotalEur)}, last year {formatEur(lastYearTotalEur)}:{' '}
-          <span className="font-semibold">
-            {changeEur >= 0 ? `${formatEur(changeEur)} more` : `${formatEur(-changeEur)} less`}
-            {changePct !== null && ` (${formatPct(Math.abs(changePct))})`}
-          </span>
-          .
-        </p>
+      <Card title={`${parsed.data.label} · this year and last year`}>
+        <YearOverYearBars months={parsed.data.months} />
       </Card>
     );
   }
@@ -84,7 +70,7 @@ export function ToolCard(props: ToolCardProps) {
   if (props.toolName === 'getCategorySplit') {
     const parsed = categorySplitSchema.safeParse(props.output);
     if (!parsed.success) return unreadable;
-    const { fromMonth, toMonth, totalEur, slices } = parsed.data;
+    const { fromMonth, toMonth, slices } = parsed.data;
     const period =
       fromMonth === toMonth
         ? formatMonth(fromMonth)
@@ -94,19 +80,14 @@ export function ToolCard(props: ToolCardProps) {
         {slices.length === 0 ? (
           <p className="text-small text-muted">No spending in this period.</p>
         ) : (
-          <>
-            <SimplePie
-              slices={slices.map((s, index) => ({
-                label: s.label,
-                valueEur: s.totalEur,
-                sharePct: s.sharePct,
-                ...categorySliceColour(index, s.categoryId),
-              }))}
-            />
-            <p className="text-small">
-              All spending: <span className="font-semibold">{formatEur(totalEur)}</span>.
-            </p>
-          </>
+          <SimplePie
+            slices={slices.map((s, index) => ({
+              label: s.label,
+              valueEur: s.totalEur,
+              sharePct: s.sharePct,
+              ...categorySliceColour(index, s.categoryId),
+            }))}
+          />
         )}
       </Card>
     );
@@ -167,6 +148,49 @@ export function ToolCard(props: ToolCardProps) {
     );
   }
 
+  if (props.toolName === 'getBasketTrend') {
+    const parsed = basketTrendSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const { fromMonth, toMonth, months } = parsed.data;
+    return (
+      <Card title={`Spending by basket · ${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`}>
+        <BasketTrendBars months={months} />
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'getPurchaseSizes') {
+    const parsed = purchaseSizesSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const rows = parsed.data.categories.map((c) => ({
+      label: c.label,
+      valueEur: c.typicalPurchaseEur,
+    }));
+    return (
+      <Card title="Typical purchase · last 12 months">
+        {rows.length > 0 ? (
+          <RowBars rows={rows} />
+        ) : (
+          <p className="text-small text-muted">No purchases in this period.</p>
+        )}
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'getSavingIdeas') {
+    const parsed = savingIdeasSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    return (
+      <Card title="Ways to free up money">
+        {parsed.data.ideas.length > 0 ? (
+          <SavingIdeasList ideas={parsed.data.ideas} />
+        ) : (
+          <p className="text-small text-muted">Nothing stands out to change.</p>
+        )}
+      </Card>
+    );
+  }
+
   if (props.toolName === 'exportToExcel') {
     const parsed = excelExportSchema.safeParse(props.output);
     return parsed.success ? <ExcelExportCard data={parsed.data} /> : unreadable;
@@ -190,7 +214,7 @@ export function ToolCard(props: ToolCardProps) {
   if (props.toolName === 'getSpendingSummary') {
     const parsed = spendingSummarySchema.safeParse(props.output);
     if (!parsed.success) return unreadable;
-    const { label, fromMonth, toMonth, totalEur, txCount, monthly } = parsed.data;
+    const { label, fromMonth, toMonth, totalEur, monthly } = parsed.data;
     const period =
       fromMonth === toMonth
         ? formatMonth(fromMonth)
@@ -198,9 +222,6 @@ export function ToolCard(props: ToolCardProps) {
     return (
       <Card title={`${label} · ${period}`}>
         <p className="text-amount font-semibold">{formatEur(totalEur)}</p>
-        <p className="text-caption text-muted">
-          {txCount} {txCount === 1 ? 'purchase' : 'purchases'}
-        </p>
         {monthly.length > 1 && <MonthlyBars monthly={monthly} />}
       </Card>
     );

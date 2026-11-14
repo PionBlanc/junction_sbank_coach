@@ -13,6 +13,29 @@ export const GUIDE_QUESTIONS = [
     question: 'What were my biggest purchases in the last 12 months?',
   },
   {
+    label: 'Where does my money go?',
+    question: 'Show me where my money went in the last 12 months.',
+  },
+  {
+    label: 'Income vs spending',
+    question: 'Show me my income and spending month by month for the last 12 months.',
+  },
+  { label: 'Am I spending more than last year?', question: 'Am I spending more than last year?' },
+  { label: 'My balance over time', question: 'Show me how my balance has changed.' },
+  {
+    label: 'Needs and wants over the year',
+    question: 'Show me my spending by basket month by month.',
+  },
+  {
+    label: 'How big are my usual purchases?',
+    question: 'How big is a typical purchase of mine in each category?',
+  },
+  { label: 'Where could I free up money?', question: 'Where could I free up money?' },
+  {
+    label: 'What if I put aside 100 € a month?',
+    question: 'What if I put aside 100 € a month?',
+  },
+  {
     label: 'My data as an Excel file',
     question: 'Can I get my data from the last 12 months as an Excel file?',
   },

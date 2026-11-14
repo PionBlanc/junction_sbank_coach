@@ -6,10 +6,12 @@ type NextQuestionsProps = {
 /** Tap-to-send replies under the coach's latest message. */
 export function NextQuestions(props: NextQuestionsProps) {
   if (props.questions.length === 0) return null;
+  // Longest first, so the wrapped rows narrow towards the bottom.
+  const sorted = [...props.questions].sort((a, b) => b.label.length - a.label.length);
 
   return (
-    <div className="flex flex-wrap gap-2 pl-9">
-      {props.questions.map((q) => (
+    <div className="flex flex-wrap justify-center gap-2">
+      {sorted.map((q) => (
         <button
           key={q.question}
           type="button"

@@ -14,6 +14,9 @@ export const CHART_TOOLS = [
   'getBalanceHistory',
   'getCategoryChanges',
   'getLargestPurchases',
+  'getBasketTrend',
+  'getPurchaseSizes',
+  'getSavingIdeas',
 ] as const;
 
 export type ChartTool = (typeof CHART_TOOLS)[number];

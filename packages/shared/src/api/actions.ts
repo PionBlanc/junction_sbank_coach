@@ -15,3 +15,19 @@ export const actionSchema = z.object({
   inputs: z.record(z.string(), z.number()),
 });
 export type Action = z.infer<typeof actionSchema>;
+
+/** Result of the coach's getSavingIdeas tool: the ideas that free up the most, largest first. */
+export const savingIdeasSchema = z.object({
+  ideas: z.array(
+    z.object({
+      id: z.string(),
+      emoji: z.string(),
+      title: z.string(),
+      categoryId: categoryIdSchema,
+      savingPerMonthEur: z.number(),
+    }),
+  ),
+  /** All ideas the app has for this customer, including those left out. */
+  ideaCount: z.number(),
+});
+export type SavingIdeas = z.infer<typeof savingIdeasSchema>;

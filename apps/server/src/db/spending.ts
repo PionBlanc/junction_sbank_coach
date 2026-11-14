@@ -232,3 +232,56 @@ export async function getLargestPurchases(
     purchaseCount: Number(count?.n ?? 0),
   };
 }
+
+export type MonthBasketTotal = { month: string; basket: string; totalEur: number };
+
+/** Spending per month and basket over a month range. Taxis count towards everyday spending. */
+export async function getBasketTotalsByMonth(
+  db: DuckDBConnection,
+  customerId: string,
+  fromMonth: string,
+  toMonth: string,
+): Promise<MonthBasketTotal[]> {
+  const rows = await queryRows(
+    db,
+    `SELECT month, basket, sum(total_eur) AS total_eur FROM monthly_category
+     WHERE customer_id = $customerId AND month BETWEEN $fromMonth AND $toMonth
+       AND basket IN (${SPENDING_BASKETS_SQL})
+     GROUP BY month, basket ORDER BY month`,
+    { customerId, fromMonth, toMonth },
+  );
+  return rows.map((r) => ({
+    month: String(r.month),
+    basket: String(r.basket),
+    totalEur: Number(r.total_eur),
+  }));
+}
+
+export type CategoryPurchaseStats = {
+  categoryId: string;
+  purchaseCount: number;
+  medianEur: number;
+};
+
+/** Card purchases per category over a month range: how many and the median size. Bills are left out. */
+export async function getPurchaseStats(
+  db: DuckDBConnection,
+  customerId: string,
+  fromMonth: string,
+  toMonth: string,
+): Promise<CategoryPurchaseStats[]> {
+  const rows = await queryRows(
+    db,
+    `SELECT category_id, count(*) AS purchase_count, median(abs_amount_eur) AS median_eur
+     FROM transactions
+     WHERE customer_id = $customerId AND month BETWEEN $fromMonth AND $toMonth
+       AND transaction_type = 'purchase' AND basket IN (${SPENDING_BASKETS_SQL})
+     GROUP BY category_id`,
+    { customerId, fromMonth, toMonth },
+  );
+  return rows.map((r) => ({
+    categoryId: String(r.category_id),
+    purchaseCount: Number(r.purchase_count),
+    medianEur: Number(r.median_eur),
+  }));
+}

@@ -48,7 +48,9 @@ describe('excel export', () => {
       '/api/users/CUST00164/export?fromMonth=2026-09&toMonth=2026-09',
     );
     expect(res.status).toBe(200);
-    expect(res.headers.get('Content-Disposition')).toContain('my-data-2026-09-to-2026-09.xlsx');
+    expect(res.headers.get('Content-Disposition')).toContain(
+      'transactions-income-and-spending-sep-2026.xlsx',
+    );
     // An xlsx file is a zip archive, which starts with "PK".
     const bytes = new Uint8Array(await res.arrayBuffer());
     expect(String.fromCharCode(bytes[0] ?? 0, bytes[1] ?? 0)).toBe('PK');

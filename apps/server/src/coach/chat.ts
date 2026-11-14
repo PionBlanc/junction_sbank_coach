@@ -15,14 +15,17 @@ import { swipeProfilePrompt } from './prompts/swipe-profile.ts';
 import { SYSTEM_PROMPT } from './prompts/system.ts';
 import { compareToPeersTool } from './tools/compare-to-peers.ts';
 import { exportToExcelTool } from './tools/export-to-excel.ts';
+import { getBasketTrendTool } from './tools/get-basket-trend.ts';
 import { getCategoryChangesTool } from './tools/get-category-changes.ts';
 import { getLargestPurchasesTool } from './tools/get-largest-purchases.ts';
 import { getBalanceHistoryTool } from './tools/get-balance-history.ts';
 import { getCategorySplitTool } from './tools/get-category-split.ts';
 import { getIncomeVsSpendingTool } from './tools/get-income-vs-spending.ts';
 import { getMonthlyBreakdownTool } from './tools/get-monthly-breakdown.ts';
+import { getPurchaseSizesTool } from './tools/get-purchase-sizes.ts';
 import { drawChartTool } from './tools/draw-chart.ts';
 import { getSafeToSpendTool } from './tools/get-safe-to-spend.ts';
+import { getSavingIdeasTool } from './tools/get-saving-ideas.ts';
 import { getSpenderGroupTool } from './tools/get-spender-group.ts';
 import { getSpendingSummaryTool } from './tools/get-spending-summary.ts';
 import { getYearOverYearTool } from './tools/get-year-over-year.ts';
@@ -59,6 +62,9 @@ export async function streamCoachReply(
       getBalanceHistory: getBalanceHistoryTool(db, customerId),
       getCategoryChanges: getCategoryChangesTool(db, customerId),
       getLargestPurchases: getLargestPurchasesTool(db, customerId),
+      getBasketTrend: getBasketTrendTool(db, customerId),
+      getPurchaseSizes: getPurchaseSizesTool(db, customerId),
+      getSavingIdeas: getSavingIdeasTool(db, customerId),
       exportToExcel: exportToExcelTool(db, customerId),
       getSpenderGroup: getSpenderGroupTool(db, customerId),
       getSpendingSummary: getSpendingSummaryTool(db, customerId),

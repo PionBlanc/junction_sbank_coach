@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { categoryIdSchema, monthSchema, subcategoryIdSchema } from './common.ts';
+import {
+  categoryIdSchema,
+  monthSchema,
+  spendingBasketSchema,
+  subcategoryIdSchema,
+} from './common.ts';
 
 /** Result of the coach's getSpendingSummary tool. */
 export const spendingSummarySchema = z.object({
@@ -138,3 +143,46 @@ export const largestPurchasesSchema = z.object({
   ),
 });
 export type LargestPurchases = z.infer<typeof largestPurchasesSchema>;
+
+/** Result of the coach's getBasketTrend tool: spending per basket in each of the last 12 months. */
+export const basketTrendSchema = z.object({
+  fromMonth: monthSchema,
+  toMonth: monthSchema,
+  /** Every month in the range, oldest first. Months without spending are 0. */
+  months: z.array(
+    z.object({
+      month: monthSchema,
+      mandatoryRegularEur: z.number(),
+      mandatoryIrregularEur: z.number(),
+      everydayEur: z.number(),
+    }),
+  ),
+  /** Each spending basket over the whole range. */
+  baskets: z.array(
+    z.object({
+      basketId: spendingBasketSchema,
+      label: z.string(),
+      totalEur: z.number(),
+      monthlyAvgEur: z.number(),
+    }),
+  ),
+});
+export type BasketTrend = z.infer<typeof basketTrendSchema>;
+
+/** Result of the coach's getPurchaseSizes tool: how often and how big the purchases in each category are. */
+export const purchaseSizesSchema = z.object({
+  fromMonth: monthSchema,
+  toMonth: monthSchema,
+  /** Categories with purchases, the largest typical purchase first. */
+  categories: z.array(
+    z.object({
+      categoryId: categoryIdSchema,
+      label: z.string(),
+      purchaseCount: z.number(),
+      purchasesPerMonth: z.number(),
+      /** The median purchase. */
+      typicalPurchaseEur: z.number(),
+    }),
+  ),
+});
+export type PurchaseSizes = z.infer<typeof purchaseSizesSchema>;
