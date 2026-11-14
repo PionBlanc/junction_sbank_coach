@@ -59,7 +59,12 @@ First version: 6–8 cards. Each is one deterministic rule on the server. Ordere
 
 Added after the first build: an **income and spending** card (income and spending bars for each of the last 6 months), **after payday** (purchases per day in the week after payday against the rest of the pay period), **weekends** (an average weekend day against an average weekday), and **millionaire** (years to a million euros investing what is left each month, or what the actions free up, at the what-if return rate; hidden when there is nothing to invest). The 6-month trend card was removed. Income and spending and where the money goes (with euros per category) are the key cards and always sit in the first three. All cards have the same fixed height; the action list scrolls inside its card. Cards have no source line, and every card has exactly two questions. The chat text field sits right under the card deck, the conversation opens between the card and the text field (the card stays visible), and the chat has no suggested questions of its own: the questions live only on the cards.
 
-Deck order: start with something calm and useful (safe to spend, or the trend), put comparisons in the middle, end with a card that leads to action ("Ways to free up money", which can be the existing action list in card form). Max about 8 cards per user.
+Deck order: every card has an importance score from 0 to 1, and the deck is sorted by it (`insights/cards/importance.ts`).
+
+- **Always 1, shown first:** the spending breakdown cards (income and spending, where your money goes, three baskets), and safe to spend when the bills before payday are bigger than the balance.
+- **Scored by difference from a benchmark:** `diff = user / benchmark - 1`, spending more counts double, then `raw / (1 + raw)` so the score stays below 1. Benchmarks: people your age (you vs. people your age, biggest category vs. peers), the median person's weekend and after-payday patterns (weekends, after payday), and the same months a year earlier (biggest change).
+- **Fixed:** safe to spend 0.5 when nothing is wrong, millionaire 0.3.
+- Ties keep the catalogue order. The action list is always the last slide.
 
 ## How it works
 

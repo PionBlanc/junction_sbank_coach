@@ -40,6 +40,8 @@ export const deckCardSchema = z.object({
   chart: cardChartSchema,
   /** One sentence saying what the chart shows. */
   sentence: z.string(),
+  /** 0–1, higher comes earlier in the deck. 1 means always shown first. */
+  importance: z.number(),
   /** Two questions the user can tap to start a chat. */
   questions: z.array(z.string()).length(2),
 });

@@ -1,4 +1,5 @@
 import type { DeckCard } from '@coach/shared';
+import { ALWAYS_IMPORTANT } from './importance.ts';
 
 type MonthIncomeSpending = { month: string; incomeEur: number; spendingEur: number };
 
@@ -18,6 +19,7 @@ export function incomeVsSpendingCard(months: MonthIncomeSpending[]): DeckCard | 
 
   return {
     id: 'income-vs-spending',
+    importance: ALWAYS_IMPORTANT,
     topic: 'Income and spending',
     chart: { type: 'incomeVsSpending', months },
     sentence,

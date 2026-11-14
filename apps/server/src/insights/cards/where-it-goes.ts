@@ -1,6 +1,7 @@
 import { CATEGORIES, type CardChart, type DeckCard } from '@coach/shared';
 import { MONTHS_IN_YEAR, isCategoryId, round2 } from '../helpers.ts';
 import { pctText } from './text.ts';
+import { ALWAYS_IMPORTANT } from './importance.ts';
 
 type DonutSlice = Extract<CardChart, { type: 'donut' }>['slices'][number];
 
@@ -37,6 +38,7 @@ export function whereItGoesCard(yearTotals: Map<string, number>): DeckCard | nul
   const label = CATEGORIES[top.categoryId].label;
   return {
     id: 'where-it-goes',
+    importance: ALWAYS_IMPORTANT,
     topic: 'Where your money goes',
     chart: { type: 'donut', slices },
     sentence: `${label} takes the biggest share: ${pctText(top.totalEur / total)} of your spending.`,

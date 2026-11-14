@@ -1,10 +1,11 @@
 import { DuckDBInstance } from '@duckdb/node-api';
 import type { PeerComparison, SafeToSpend } from '@coach/shared';
 import { describe, expect, it } from 'vitest';
-import { getPeerTotalMedian } from '../../db/peers.ts';
+import { getPeerPaydayRatio, getPeerTotalMedian, getPeerWeekendRatio } from '../../db/peers.ts';
 import { basketsCard } from './baskets.ts';
 import { biggestChangeCard } from './biggest-change.ts';
 import { biggestGapCard } from './biggest-gap.ts';
+import { importanceOf, rankCards } from './importance.ts';
 import { incomeVsSpendingCard } from './income-vs-spending.ts';
 import { millionaireCard, yearsToMillion } from './millionaire.ts';
 import { paydayCard } from './payday.ts';
@@ -13,6 +14,31 @@ import { safeToSpendCard } from './safe-to-spend.ts';
 import { periodText } from './text.ts';
 import { weekendCard } from './weekend.ts';
 import { whereItGoesCard } from './where-it-goes.ts';
+
+describe('importanceOf', () => {
+  it('grows with the difference and counts spending more double', () => {
+    expect(importanceOf(0)).toBe(0);
+    // 50% less: raw 0.5. 50% more: raw 1.0.
+    expect(importanceOf(-0.5)).toBe(0.333);
+    expect(importanceOf(0.5)).toBe(0.5);
+    expect(importanceOf(3)).toBeLessThan(1);
+  });
+});
+
+describe('rankCards', () => {
+  it('puts the most important first and keeps catalogue order on ties', () => {
+    const card = (id: string, importance: number) => ({
+      id,
+      importance,
+      topic: id,
+      chart: { type: 'stat' as const, valueEur: 0, caption: '' },
+      sentence: '',
+      questions: ['a', 'b'],
+    });
+    const ranked = rankCards([card('a', 0.2), card('b', 1), card('c', 0.7), card('d', 1)]);
+    expect(ranked.map((c) => c.id)).toEqual(['b', 'd', 'c', 'a']);
+  });
+});
 
 describe('safeToSpendCard', () => {
   const data: SafeToSpend = {
@@ -35,6 +61,7 @@ describe('safeToSpendCard', () => {
   it('says plainly when bills are larger than the balance', () => {
     const card = safeToSpendCard({ ...data, availableEur: -120, perDayEur: 0, safeThisWeekEur: 0 });
     expect(card.sentence).toBe('The bills due before payday are 120 € more than your balance.');
+    expect(card.importance).toBe(1);
   });
 });
 
@@ -82,15 +109,20 @@ describe('periodText', () => {
 describe('weekendCard', () => {
   it('compares an average weekend day with an average weekday', () => {
     // 2026-09-05 and 2026-09-06 are a Saturday and a Sunday.
-    const card = weekendCard([
-      { date: '2026-09-04', totalEur: 40 },
-      { date: '2026-09-05', totalEur: 100 },
-      { date: '2026-09-06', totalEur: 60 },
-      { date: '2026-09-07', totalEur: 60 },
-    ]);
+    const card = weekendCard(
+      [
+        { date: '2026-09-04', totalEur: 40 },
+        { date: '2026-09-05', totalEur: 100 },
+        { date: '2026-09-06', totalEur: 60 },
+        { date: '2026-09-07', totalEur: 60 },
+      ],
+      1.1,
+    );
     expect(card?.sentence).toBe('You spend 60% more on a weekend day.');
     if (card?.chart.type !== 'bars') throw new Error('expected bars');
     expect(card.chart.bars.map((b) => b.valueEur)).toEqual([50, 80]);
+    // Ratio 1.6 against the median person's 1.1: 45% more, counted double.
+    expect(card.importance).toBe(0.476);
   });
 });
 
@@ -100,12 +132,12 @@ describe('paydayCard', () => {
       daysSincePayday: i,
       totalEur: i < 7 ? 30 : 20,
     }));
-    expect(paydayCard(days)?.sentence).toBe('You spend 50% more a day right after payday.');
+    expect(paydayCard(days, 1.15)?.sentence).toBe('You spend 50% more a day right after payday.');
   });
 
   it('calls a small difference even', () => {
     const days = Array.from({ length: 28 }, (_, i) => ({ daysSincePayday: i, totalEur: 20 }));
-    expect(paydayCard(days)?.sentence).toBe('You spend evenly between paydays.');
+    expect(paydayCard(days, 1.15)?.sentence).toBe('You spend evenly between paydays.');
   });
 });
 
@@ -140,6 +172,7 @@ describe('whereItGoesCard', () => {
     ]);
     const card = whereItGoesCard(totals);
     expect(card?.sentence).toBe('Housing takes the biggest share: 50% of your spending.');
+    expect(card?.importance).toBe(1);
     if (card?.chart.type !== 'donut') throw new Error('expected a donut');
     expect(card.chart.slices.map((s) => [s.label, s.valueEur, s.sharePct])).toEqual([
       ['Housing', 500, 0.5],
@@ -164,6 +197,7 @@ describe('basketsCard', () => {
     );
     if (card?.chart.type !== 'bars') throw new Error('expected bars');
     expect(card.chart.bars.map((b) => b.valueEur)).toEqual([600, 100, 300]);
+    expect(card.importance).toBe(1);
   });
 });
 
@@ -262,5 +296,46 @@ describe('getPeerTotalMedian', () => {
       ) t(customer_id, month, category_id, basket, total_eur);
     `);
     expect(await getPeerTotalMedian(db, '18-24', '2026-09', '2026-09', 1)).toBe(400);
+  });
+});
+
+describe('peer ratios', () => {
+  async function fixture() {
+    const instance = await DuckDBInstance.create(':memory:');
+    const db = await instance.connect();
+    await db.run(`
+      CREATE TABLE customers AS SELECT * FROM (VALUES ('c1'), ('c2'), ('c3')) t(customer_id);
+      CREATE TABLE monthly_category AS SELECT * FROM (VALUES
+        ('c3', 'salary_sweep')
+      ) t(customer_id, category_id);
+      CREATE TABLE transactions AS SELECT customer_id, CAST(tx_date AS DATE) AS tx_date,
+        abs_amount_eur, transaction_type, basket, category_id FROM (VALUES
+        ('c1', '2026-09-01', 2000.0, 'salary',   'income',   'salary'),
+        ('c2', '2026-09-01', 2000.0, 'salary',   'income',   'salary'),
+        ('c3', '2026-09-01', 2000.0, 'salary',   'income',   'salary'),
+        ('c1', '2026-09-02',   70.0, 'purchase', 'everyday', 'restaurants'),
+        ('c1', '2026-09-05',  100.0, 'purchase', 'everyday', 'restaurants'),
+        ('c1', '2026-09-07',   50.0, 'purchase', 'everyday', 'restaurants'),
+        ('c1', '2026-09-09',   30.0, 'purchase', 'everyday', 'restaurants'),
+        ('c2', '2026-09-03',  140.0, 'purchase', 'everyday', 'restaurants'),
+        ('c2', '2026-09-06',  300.0, 'purchase', 'everyday', 'restaurants'),
+        ('c2', '2026-09-07',  100.0, 'purchase', 'everyday', 'restaurants'),
+        ('c2', '2026-09-08',   30.0, 'purchase', 'everyday', 'restaurants'),
+        ('c3', '2026-09-05', 9999.0, 'purchase', 'everyday', 'restaurants')
+      ) t(customer_id, tx_date, abs_amount_eur, transaction_type, basket, category_id);
+    `);
+    return db;
+  }
+
+  it('takes the median weekend-to-weekday ratio per day, without salary-sweep customers', async () => {
+    // 2026-09-05 Sat, 09-06 Sun, 09-07 Mon. c1: (100 / 2) / (50 / 1) = 1. c2: (300 / 2) / 100 = 1.5.
+    expect(await getPeerWeekendRatio(await fixture(), '2026-09-05', '2026-09-07')).toBe(1.25);
+  });
+
+  it('takes the median first-week-to-rest ratio per day after payday', async () => {
+    // Payday 09-01. First week 09-01..07 (7 days), rest 09-08..10 (3 days).
+    // c1: (70 + 100 + 50) / 7 against 30 / 3. c2: (140 + 300 + 100) / 7 against 30 / 3.
+    const ratio = await getPeerPaydayRatio(await fixture(), '2026-09-01', '2026-09-10', 7);
+    expect(ratio).toBeCloseTo((220 / 7 / 10 + 540 / 7 / 10) / 2, 6);
   });
 });

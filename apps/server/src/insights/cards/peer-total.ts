@@ -1,5 +1,6 @@
 import type { DeckCard } from '@coach/shared';
 import { pctText } from './text.ts';
+import { importanceOf } from './importance.ts';
 
 /** A difference smaller than this counts as "about the same". */
 const SAME_PCT = 0.05;
@@ -18,6 +19,7 @@ export function peerTotalCard(
 
   return {
     id: 'peer-total',
+    importance: importanceOf(diff),
     topic: 'You vs. people your age',
     chart: {
       type: 'bars',

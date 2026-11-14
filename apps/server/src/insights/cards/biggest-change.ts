@@ -1,6 +1,7 @@
 import { CATEGORIES, type CategoryId, type DeckCard } from '@coach/shared';
 import { isCategoryId, round2 } from '../helpers.ts';
 import { pctText } from './text.ts';
+import { importanceOf } from './importance.ts';
 
 /** Only a clear change makes a card: at least this share... */
 const MIN_CHANGE_PCT = 0.15;
@@ -40,6 +41,7 @@ export function biggestChangeCard(
   const direction = best.afterEur < best.beforeEur ? 'down' : 'up';
   return {
     id: 'biggest-change',
+    importance: importanceOf(best.afterEur / best.beforeEur - 1),
     topic: label,
     chart: {
       type: 'bars',

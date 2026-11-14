@@ -1,5 +1,6 @@
 import { CATEGORIES, type DeckCard, type PeerComparison } from '@coach/shared';
 import { eurText } from './text.ts';
+import { importanceOf } from './importance.ts';
 
 /** Only a clear gap makes a card: at least this much above the peer median... */
 const MIN_GAP_PCT = 0.2;
@@ -21,6 +22,7 @@ export function biggestGapCard(peers: PeerComparison): DeckCard | null {
   const name = category.label.toLowerCase();
   return {
     id: 'biggest-gap',
+    importance: importanceOf(best.youMonthlyAvgEur / best.peerMedianMonthlyEur - 1),
     topic: category.label,
     chart: {
       type: 'bars',

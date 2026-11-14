@@ -1,6 +1,7 @@
 import { SPENDING_BASKETS, type DeckCard, type SpendingBasketId } from '@coach/shared';
 import { MONTHS_IN_YEAR, round2 } from '../helpers.ts';
 import { pctText } from './text.ts';
+import { ALWAYS_IMPORTANT } from './importance.ts';
 
 /** Short bar labels. The full names are in BASKET_LABELS. */
 const SHORT_LABELS: Record<SpendingBasketId, string> = {
@@ -17,6 +18,7 @@ export function basketsCard(yearTotals: Map<string, number>): DeckCard | null {
 
   return {
     id: 'baskets',
+    importance: ALWAYS_IMPORTANT,
     topic: 'Three baskets',
     chart: {
       type: 'bars',

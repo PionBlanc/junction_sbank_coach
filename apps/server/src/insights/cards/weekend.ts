@@ -1,6 +1,7 @@
 import type { DeckCard } from '@coach/shared';
 import { round2 } from '../helpers.ts';
 import { pctText } from './text.ts';
+import { importanceOf } from './importance.ts';
 
 /** A difference smaller than this counts as "about the same". */
 const SAME_PCT = 0.1;
@@ -10,8 +11,14 @@ function isWeekend(date: string): boolean {
   return day === 0 || day === 6;
 }
 
-/** Purchases on an average Saturday or Sunday next to an average weekday. */
-export function weekendCard(days: { date: string; totalEur: number }[]): DeckCard | null {
+/**
+ * Purchases on an average Saturday or Sunday next to an average weekday. Importance compares the
+ * user's weekend-to-weekday ratio with the median person's.
+ */
+export function weekendCard(
+  days: { date: string; totalEur: number }[],
+  peerMedianRatio: number,
+): DeckCard | null {
   const weekend = days.filter((d) => isWeekend(d.date));
   const weekdays = days.filter((d) => !isWeekend(d.date));
   if (weekend.length === 0 || weekdays.length === 0) return null;
@@ -27,6 +34,7 @@ export function weekendCard(days: { date: string; totalEur: number }[]): DeckCar
 
   return {
     id: 'weekend',
+    importance: importanceOf(weekendEur / weekdayEur / peerMedianRatio - 1),
     topic: 'Weekends',
     chart: {
       type: 'bars',

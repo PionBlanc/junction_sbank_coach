@@ -2,6 +2,8 @@ import type { DeckCard } from '@coach/shared';
 import { eurText, pctText } from './text.ts';
 
 const MILLION_EUR = 1_000_000;
+/** A motivating card, not a finding about the user, so it ranks low. */
+const MILLIONAIRE_IMPORTANCE = 0.3;
 /** Beyond this the number stops meaning anything, so no card. */
 const MAX_YEARS = 80;
 
@@ -27,6 +29,7 @@ export function millionaireCard(
 
   return {
     id: 'millionaire',
+    importance: MILLIONAIRE_IMPORTANCE,
     topic: 'Millionaire',
     chart: {
       type: 'years',

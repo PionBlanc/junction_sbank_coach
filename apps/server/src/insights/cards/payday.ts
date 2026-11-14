@@ -1,14 +1,21 @@
 import type { DeckCard } from '@coach/shared';
 import { round2 } from '../helpers.ts';
 import { pctText } from './text.ts';
+import { importanceOf } from './importance.ts';
 
 /** The first days after a salary arrives, payday included. */
-const PAYDAY_WEEK_DAYS = 7;
+export const PAYDAY_WEEK_DAYS = 7;
 /** A difference smaller than this counts as spending evenly. */
 const SAME_PCT = 0.1;
 
-/** Purchases per day in the week after payday next to the rest of the pay period. */
-export function paydayCard(days: { totalEur: number; daysSincePayday: number }[]): DeckCard | null {
+/**
+ * Purchases per day in the week after payday next to the rest of the pay period. Importance
+ * compares the user's first-week-to-rest ratio with the median person's.
+ */
+export function paydayCard(
+  days: { totalEur: number; daysSincePayday: number }[],
+  peerMedianRatio: number,
+): DeckCard | null {
   const firstWeek = days.filter((d) => d.daysSincePayday < PAYDAY_WEEK_DAYS);
   const rest = days.filter((d) => d.daysSincePayday >= PAYDAY_WEEK_DAYS);
   if (firstWeek.length === 0 || rest.length === 0) return null;
@@ -24,6 +31,7 @@ export function paydayCard(days: { totalEur: number; daysSincePayday: number }[]
 
   return {
     id: 'payday',
+    importance: importanceOf(firstWeekEur / restEur / peerMedianRatio - 1),
     topic: 'After payday',
     chart: {
       type: 'bars',
