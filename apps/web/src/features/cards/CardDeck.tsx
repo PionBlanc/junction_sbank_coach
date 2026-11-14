@@ -22,6 +22,8 @@ type Drag = {
   startTime: number;
   /** True once the move is a sideways swipe. Kept here, not in state, so fast events see it. */
   swiping: boolean;
+  /** Last sideways distance seen while moving. A cancelled touch reports no usable position. */
+  dx: number;
 };
 
 /** The home screen: insight cards the user swipes through, ending with the ways to free up money. */
@@ -59,6 +61,7 @@ export function CardDeck() {
       startY: event.clientY,
       startTime: event.timeStamp,
       swiping: false,
+      dx: 0,
     };
   }
 
@@ -78,6 +81,7 @@ export function CardDeck() {
       current.swiping = true;
       setDragging(true);
     }
+    current.dx = dx;
     const atEdge = (index === 0 && dx > 0) || (index === slideCount - 1 && dx < 0);
     setDragX(atEdge ? dx / 3 : dx);
   }
@@ -86,7 +90,8 @@ export function CardDeck() {
     const current = drag.current;
     drag.current = null;
     if (!current?.swiping) return;
-    const dx = event.clientX - current.startX;
+    // Not event.clientX: on pointercancel it is 0, which read as a long swipe to the next card.
+    const dx = current.dx;
     const width = viewportRef.current?.offsetWidth ?? 1;
     const speed = Math.abs(dx) / Math.max(1, event.timeStamp - current.startTime);
     if (Math.abs(dx) > width * SWIPE_SHARE || speed > FLICK_SPEED) go(dx < 0 ? 1 : -1);
