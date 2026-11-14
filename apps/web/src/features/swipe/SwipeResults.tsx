@@ -29,18 +29,12 @@ export function SwipeResults(props: SwipeResultsProps) {
       <div className="flex flex-col gap-2 rounded-lg bg-ink p-6 text-card">
         {matches.length > 0 ? (
           <>
-<<<<<<< Updated upstream
-            <p className="text-title font-semibold text-ink">
-              You could save up to <span className="text-positive">{formatEur(monthlyEur)}</span> a
-              month
-=======
             <p className="text-small font-semibold text-card/75">You could free up</p>
             <p className="flex flex-wrap items-baseline gap-x-2">
               <span className="font-display text-poster font-extrabold text-lime font-stretch-75%">
                 +{formatEur(monthlyEur)}
               </span>
               <span className="text-body font-semibold">a month</span>
->>>>>>> Stashed changes
             </p>
           </>
         ) : (

@@ -277,16 +277,9 @@ export function ToolCard(props: ToolCardProps) {
         : `${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`;
     return (
       <Card title={`${label} · ${period}`}>
-<<<<<<< Updated upstream
-        <p className="text-amount font-semibold">{formatEur(totalEur)}</p>
-=======
         <p className="font-display text-display font-extrabold font-stretch-75%">
           {formatEur(totalEur)}
         </p>
-        <p className="text-caption text-muted">
-          {txCount} {txCount === 1 ? 'purchase' : 'purchases'}
-        </p>
->>>>>>> Stashed changes
         {monthly.length > 1 && <MonthlyBars monthly={monthly} />}
       </Card>
     );
