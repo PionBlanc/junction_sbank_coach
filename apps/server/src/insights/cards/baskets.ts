@@ -10,7 +10,7 @@ const SHORT_LABELS: Record<SpendingBasketId, string> = {
   everyday: 'Everyday',
 };
 
-/** The teaching card: the three baskets, with everyday spending as the part easiest to change. */
+/** The teaching card: the three spending types (baskets), with everyday spending as the part easiest to change. */
 export function basketsCard(yearTotals: Map<string, number>): DeckCard | null {
   const total = SPENDING_BASKETS.reduce((sum, b) => sum + (yearTotals.get(b) ?? 0), 0);
   if (total <= 0) return null;
@@ -19,7 +19,7 @@ export function basketsCard(yearTotals: Map<string, number>): DeckCard | null {
   return {
     id: 'baskets',
     importance: ALWAYS_IMPORTANT,
-    topic: 'Three baskets',
+    topic: 'Three spending types',
     chart: {
       type: 'bars',
       bars: SPENDING_BASKETS.map((basket) => ({
@@ -29,6 +29,6 @@ export function basketsCard(yearTotals: Map<string, number>): DeckCard | null {
       })),
     },
     sentence: `Everyday spending is ${pctText(everyday / total)} of what you spend: the easiest part to change.`,
-    questions: ['What are the three spending baskets?', 'What counts as my everyday spending?'],
+    questions: ['What are the three spending types?', 'What counts as my everyday spending?'],
   };
 }

@@ -170,7 +170,7 @@ export function ToolCard(props: ToolCardProps) {
     if (!parsed.success) return unreadable;
     const { fromMonth, toMonth, months } = parsed.data;
     return (
-      <Card title={`Spending by basket · ${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`}>
+      <Card title={`Spending by type · ${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`}>
         <BasketTrendBars months={months} />
       </Card>
     );

@@ -9,7 +9,7 @@ const FIRST_MONTH = DATA_START_DATE.slice(0, 7);
 export function getMonthlyBreakdownTool(db: DuckDBConnection, customerId: string) {
   return tool({
     description:
-      'One month (YYYY-MM) at a glance: income, spending split into the three baskets with ' +
+      'One month (YYYY-MM) at a glance: income, spending split into the three spending types with ' +
       'their categories, and what was left over. Use it when the customer wants an overview ' +
       'or breakdown of a month, or asks where their money went.',
     inputSchema: overviewQuerySchema,

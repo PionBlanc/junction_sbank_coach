@@ -29,7 +29,7 @@ export const GUIDE_QUESTIONS = [
   { label: 'My balance over time', question: 'Show me how my balance has changed.' },
   {
     label: 'Needs and wants over the year',
-    question: 'Show me my spending by basket month by month.',
+    question: 'Show me my spending by type month by month.',
   },
   {
     label: 'How big are my usual purchases?',
