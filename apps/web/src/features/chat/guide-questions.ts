@@ -22,6 +22,10 @@ export const GUIDE_QUESTIONS = [
   },
   { label: 'Am I spending more than last year?', question: 'Am I spending more than last year?' },
   { label: 'Is my spending going up?', question: 'Is my spending going up?' },
+  {
+    label: 'Show me a six month spending breakdown',
+    question: 'Show me a six month spending breakdown',
+  },
   { label: 'My balance over time', question: 'Show me how my balance has changed.' },
   {
     label: 'Needs and wants over the year',

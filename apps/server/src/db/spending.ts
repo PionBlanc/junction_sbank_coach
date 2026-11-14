@@ -285,3 +285,27 @@ export async function getPurchaseStats(
     medianEur: Number(r.median_eur),
   }));
 }
+
+export type MonthCategoryTotal = { month: string; categoryId: string; totalEur: number };
+
+/** Spending per month and category over a month range, summed across baskets (taxis included). */
+export async function getCategoryTotalsByMonth(
+  db: DuckDBConnection,
+  customerId: string,
+  fromMonth: string,
+  toMonth: string,
+): Promise<MonthCategoryTotal[]> {
+  const rows = await queryRows(
+    db,
+    `SELECT month, category_id, sum(total_eur) AS total_eur FROM monthly_category
+     WHERE customer_id = $customerId AND month BETWEEN $fromMonth AND $toMonth
+       AND basket IN (${SPENDING_BASKETS_SQL})
+     GROUP BY month, category_id ORDER BY month`,
+    { customerId, fromMonth, toMonth },
+  );
+  return rows.map((r) => ({
+    month: String(r.month),
+    categoryId: String(r.category_id),
+    totalEur: Number(r.total_eur),
+  }));
+}

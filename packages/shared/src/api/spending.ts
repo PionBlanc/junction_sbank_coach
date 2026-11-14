@@ -186,3 +186,20 @@ export const purchaseSizesSchema = z.object({
   ),
 });
 export type PurchaseSizes = z.infer<typeof purchaseSizesSchema>;
+
+export const categoryTrendInputSchema = z.object({ fromMonth: monthSchema, toMonth: monthSchema });
+
+/** Result of the coach's getCategoryTrend tool: spending per month, split into categories. */
+export const categoryTrendSchema = z.object({
+  fromMonth: monthSchema,
+  toMonth: monthSchema,
+  /** The biggest categories over the range, largest first. The last may be "Other" (categoryId null). */
+  series: z.array(
+    z.object({ categoryId: categoryIdSchema.nullable(), label: z.string(), totalEur: z.number() }),
+  ),
+  /** Every month in the range, oldest first. valuesEur lines up with series. */
+  months: z.array(
+    z.object({ month: monthSchema, totalEur: z.number(), valuesEur: z.array(z.number()) }),
+  ),
+});
+export type CategoryTrend = z.infer<typeof categoryTrendSchema>;

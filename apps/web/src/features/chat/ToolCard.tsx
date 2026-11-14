@@ -6,6 +6,7 @@ import {
   balanceHistorySchema,
   basketTrendSchema,
   categorySplitSchema,
+  categoryTrendSchema,
   incomeVsSpendingSchema,
   overviewSchema,
   peerComparisonSchema,
@@ -23,6 +24,7 @@ import { formatEur, formatMonth, formatShortDay } from '../../lib/format.ts';
 import { SavingIdeasList } from '../actions/SavingIdeasList.tsx';
 import { BalanceLine } from '../charts/BalanceLine.tsx';
 import { BasketTrendBars } from '../charts/BasketTrendBars.tsx';
+import { CategoryTrendBars } from '../charts/CategoryTrendBars.tsx';
 import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
 import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
@@ -143,6 +145,21 @@ export function ToolCard(props: ToolCardProps) {
           <RowBars rows={rows} />
         ) : (
           <p className="text-small text-muted">No purchases in this period.</p>
+        )}
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'getCategoryTrend') {
+    const parsed = categoryTrendSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const { fromMonth, toMonth, series, months } = parsed.data;
+    return (
+      <Card title={`Spending by category · ${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`}>
+        {series.length > 0 ? (
+          <CategoryTrendBars series={series} months={months} />
+        ) : (
+          <p className="text-small text-muted">No spending in this period.</p>
         )}
       </Card>
     );

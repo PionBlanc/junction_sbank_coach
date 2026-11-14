@@ -17,6 +17,7 @@ export const CHART_TOOLS = [
   'getBasketTrend',
   'getPurchaseSizes',
   'getSavingIdeas',
+  'getCategoryTrend',
 ] as const;
 
 export type ChartTool = (typeof CHART_TOOLS)[number];
