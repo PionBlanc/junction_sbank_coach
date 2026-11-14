@@ -1,5 +1,6 @@
 import {
   CATEGORIES,
+  balanceHistorySchema,
   categorySplitSchema,
   incomeVsSpendingSchema,
   overviewSchema,
@@ -13,6 +14,7 @@ import {
 import { Card } from '../../components/Card.tsx';
 import { categorySliceColour } from '../../lib/chart-colours.ts';
 import { formatEur, formatMonth, formatPct } from '../../lib/format.ts';
+import { BalanceLine } from '../charts/BalanceLine.tsx';
 import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
 import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
@@ -101,6 +103,22 @@ export function ToolCard(props: ToolCardProps) {
             </p>
           </>
         )}
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'getBalanceHistory') {
+    const parsed = balanceHistorySchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const fromMonth = parsed.data.fromDate.slice(0, 7);
+    const toMonth = parsed.data.toDate.slice(0, 7);
+    const period =
+      fromMonth === toMonth
+        ? formatMonth(fromMonth)
+        : `${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`;
+    return (
+      <Card title={`Your balance · ${period}`}>
+        <BalanceLine days={parsed.data.days} />
       </Card>
     );
   }

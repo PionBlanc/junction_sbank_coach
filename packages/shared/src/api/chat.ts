@@ -11,6 +11,7 @@ export const CHART_TOOLS = [
   'getIncomeVsSpending',
   'getYearOverYear',
   'getCategorySplit',
+  'getBalanceHistory',
 ] as const;
 
 export type ChartTool = (typeof CHART_TOOLS)[number];

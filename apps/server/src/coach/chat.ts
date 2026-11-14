@@ -14,6 +14,7 @@ import { COACH_MODEL_ID } from './model.ts';
 import { swipeProfilePrompt } from './prompts/swipe-profile.ts';
 import { SYSTEM_PROMPT } from './prompts/system.ts';
 import { compareToPeersTool } from './tools/compare-to-peers.ts';
+import { getBalanceHistoryTool } from './tools/get-balance-history.ts';
 import { getCategorySplitTool } from './tools/get-category-split.ts';
 import { getIncomeVsSpendingTool } from './tools/get-income-vs-spending.ts';
 import { getMonthlyBreakdownTool } from './tools/get-monthly-breakdown.ts';
@@ -52,6 +53,7 @@ export async function streamCoachReply(
       getIncomeVsSpending: getIncomeVsSpendingTool(db, customerId),
       getYearOverYear: getYearOverYearTool(db, customerId),
       getCategorySplit: getCategorySplitTool(db, customerId),
+      getBalanceHistory: getBalanceHistoryTool(db, customerId),
       getSpenderGroup: getSpenderGroupTool(db, customerId),
       getSpendingSummary: getSpendingSummaryTool(db, customerId),
       getSafeToSpend: getSafeToSpendTool(db, customerId),
