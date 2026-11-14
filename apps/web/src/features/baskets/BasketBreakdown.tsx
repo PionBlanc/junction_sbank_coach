@@ -2,6 +2,7 @@ import { BASKET_LABELS, type Overview, type SpendingBasketId } from '@coach/shar
 import { useState } from 'react';
 import { Card } from '../../components/Card.tsx';
 import { formatEur, formatMonth } from '../../lib/format.ts';
+import { SimpleBars } from '../charts/SimpleBars.tsx';
 import { SimpleDonut } from '../charts/SimpleDonut.tsx';
 import { BasketDetail } from './BasketDetail.tsx';
 
@@ -13,7 +14,7 @@ const BASKET_COLOURS: Record<SpendingBasketId, string> = {
 
 type BasketBreakdownProps = { data: Overview };
 
-/** One stacked bar: a month's income split into the three baskets and what is left. */
+/** A month at a glance: income against spending, the three baskets, and spending by category. */
 export function BasketBreakdown(props: BasketBreakdownProps) {
   const { data } = props;
   const [selected, setSelected] = useState<SpendingBasketId | null>(null);
@@ -30,6 +31,12 @@ export function BasketBreakdown(props: BasketBreakdownProps) {
 
   return (
     <Card title={title}>
+      <SimpleBars
+        bars={[
+          { label: 'Income', valueEur: data.incomeEur, highlight: false },
+          { label: 'Spending', valueEur: data.spendingEur, highlight: true },
+        ]}
+      />
       <div className="flex h-6 overflow-hidden rounded-full bg-surface">
         {data.baskets.map((b) => (
           <div
@@ -56,13 +63,6 @@ export function BasketBreakdown(props: BasketBreakdownProps) {
           </button>
         ))}
       </div>
-      <p className="text-sm text-muted">
-        Income {formatEur(data.incomeEur)}.{' '}
-        {data.leftEur >= 0
-          ? `Left over ${formatEur(data.leftEur)}.`
-          : `${formatEur(-data.leftEur)} more went out than came in.`}{' '}
-        Tap a basket to see what is in it.
-      </p>
       {selectedBasket && <BasketDetail basket={selectedBasket} />}
       <h3 className="text-small font-medium text-muted">By category</h3>
       <SimpleDonut
