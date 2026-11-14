@@ -90,7 +90,7 @@ export function SwipeResults(props: SwipeResultsProps) {
             ))}
           </div>
           <p className="text-caption text-muted">
-            You swiped left on these. The coach will not ask you to change them.
+            You swiped left on these. Your advisor will not ask you to change them.
           </p>
         </Card>
       )}

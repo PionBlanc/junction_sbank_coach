@@ -1,5 +1,6 @@
 import {
   CATEGORIES,
+  overviewSchema,
   peerComparisonSchema,
   safeToSpendSchema,
   spendingSummarySchema,
@@ -7,6 +8,7 @@ import {
 } from '@coach/shared';
 import { Card } from '../../components/Card.tsx';
 import { formatEur, formatMonth } from '../../lib/format.ts';
+import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
 import { MonthlyBars } from '../charts/MonthlyBars.tsx';
 import { SafeToSpendCard } from '../safe-to-spend/SafeToSpendCard.tsx';
@@ -17,6 +19,11 @@ type ToolCardProps = { toolName: string; input: unknown; output: unknown };
 /** Draws a coach tool result as a card. The numbers are the server's, shown as they came. */
 export function ToolCard(props: ToolCardProps) {
   const unreadable = <p className="text-small text-muted">This result could not be shown.</p>;
+
+  if (props.toolName === 'getMonthlyBreakdown') {
+    const parsed = overviewSchema.safeParse(props.output);
+    return parsed.success ? <BasketBreakdown data={parsed.data} /> : unreadable;
+  }
 
   if (props.toolName === 'getSafeToSpend') {
     const parsed = safeToSpendSchema.safeParse(props.output);

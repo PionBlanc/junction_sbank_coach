@@ -3,6 +3,8 @@ import { useEffect, useRef } from 'react';
 import { useCoachChat } from '../../lib/chat-context.ts';
 import { ChatComposer } from './ChatComposer.tsx';
 import { CoachAvatar } from './CoachAvatar.tsx';
+import { CoachGreeting } from './CoachGreeting.tsx';
+import { NextQuestions } from './NextQuestions.tsx';
 import { ToolCard } from './ToolCard.tsx';
 import { TypingIndicator } from './TypingIndicator.tsx';
 
@@ -14,6 +16,9 @@ export function Chat() {
   const lastMessage = messages.at(-1);
   // Show dots until the coach's reply has something on screen.
   const waiting = busy && (lastMessage?.role !== 'assistant' || status === 'submitted');
+  const asked = messages.flatMap((m) =>
+    m.role === 'user' ? m.parts.flatMap((p) => (p.type === 'text' ? [p.text] : [])) : [],
+  );
 
   // Keep the newest message in view inside the chat, without moving the card above it.
   useEffect(() => {
@@ -42,15 +47,7 @@ export function Chat() {
           </button>
 
           <div ref={listRef} className="flex max-h-96 flex-col gap-4 overflow-y-auto p-1">
-            {messages.length === 0 && (
-              <div className="flex items-start gap-2">
-                <CoachAvatar />
-                <p className="pt-1 text-small">
-                  Hi! Ask me anything about your money. I look at your own transactions and show you
-                  the numbers.
-                </p>
-              </div>
-            )}
+            {messages.length === 0 && <CoachGreeting onAsk={ask} />}
 
             {messages.map((message) =>
               message.parts.map((part, index) => {
@@ -88,9 +85,10 @@ export function Chat() {
             )}
 
             {waiting && <TypingIndicator />}
+            {!busy && !error && messages.length > 0 && <NextQuestions asked={asked} onAsk={ask} />}
             {error && (
               <p className="rounded-md border border-line bg-card px-4 py-2 text-small">
-                The coach could not answer just now. Please try again.
+                Your advisor could not answer just now. Please try again.
               </p>
             )}
           </div>
@@ -98,6 +96,17 @@ export function Chat() {
       )}
       {/* Docked to the bottom of the screen, like the text field of a phone app. */}
       <div className="sticky bottom-0 -mx-4 mt-auto -mb-4 border-t border-line bg-surface px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        {/* A quiet way into the chat, so it does not compete with the deck's own button. */}
+        {!open && (
+          <button
+            type="button"
+            className="mb-2 flex min-h-11 items-center gap-2 text-small text-muted hover:text-ink"
+            onClick={() => setOpen(true)}
+          >
+            <CoachAvatar />
+            Chat with your financial advisor <span aria-hidden>›</span>
+          </button>
+        )}
         <ChatComposer disabled={busy} onSend={ask} onFocus={() => setOpen(true)} />
       </div>
     </>
