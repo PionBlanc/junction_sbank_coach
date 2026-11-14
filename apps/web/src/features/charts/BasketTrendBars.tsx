@@ -1,7 +1,7 @@
 import { BASKET_LABELS, type BasketTrend } from '@coach/shared';
-import { Bar, BarChart, ResponsiveContainer, XAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { BASKET_SLICE_COLOURS } from '../../lib/chart-colours.ts';
-import { formatShortMonth } from '../../lib/format.ts';
+import { formatEurShort, formatShortMonth } from '../../lib/format.ts';
 
 type BasketTrendBarsProps = { months: BasketTrend['months'] };
 
@@ -33,6 +33,16 @@ export function BasketTrendBars(props: BasketTrendBarsProps) {
             margin={{ top: 4, right: 0, bottom: 0, left: 0 }}
             barCategoryGap="20%"
           >
+            <CartesianGrid vertical={false} stroke="var(--color-line)" />
+            <YAxis
+              width={44}
+              tickCount={4}
+              tickFormatter={formatEurShort}
+              axisLine={false}
+              tickLine={false}
+              fontSize={12}
+              tick={{ fill: 'var(--color-muted)' }}
+            />
             <XAxis
               dataKey="month"
               axisLine={{ stroke: 'var(--color-line)' }}

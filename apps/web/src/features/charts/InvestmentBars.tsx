@@ -1,6 +1,6 @@
 import type { Investments } from '@coach/shared';
-import { Bar, BarChart, ResponsiveContainer, XAxis } from 'recharts';
-import { formatShortMonth } from '../../lib/format.ts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { formatEurShort, formatShortMonth } from '../../lib/format.ts';
 
 type InvestmentBarsProps = { months: Investments['months']; showWithdrawals: boolean };
 
@@ -28,6 +28,16 @@ export function InvestmentBars(props: InvestmentBarsProps) {
             barGap={2}
             barCategoryGap="20%"
           >
+            <CartesianGrid vertical={false} stroke="var(--color-line)" />
+            <YAxis
+              width={44}
+              tickCount={4}
+              tickFormatter={formatEurShort}
+              axisLine={false}
+              tickLine={false}
+              fontSize={12}
+              tick={{ fill: 'var(--color-muted)' }}
+            />
             <XAxis
               dataKey="month"
               axisLine={{ stroke: 'var(--color-line)' }}
