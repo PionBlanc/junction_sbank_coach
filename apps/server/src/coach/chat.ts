@@ -14,12 +14,15 @@ import { COACH_MODEL_ID } from './model.ts';
 import { swipeProfilePrompt } from './prompts/swipe-profile.ts';
 import { SYSTEM_PROMPT } from './prompts/system.ts';
 import { compareToPeersTool } from './tools/compare-to-peers.ts';
+import { getIncomeVsSpendingTool } from './tools/get-income-vs-spending.ts';
 import { getMonthlyBreakdownTool } from './tools/get-monthly-breakdown.ts';
 import { drawChartTool } from './tools/draw-chart.ts';
 import { getSafeToSpendTool } from './tools/get-safe-to-spend.ts';
 import { getSpenderGroupTool } from './tools/get-spender-group.ts';
 import { getSpendingSummaryTool } from './tools/get-spending-summary.ts';
+import { getYearOverYearTool } from './tools/get-year-over-year.ts';
 import { simulateWhatIfTool } from './tools/simulate-what-if.ts';
+import { suggestRepliesTool } from './tools/suggest-replies.ts';
 
 /** Ids of the saving ideas the customer swiped right (accepted) and left (rejected) on. */
 export type Swipes = { acceptedIds: string[]; rejectedIds: string[] };
@@ -45,12 +48,15 @@ export async function streamCoachReply(
     messages: await convertToModelMessages(messages),
     tools: {
       getMonthlyBreakdown: getMonthlyBreakdownTool(db, customerId),
+      getIncomeVsSpending: getIncomeVsSpendingTool(db, customerId),
+      getYearOverYear: getYearOverYearTool(db, customerId),
       getSpenderGroup: getSpenderGroupTool(db, customerId),
       getSpendingSummary: getSpendingSummaryTool(db, customerId),
       getSafeToSpend: getSafeToSpendTool(db, customerId),
       compareToPeers: compareToPeersTool(db, customerId),
       simulateWhatIf: simulateWhatIfTool(db, customerId),
       drawChart: drawChartTool(),
+      suggestReplies: suggestRepliesTool(),
     },
     stopWhen: isStepCount(5),
   });

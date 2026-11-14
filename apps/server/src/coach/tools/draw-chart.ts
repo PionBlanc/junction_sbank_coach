@@ -6,8 +6,8 @@ export function drawChartTool() {
   return tool({
     description:
       'Show the customer the chart or card for an earlier tool result in this conversation. ' +
-      'Call it only when the customer asks for a chart, graph, diagram or picture. ' +
-      'Tool results are never shown otherwise.',
+      'Call it whenever the customer asks to see or show their numbers, asks for a chart, or ' +
+      'says yes to your offer to show something. Tool results are never shown otherwise.',
     inputSchema: drawChartInputSchema,
     execute: async (input) => ({ shown: input.result }),
   });
