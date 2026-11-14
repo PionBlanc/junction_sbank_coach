@@ -20,6 +20,8 @@ const FLICK_SPEED = 0.5;
 const DRAG_START_PX = 8;
 /** Drag distance at which the LET'S DO IT / NO THANKS stamp is fully visible. */
 const STAMP_FULL_PX = 80;
+/** Size of the card waiting underneath the top one. */
+const NEXT_SCALE = 0.95;
 /** How long the card takes to fly off the screen. */
 const LEAVE_MS = 250;
 /** How long "It's a match!" stays up. */
@@ -192,6 +194,8 @@ export function SwipeDeck() {
   if (leaving === 'right') topTransform = 'translateX(150%) rotate(20deg)';
   if (leaving === 'left') topTransform = 'translateX(-150%) rotate(-20deg)';
   const stamp = Math.min(1, Math.abs(dragX) / STAMP_FULL_PX);
+  // The card underneath grows as the top one is dragged away, and is full size once it has left.
+  const nextScale = leaving ? 1 : NEXT_SCALE + (1 - NEXT_SCALE) * stamp * 0.5;
 
   return (
     <div className="flex flex-1 flex-col gap-4">
@@ -230,7 +234,17 @@ export function SwipeDeck() {
 
       <div ref={deckRef} className="relative min-h-104 flex-1">
         {next && (
-          <div key={next.id} className="absolute inset-0 scale-95 transition-transform" inert>
+          // Same transform property and timing as the top card: when this card moves up to the top
+          // it keeps its element, so it grows smoothly instead of snapping to full size.
+          <div
+            key={next.id}
+            className="absolute inset-0"
+            style={{
+              transform: `scale(${nextScale})`,
+              transition: dragging ? 'none' : `transform ${LEAVE_MS}ms ease-out`,
+            }}
+            inert
+          >
             <OpportunityCard
               action={next}
               index={all.indexOf(next)}
