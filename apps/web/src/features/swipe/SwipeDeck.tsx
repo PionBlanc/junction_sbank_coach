@@ -17,7 +17,7 @@ const SWIPE_SHARE = 0.25;
 const FLICK_SPEED = 0.5;
 /** Movement before we decide whether the finger is swiping sideways or scrolling. */
 const DRAG_START_PX = 8;
-/** Drag distance at which the DOWN / NO THANKS stamp is fully visible. */
+/** Drag distance at which the LET'S DO IT / NO THANKS stamp is fully visible. */
 const STAMP_FULL_PX = 80;
 /** How long the card takes to fly off the screen. */
 const LEAVE_MS = 250;
@@ -35,7 +35,7 @@ type Drag = {
   dx: number;
 };
 
-/** The home screen: saving ideas to swipe right (down to try) or left (no thanks). */
+/** The home screen: saving ideas to swipe right (let's do it) or left (no thanks). */
 export function SwipeDeck() {
   const { userId } = useUser();
   const actions = useActions(userId);
@@ -284,7 +284,7 @@ export function SwipeDeck() {
         </button>
         <button
           type="button"
-          aria-label="Down to try"
+          aria-label="Let's do it"
           className="flex size-14 items-center justify-center rounded-full bg-brand text-card"
           onClick={() => decide(true)}
         >
