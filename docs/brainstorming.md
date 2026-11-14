@@ -63,15 +63,15 @@ Ranked by demo value against build effort. "Data" says whether the dataset suppo
 
 ### Tier 4: weak fit, keep for the pitch slide
 
-| Feature                     | Why it ranks low                                                                                                                                                                              |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Deal finder                 | Utilities have no merchant or MCC, so we cannot say what the user pays for electricity. The coach would compare web prices with a number it does not have. Risky live, and off the core story |
-| Average-Finn benchmark      | Category mapping to Statistics Finland takes hours and the brief calls it optional. Peers cover it. Do it only if someone is free: **Lauri's opinions: The average finn can be the average of the dataset from other users.**                                                             |
-| Home-buying readiness       | 201 mortgage applications. Hard to make a fair comparison for a demo user in the time we have                                                                                                 |
-| Multi-bank (PSD2)           | A mocked second account proves nothing. One sentence in the pitch is enough                                                                                                                   |
-| Subscriptions               | Not in the data. Already decided: skip                                                                                                                                                        |
-| Voice input                 | Cheap with the browser speech API, but unreliable in a loud hall                                                                                                                              |
-| Money flow (Sankey) and pie | The basket bar says the same thing in less space                                                                                                                                              |
+| Feature                     | Why it ranks low                                                                                                                                                                                                              |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deal finder                 | Utilities have no merchant or MCC, so we cannot say what the user pays for electricity. The coach would compare web prices with a number it does not have. Risky live, and off the core story                                 |
+| Average-Finn benchmark      | Category mapping to Statistics Finland takes hours and the brief calls it optional. Peers cover it. Do it only if someone is free: **Lauri's opinions: The average finn can be the average of the dataset from other users.** |
+| Home-buying readiness       | 201 mortgage applications. Hard to make a fair comparison for a demo user in the time we have                                                                                                                                 |
+| Multi-bank (PSD2)           | A mocked second account proves nothing. One sentence in the pitch is enough                                                                                                                                                   |
+| Subscriptions               | Not in the data. Already decided: skip                                                                                                                                                                                        |
+| Voice input                 | Cheap with the browser speech API, but unreliable in a loud hall                                                                                                                                                              |
+| Money flow (Sankey) and pie | The basket bar says the same thing in less space                                                                                                                                                                              |
 
 ### Suggested cut
 
