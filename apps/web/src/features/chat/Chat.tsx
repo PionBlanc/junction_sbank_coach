@@ -76,10 +76,10 @@ export function Chat() {
         className={
           open
             ? 'fixed inset-x-0 bottom-0 z-40 mx-auto flex h-[85dvh] max-w-[390px] flex-col rounded-t-lg bg-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl'
-            : 'sticky bottom-0 -mx-4 mt-auto -mb-4 border-t border-line bg-surface px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]'
+            : 'sticky bottom-0 -mx-4 mt-auto -mb-4 rounded-t-lg border-t border-line bg-card px-4 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))]'
         }
       >
-        {open ? (
+        {open && (
           <>
             <button
               type="button"
@@ -161,18 +161,9 @@ export function Chat() {
               )}
             </div>
           </>
-        ) : (
-          // A quiet way into the chat, so it does not compete with the deck's own button.
-          <button
-            type="button"
-            className="mb-2 flex min-h-11 items-center gap-2 text-small text-muted hover:text-ink"
-            onClick={() => setOpen(true)}
-          >
-            <CoachAvatar />
-            Chat with your financial advisor <span aria-hidden>›</span>
-          </button>
         )}
-        <ChatComposer disabled={busy} onSend={ask} onFocus={() => setOpen(true)} />
+        {/* Docked, the text field itself invites into the chat: one row, so the card stays in view. */}
+        <ChatComposer docked={!open} disabled={busy} onSend={ask} onFocus={() => setOpen(true)} />
       </div>
     </>
   );

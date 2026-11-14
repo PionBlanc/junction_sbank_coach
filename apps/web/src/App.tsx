@@ -12,7 +12,7 @@ export function App() {
       <UserProvider>
         <SwipeProvider>
           <ChatProvider>
-            <main className="mx-auto flex min-h-dvh max-w-[390px] flex-col gap-4 bg-surface p-4 sm:border-x sm:border-line">
+            <main className="mx-auto flex min-h-dvh max-w-[390px] flex-col gap-4 overflow-x-clip bg-surface p-4 sm:border-x sm:border-line">
               <UserSwitcher />
               <SwipeDeck />
               <Chat />
