@@ -14,6 +14,7 @@ import { COACH_MODEL_ID } from './model.ts';
 import { swipeProfilePrompt } from './prompts/swipe-profile.ts';
 import { SYSTEM_PROMPT } from './prompts/system.ts';
 import { compareToPeersTool } from './tools/compare-to-peers.ts';
+import { getMonthlyBreakdownTool } from './tools/get-monthly-breakdown.ts';
 import { getSafeToSpendTool } from './tools/get-safe-to-spend.ts';
 import { getSpendingSummaryTool } from './tools/get-spending-summary.ts';
 import { simulateWhatIfTool } from './tools/simulate-what-if.ts';
@@ -41,6 +42,7 @@ export async function streamCoachReply(
     instructions,
     messages: await convertToModelMessages(messages),
     tools: {
+      getMonthlyBreakdown: getMonthlyBreakdownTool(db, customerId),
       getSpendingSummary: getSpendingSummaryTool(db, customerId),
       getSafeToSpend: getSafeToSpendTool(db, customerId),
       compareToPeers: compareToPeersTool(db, customerId),
