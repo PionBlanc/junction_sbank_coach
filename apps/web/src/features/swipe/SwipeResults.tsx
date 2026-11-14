@@ -1,21 +1,15 @@
 import type { Action } from '@coach/shared';
 import { useState } from 'react';
-import { useSpenderGroup } from '../../api/useSpenderGroup.ts';
 import { Card } from '../../components/Card.tsx';
-import { LoadError } from '../../components/LoadError.tsx';
 import { useCoachChat } from '../../lib/chat-context.ts';
 import { formatEur } from '../../lib/format.ts';
 import { useSwipes } from '../../lib/swipe-context.ts';
-import { useUser } from '../../lib/user-context.ts';
-import { SpenderGroupCard } from '../spender-group/SpenderGroupCard.tsx';
-import { WhatIfCard } from '../what-if/WhatIfCard.tsx';
+import { WhatIfDialog } from './WhatIfDialog.tsx';
 
 type SwipeResultsProps = { actions: Action[] };
 
-/** The view after the last swipe: the user's spender group, their matches, and what they keep. */
+/** The view after the last swipe: the user's matches and what they keep. */
 export function SwipeResults(props: SwipeResultsProps) {
-  const { userId } = useUser();
-  const group = useSpenderGroup(userId);
   const { swipes, reset } = useSwipes();
   const { ask, busy } = useCoachChat();
   const [showWhatIf, setShowWhatIf] = useState(false);
@@ -29,23 +23,9 @@ export function SwipeResults(props: SwipeResultsProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {group.isPending && (
-        <Card title="What kind of spender you are">
-          <p className="text-small text-muted">Loading…</p>
-        </Card>
-      )}
-      {group.isError && (
-        <Card title="What kind of spender you are">
-          <LoadError message={group.error.message} onRetry={() => void group.refetch()} />
-        </Card>
-      )}
-      {group.data && (
-        <SpenderGroupCard group={group.data}>
-          <p className="text-small">
-            You matched with {matches.length} of {props.actions.length} saving ideas.
-          </p>
-        </SpenderGroupCard>
-      )}
+      <p className="text-small text-muted">
+        You matched with {matches.length} of {props.actions.length} saving ideas.
+      </p>
 
       {matches.length > 0 && (
         <Card title="Your matches">
@@ -74,12 +54,15 @@ export function SwipeResults(props: SwipeResultsProps) {
           <button
             type="button"
             className="h-11 rounded-md border border-line text-small font-semibold"
-            onClick={() => setShowWhatIf(!showWhatIf)}
+            onClick={() => setShowWhatIf(true)}
           >
-            {showWhatIf ? 'Hide' : 'See what this becomes'}
+            See what this becomes
           </button>
           {showWhatIf && (
-            <WhatIfCard key={monthlyEur} monthlyEur={Math.round(monthlyEur * 100) / 100} />
+            <WhatIfDialog
+              monthlyEur={Math.round(monthlyEur * 100) / 100}
+              onClose={() => setShowWhatIf(false)}
+            />
           )}
         </Card>
       )}

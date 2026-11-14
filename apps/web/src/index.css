@@ -25,6 +25,9 @@
   --color-basket-irregular: #d39b2a;
   --color-basket-everyday: #2a9d8f;
 
+  /* The demo banner: marks what exists only in the demo. */
+  --color-demo: #ffd84d;
+
   /* Type scale. */
   --text-caption: 0.75rem;
   --text-caption--line-height: 1rem;
@@ -38,7 +41,8 @@
   --text-amount--line-height: 2rem;
   --text-display: 2.5rem;
   --text-display--line-height: 2.75rem;
-  --text-emoji: 6rem;
+  /* Fills most of its container: the box it sits in must set container-type: size. */
+  --text-emoji: min(60cqw, 60cqh);
   --text-emoji--line-height: 1;
 
   /* Radii: bars and legend marks, controls and cards, chat bubbles. */

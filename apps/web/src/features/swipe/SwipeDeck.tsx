@@ -6,6 +6,7 @@ import { LoadError } from '../../components/LoadError.tsx';
 import { formatEur } from '../../lib/format.ts';
 import { useSwipes } from '../../lib/swipe-context.ts';
 import { useUser } from '../../lib/user-context.ts';
+import { bounce, flyEuro, prefersReducedMotion } from './fly-euro.ts';
 import { OpportunityCard } from './OpportunityCard.tsx';
 import { SwipeIntro } from './SwipeIntro.tsx';
 import { SwipeResults } from './SwipeResults.tsx';
@@ -47,6 +48,9 @@ export function SwipeDeck() {
   const [introSeen, setIntroSeen] = useState(false);
   const drag = useRef<Drag | null>(null);
   const deckRef = useRef<HTMLDivElement>(null);
+  const totalRef = useRef<HTMLSpanElement>(null);
+  // Euros on their way to the total: the total counts them when the coin lands.
+  const [inFlightEur, setInFlightEur] = useState(0);
 
   const all = actions.data ?? [];
   const remaining = all.filter((a) => !swipes.some((s) => s.id === a.id));
@@ -60,9 +64,26 @@ export function SwipeDeck() {
     setTimeout(() => {
       swipe(top.id, liked);
       if (liked) setMatch(top);
+      // The last card leads to the results, which have no total to fly to.
+      if (liked && next) launchCoin(top.savingPerMonthEur);
       setLeaving(null);
       setDragX(0);
     }, LEAVE_MS);
+  }
+
+  function launchCoin(eur: number) {
+    const deck = deckRef.current?.getBoundingClientRect();
+    const total = totalRef.current?.getBoundingClientRect();
+    if (!deck || !total || prefersReducedMotion()) return;
+    setInFlightEur((v) => v + eur);
+    flyEuro(
+      { x: deck.left + deck.width / 2, y: deck.top + deck.height / 3 },
+      { x: total.left + total.width / 2, y: total.top + total.height / 2 },
+      () => {
+        setInFlightEur((v) => v - eur);
+        bounce(totalRef.current);
+      },
+    );
   }
 
   useEffect(() => {
@@ -171,23 +192,27 @@ export function SwipeDeck() {
       <div className="flex flex-col gap-2">
         <p className="flex items-baseline justify-between gap-4">
           <span className="text-title font-semibold text-ink">
-            {swipes.length + 1} / {all.length}
+            {swipes.length} / {all.length}
           </span>
-          <span className="text-small font-semibold text-positive">
-            +{formatEur(freedEur)}/month freed up
+          <span
+            ref={totalRef}
+            className="inline-block text-title font-semibold text-positive"
+            aria-label={`${formatEur(freedEur)} a month freed up`}
+          >
+            +{formatEur(Math.max(0, freedEur - inFlightEur))}
           </span>
         </p>
         <div
           className="h-1.5 overflow-hidden rounded-sm bg-fill"
           role="progressbar"
           aria-label="Ideas reviewed"
-          aria-valuemin={1}
+          aria-valuemin={0}
           aria-valuemax={all.length}
-          aria-valuenow={swipes.length + 1}
+          aria-valuenow={swipes.length}
         >
           <div
             className="h-full bg-brand transition-[width]"
-            style={{ width: `${((swipes.length + 1) / all.length) * 100}%` }}
+            style={{ width: `${(swipes.length / all.length) * 100}%` }}
           />
         </div>
       </div>

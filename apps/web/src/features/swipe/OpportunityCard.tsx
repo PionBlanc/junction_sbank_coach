@@ -13,7 +13,7 @@ export function OpportunityCard(props: OpportunityCardProps) {
   const { action } = props;
   return (
     <section className="flex h-full flex-col gap-4 rounded-md border border-line bg-card p-4">
-      <div className="relative flex min-h-0 flex-1 items-center justify-center rounded-md bg-fill">
+      <div className="relative flex min-h-0 flex-1 items-center justify-center rounded-md bg-fill [container-type:size]">
         <span className="text-emoji" aria-hidden>
           {action.emoji}
         </span>
