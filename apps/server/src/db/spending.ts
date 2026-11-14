@@ -76,6 +76,33 @@ export async function getSpendingByMonth(
   }));
 }
 
+export type SubcategoryTotal = { totalEur: number; txCount: number };
+
+/** Spending and purchase count per subcategory over a month range. Purchases without an MCC are left out. */
+export async function getSubcategoryTotals(
+  db: DuckDBConnection,
+  customerId: string,
+  fromMonth: string,
+  toMonth: string,
+): Promise<Map<string, SubcategoryTotal>> {
+  const rows = await queryRows(
+    db,
+    `SELECT subcategory_id, round(sum(abs_amount_eur), 2) AS total_eur, count(*) AS tx_count
+     FROM transactions
+     WHERE customer_id = $customerId AND month BETWEEN $fromMonth AND $toMonth
+       AND basket IN (${SPENDING_BASKETS_SQL})
+       AND subcategory_id IS NOT NULL
+     GROUP BY subcategory_id`,
+    { customerId, fromMonth, toMonth },
+  );
+  return new Map(
+    rows.map((r) => [
+      String(r.subcategory_id),
+      { totalEur: Number(r.total_eur), txCount: Number(r.tx_count) },
+    ]),
+  );
+}
+
 /** Spending per basket over a month range. Taxis count towards everyday spending. */
 export async function getBasketTotals(
   db: DuckDBConnection,

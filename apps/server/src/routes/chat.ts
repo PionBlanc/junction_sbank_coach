@@ -7,7 +7,12 @@ import { z } from 'zod';
 import { streamCoachReply } from '../coach/chat.ts';
 
 /** The AI SDK chat request. The messages themselves are checked by the SDK's own validator. */
-const chatBodySchema = z.object({ messages: z.array(z.unknown()) });
+const chatBodySchema = z.object({
+  messages: z.array(z.unknown()),
+  /** Saving ideas the customer swiped right and left on. Only ids: the server looks up the rest. */
+  acceptedIds: z.array(z.string()).max(50).default([]),
+  rejectedIds: z.array(z.string()).max(50).default([]),
+});
 
 export function chatRoutes(db: DuckDBConnection) {
   return new Hono().post(
@@ -15,11 +20,15 @@ export function chatRoutes(db: DuckDBConnection) {
     zValidator('param', customerParamSchema),
     zValidator('json', chatBodySchema),
     async (c) => {
-      const validated = await safeValidateUIMessages({ messages: c.req.valid('json').messages });
+      const { messages, acceptedIds, rejectedIds } = c.req.valid('json');
+      const validated = await safeValidateUIMessages({ messages });
       if (!validated.success) {
         return c.json({ error: 'Invalid chat messages' }, 400);
       }
-      return streamCoachReply(db, c.req.valid('param').id, validated.data);
+      return streamCoachReply(db, c.req.valid('param').id, validated.data, {
+        acceptedIds,
+        rejectedIds,
+      });
     },
   );
 }

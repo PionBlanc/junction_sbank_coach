@@ -19,6 +19,7 @@ export function taxiActions(taxiMonthlyAvgEur: number, rideCount: number): Actio
         `You took ${rideCount} taxi rides in the last 12 months, about ` +
         `${Math.round(taxiMonthlyAvgEur)} € a month. ` +
         `Swapping half of them frees up about ${Math.round(savingPerMonthEur)} € a month.`,
+      emoji: '🚕',
       savingPerMonthEur,
       savingPerWeekEur: round2((savingPerMonthEur * 12) / 52),
       categoryId: 'transportation',

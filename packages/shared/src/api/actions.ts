@@ -5,6 +5,8 @@ export const actionSchema = z.object({
   id: z.string(),
   title: z.string(),
   explanation: z.string(),
+  /** The "photo" on the swipe card. */
+  emoji: z.string(),
   savingPerMonthEur: z.number(),
   /** The same saving per week, so the UI can relate it to safe to spend. */
   savingPerWeekEur: z.number(),

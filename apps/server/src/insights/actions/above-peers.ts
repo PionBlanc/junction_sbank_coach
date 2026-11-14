@@ -22,6 +22,7 @@ export function abovePeersActions(peers: PeerComparison): Action[] {
         `You spend about ${Math.round(row.youMonthlyAvgEur)} € a month here (12-month average). ` +
         `People your age typically spend ${Math.round(row.peerMedianMonthlyEur)} €. ` +
         `A fifth less frees up about ${Math.round(savingPerMonthEur)} € a month.`,
+      emoji: '💸',
       savingPerMonthEur,
       savingPerWeekEur: round2((savingPerMonthEur * 12) / 52),
       categoryId: row.categoryId,

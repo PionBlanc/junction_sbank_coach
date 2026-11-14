@@ -38,6 +38,8 @@
   --text-amount--line-height: 2rem;
   --text-display: 2.5rem;
   --text-display--line-height: 2.75rem;
+  --text-emoji: 6rem;
+  --text-emoji--line-height: 1;
 
   /* Radii: bars and legend marks, controls and cards, chat bubbles. */
   --radius-sm: 2px;
