@@ -6,6 +6,7 @@ export const CHART_TOOLS = [
   'compareToPeers',
   'getSafeToSpend',
   'simulateWhatIf',
+  'getSpenderGroup',
 ] as const;
 
 export type ChartTool = (typeof CHART_TOOLS)[number];

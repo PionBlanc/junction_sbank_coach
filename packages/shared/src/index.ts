@@ -9,3 +9,5 @@ export * from './api/spending.ts';
 export * from './api/peers.ts';
 export * from './api/cards.ts';
 export * from './api/chat.ts';
+export * from './spender-groups.ts';
+export * from './api/spender-group.ts';

@@ -17,6 +17,7 @@ import { compareToPeersTool } from './tools/compare-to-peers.ts';
 import { getMonthlyBreakdownTool } from './tools/get-monthly-breakdown.ts';
 import { drawChartTool } from './tools/draw-chart.ts';
 import { getSafeToSpendTool } from './tools/get-safe-to-spend.ts';
+import { getSpenderGroupTool } from './tools/get-spender-group.ts';
 import { getSpendingSummaryTool } from './tools/get-spending-summary.ts';
 import { simulateWhatIfTool } from './tools/simulate-what-if.ts';
 
@@ -44,6 +45,7 @@ export async function streamCoachReply(
     messages: await convertToModelMessages(messages),
     tools: {
       getMonthlyBreakdown: getMonthlyBreakdownTool(db, customerId),
+      getSpenderGroup: getSpenderGroupTool(db, customerId),
       getSpendingSummary: getSpendingSummaryTool(db, customerId),
       getSafeToSpend: getSafeToSpendTool(db, customerId),
       compareToPeers: compareToPeersTool(db, customerId),
