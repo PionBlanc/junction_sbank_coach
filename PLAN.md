@@ -2,7 +2,7 @@
 
 Actionable steps, in order. Tick boxes as you go. Items marked **Decide** need a team decision. Each has a recommendation, so if nobody objects, take the recommendation and move on.
 
-Done so far: dataset download and preprocessing pipeline (`npm run data`), shared taxonomy, repo conventions, server and web scaffolds (`npm run dev` runs both end to end), ESLint, Vitest. See [docs/data.md](docs/data.md) for what the data contains and [docs/handoff.md](docs/handoff.md) for the skeleton review.
+Done so far: dataset download and preprocessing pipeline (`npm run data`), shared taxonomy, repo conventions, server and web scaffolds (`npm run dev` runs both end to end), ESLint, Vitest. See [docs/data.md](docs/data.md) for what the data contains.
 
 This is a 48-hour demo: build what the demo shows, nothing "for later". See the mindset section in [AGENTS.md](AGENTS.md).
 
@@ -164,6 +164,7 @@ Build in this order. Stop when time runs out.
 - [ ] Pre-warm caches so the summary and first chat answer appear fast
 - [ ] Record a backup video of the demo
 - [ ] Pitch points: first Finnish bank chat over your own data, three-basket pedagogy, trustworthy numbers (deterministic maths, AI only explains), MyData-style free exploration, ready to embed in S-mobiili as a web view
+- [ ] Teaching angle: the coach explains the idea behind each action in one or two plain sentences (for example why to keep a buffer for irregular costs). Lead the demo with the young diner (`CUST00164`): the brief stresses young adults
 
 ## Risks
 
