@@ -5,7 +5,7 @@ type IncomeSpendingBarsProps = {
   months: { month: string; incomeEur: number; spendingEur: number }[];
 };
 
-/** Income and spending side by side for each month. Too many bars for values, so a small key. */
+/** Income and spending side by side for each month, with a small key instead of values. */
 export function IncomeSpendingBars(props: IncomeSpendingBarsProps) {
   return (
     <div className="flex flex-col gap-2">
@@ -24,7 +24,7 @@ export function IncomeSpendingBars(props: IncomeSpendingBarsProps) {
           <BarChart
             data={props.months}
             margin={{ top: 4, right: 0, bottom: 0, left: 0 }}
-            barGap={1}
+            barGap={2}
             barCategoryGap="20%"
           >
             <XAxis
@@ -32,9 +32,9 @@ export function IncomeSpendingBars(props: IncomeSpendingBarsProps) {
               axisLine={false}
               tickLine={false}
               interval={0}
-              fontSize={10}
+              fontSize={12}
               tick={{ fill: 'var(--color-muted)' }}
-              tickFormatter={(month: string) => formatShortMonth(month).slice(0, 1)}
+              tickFormatter={(month: string) => formatShortMonth(month)}
             />
             <Bar
               dataKey="incomeEur"

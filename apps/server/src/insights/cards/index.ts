@@ -1,27 +1,32 @@
 import type { DuckDBConnection } from '@duckdb/node-api';
-import type { DeckCard } from '@coach/shared';
+import { DATA_END_DATE, type DeckCard } from '@coach/shared';
+import { getCustomer } from '../../db/customers.ts';
 import { getPeerTotalMedian } from '../../db/peers.ts';
 import {
   getBasketTotals,
   getCategoryTotals,
+  getDailyPurchases,
   getIncomeAndSpendingByMonth,
 } from '../../db/spending.ts';
 import { LAST_MONTH, MONTHS_IN_YEAR, YEAR_FROM_MONTH, addMonths, round2 } from '../helpers.ts';
+import { getActions } from '../actions/index.ts';
 import { getPeerComparison } from '../peers.ts';
 import { getSafeToSpend } from '../safe-to-spend.ts';
-import { getSpendingSummary } from '../spending-summary.ts';
+import { RETURN_PCT } from '../what-if.ts';
 import { basketsCard } from './baskets.ts';
 import { biggestChangeCard } from './biggest-change.ts';
 import { biggestGapCard } from './biggest-gap.ts';
 import { incomeVsSpendingCard } from './income-vs-spending.ts';
+import { millionaireCard } from './millionaire.ts';
+import { paydayCard } from './payday.ts';
 import { peerTotalCard } from './peer-total.ts';
 import { safeToSpendCard } from './safe-to-spend.ts';
 import { periodText } from './text.ts';
-import { trendCard } from './trend.ts';
+import { weekendCard } from './weekend.ts';
 import { whereItGoesCard } from './where-it-goes.ts';
 
-/** Months on the trend card. */
-const TREND_MONTHS = 6;
+/** Months on the income and spending card. */
+const INCOME_MONTHS = 6;
 /** Months compared on the biggest-change card, against the same months a year earlier. */
 const CHANGE_MONTHS = 3;
 
@@ -31,16 +36,6 @@ const CHANGE_MONTHS = 3;
  */
 export async function getCards(db: DuckDBConnection, customerId: string): Promise<DeckCard[]> {
   const safeToSpend = await getSafeToSpend(db, customerId);
-
-  const trendFrom = addMonths(LAST_MONTH, -(TREND_MONTHS - 1));
-  const trend = await getSpendingSummary(db, customerId, {
-    fromMonth: trendFrom,
-    toMonth: LAST_MONTH,
-  });
-  const trendMonthly = Array.from({ length: TREND_MONTHS }, (_, i) => {
-    const month = addMonths(trendFrom, i);
-    return { month, totalEur: trend.monthly.find((m) => m.month === month)?.totalEur ?? 0 };
-  });
 
   const incomeSpending = await getIncomeAndSpendingByMonth(
     db,
@@ -53,6 +48,15 @@ export async function getCards(db: DuckDBConnection, customerId: string): Promis
     const row = incomeSpending.find((m) => m.month === month);
     return { month, incomeEur: row?.incomeEur ?? 0, spendingEur: row?.spendingEur ?? 0 };
   });
+  const leftOverMonthlyEur = round2(
+    yearMonthly.reduce((sum, m) => sum + m.incomeEur - m.spendingEur, 0) / MONTHS_IN_YEAR,
+  );
+  const actionsMonthlyEur = round2(
+    (await getActions(db, customerId)).reduce((sum, a) => sum + a.savingPerMonthEur, 0),
+  );
+  const customer = await getCustomer(db, customerId);
+
+  const days = await getDailyPurchases(db, customerId, `${YEAR_FROM_MONTH}-01`, DATA_END_DATE);
 
   const yearCategories = await getCategoryTotals(db, customerId, YEAR_FROM_MONTH, LAST_MONTH);
   const yearBaskets = await getBasketTotals(db, customerId, YEAR_FROM_MONTH, LAST_MONTH);
@@ -77,11 +81,19 @@ export async function getCards(db: DuckDBConnection, customerId: string): Promis
 
   const cards = [
     safeToSpendCard(safeToSpend),
-    incomeVsSpendingCard(yearMonthly),
+    incomeVsSpendingCard(yearMonthly.slice(-INCOME_MONTHS)),
     whereItGoesCard(yearCategories),
-    trendCard(trendMonthly),
+    paydayCard(days),
+    weekendCard(days),
+    millionaireCard(
+      leftOverMonthlyEur > 0
+        ? { monthlyEur: leftOverMonthlyEur, source: 'left-over' }
+        : { monthlyEur: actionsMonthlyEur, source: 'actions' },
+      customer.age,
+      RETURN_PCT,
+    ),
     basketsCard(yearBaskets),
-    peerTotalCard(youMonthlyEur, peerTotal, peers.ageBand),
+    peerTotalCard(youMonthlyEur, peerTotal),
     biggestGapCard(peers),
     biggestChangeCard(
       before,

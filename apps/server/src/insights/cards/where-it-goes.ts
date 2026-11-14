@@ -40,7 +40,6 @@ export function whereItGoesCard(yearTotals: Map<string, number>): DeckCard | nul
     topic: 'Where your money goes',
     chart: { type: 'donut', slices },
     sentence: `${label} takes the biggest share: ${pctText(top.totalEur / total)} of your spending.`,
-    sourceNote: 'Monthly average · last 12 months',
     questions: [
       `How much do I spend on ${label.toLowerCase()} each month?`,
       'What are my biggest costs?',

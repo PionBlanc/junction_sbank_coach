@@ -20,6 +20,7 @@ export const cardChartSchema = z.discriminatedUnion('type', [
     ),
   }),
   z.object({ type: z.literal('stat'), valueEur: z.number(), caption: z.string() }),
+  z.object({ type: z.literal('years'), years: z.number(), caption: z.string() }),
   z.object({
     type: z.literal('incomeVsSpending'),
     /** Oldest month first. */
@@ -39,10 +40,8 @@ export const deckCardSchema = z.object({
   chart: cardChartSchema,
   /** One sentence saying what the chart shows. */
   sentence: z.string(),
-  /** Period and comparison group, such as "Last 12 months · people your age". */
-  sourceNote: z.string(),
-  /** One or two questions the user can tap to start a chat. */
-  questions: z.array(z.string()).min(1).max(2),
+  /** Two questions the user can tap to start a chat. */
+  questions: z.array(z.string()).length(2),
 });
 export type DeckCard = z.infer<typeof deckCardSchema>;
 

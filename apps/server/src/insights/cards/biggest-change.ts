@@ -51,7 +51,9 @@ export function biggestChangeCard(
     sentence:
       `${label} spending is ${direction} ${pctText(best.afterEur / best.beforeEur - 1)} ` +
       'from the same months last year.',
-    sourceNote: `Monthly average · ${afterPeriod.label} vs. a year earlier`,
-    questions: [`How has my ${label.toLowerCase()} spending changed over the last year?`],
+    questions: [
+      `How has my ${label.toLowerCase()} spending changed over the last year?`,
+      'Which other costs changed this year?',
+    ],
   };
 }

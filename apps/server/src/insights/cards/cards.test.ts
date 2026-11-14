@@ -6,13 +6,13 @@ import { basketsCard } from './baskets.ts';
 import { biggestChangeCard } from './biggest-change.ts';
 import { biggestGapCard } from './biggest-gap.ts';
 import { incomeVsSpendingCard } from './income-vs-spending.ts';
+import { millionaireCard, yearsToMillion } from './millionaire.ts';
+import { paydayCard } from './payday.ts';
 import { peerTotalCard } from './peer-total.ts';
 import { safeToSpendCard } from './safe-to-spend.ts';
 import { periodText } from './text.ts';
-import { trendCard } from './trend.ts';
+import { weekendCard } from './weekend.ts';
 import { whereItGoesCard } from './where-it-goes.ts';
-
-const MONTHS = ['2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09'];
 
 describe('safeToSpendCard', () => {
   const data: SafeToSpend = {
@@ -57,6 +57,16 @@ describe('incomeVsSpendingCard', () => {
     expect(card?.sentence).toBe('Your income covered your spending in all of the last 2 months.');
   });
 
+  it('says so when spending was larger every month', () => {
+    const card = incomeVsSpendingCard([
+      { month: '2026-08', incomeEur: 2000, spendingEur: 2100 },
+      { month: '2026-09', incomeEur: 2000, spendingEur: 2500 },
+    ]);
+    expect(card?.sentence).toBe(
+      'You spent more than you earned in every one of the last 2 months.',
+    );
+  });
+
   it('has nothing to say without data', () => {
     expect(incomeVsSpendingCard([])).toBeNull();
   });
@@ -69,32 +79,52 @@ describe('periodText', () => {
   });
 });
 
-describe('trendCard', () => {
-  const series = (values: number[]) =>
-    MONTHS.map((month, i) => ({ month, totalEur: values[i] ?? 0 }));
-
-  it('calls a rise of more than 5% between the first and last three months a trend up', () => {
-    const card = trendCard(series([1000, 1000, 1000, 1100, 1100, 1100]));
-    expect(card?.sentence).toBe('Your spending has been trending up over the past 6 months.');
-    expect(card?.chart).toMatchObject({ type: 'bars' });
-    if (card?.chart.type !== 'bars') return;
-    expect(card.chart.bars.map((b) => [b.label, b.highlight])).toEqual([
-      ['Apr', false],
-      ['May', false],
-      ['Jun', false],
-      ['Jul', false],
-      ['Aug', false],
-      ['Sep', true],
+describe('weekendCard', () => {
+  it('compares an average weekend day with an average weekday', () => {
+    // 2026-09-05 and 2026-09-06 are a Saturday and a Sunday.
+    const card = weekendCard([
+      { date: '2026-09-04', totalEur: 40 },
+      { date: '2026-09-05', totalEur: 100 },
+      { date: '2026-09-06', totalEur: 60 },
+      { date: '2026-09-07', totalEur: 60 },
     ]);
+    expect(card?.sentence).toBe('You spend 60% more on a weekend day.');
+    if (card?.chart.type !== 'bars') throw new Error('expected bars');
+    expect(card.chart.bars.map((b) => b.valueEur)).toEqual([50, 80]);
+  });
+});
+
+describe('paydayCard', () => {
+  it('compares the week after payday with the rest of the pay period', () => {
+    const days = Array.from({ length: 28 }, (_, i) => ({
+      daysSincePayday: i,
+      totalEur: i < 7 ? 30 : 20,
+    }));
+    expect(paydayCard(days)?.sentence).toBe('You spend 50% more a day right after payday.');
   });
 
-  it('calls a small change steady', () => {
-    const card = trendCard(series([1000, 1000, 1000, 1020, 1020, 1020]));
-    expect(card?.sentence).toBe('Your spending has stayed steady over the past 6 months.');
+  it('calls a small difference even', () => {
+    const days = Array.from({ length: 28 }, (_, i) => ({ daysSincePayday: i, totalEur: 20 }));
+    expect(paydayCard(days)?.sentence).toBe('You spend evenly between paydays.');
+  });
+});
+
+describe('millionaireCard', () => {
+  it('counts the whole years until monthly investing reaches a million', () => {
+    // 1 000 € a month at 5%: 395 months, so 33 whole years.
+    expect(yearsToMillion(1000, 0.05)).toBe(33);
+    const card = millionaireCard({ monthlyEur: 1000, source: 'left-over' }, 30, 0.05);
+    expect(card?.chart).toEqual({
+      type: 'years',
+      years: 33,
+      caption: 'years to 1 000 000 € at 5% a year',
+    });
+    expect(card?.sentence).toBe('Investing 1 000 € a month, you are a millionaire at 63.');
   });
 
-  it('has nothing to say without spending', () => {
-    expect(trendCard(series([0, 0, 0, 0, 0, 0]))).toBeNull();
+  it('stays quiet when there is nothing to invest or it would take too long', () => {
+    expect(millionaireCard({ monthlyEur: 0, source: 'actions' }, 30, 0.05)).toBeNull();
+    expect(millionaireCard({ monthlyEur: 5, source: 'actions' }, 30, 0.05)).toBeNull();
   });
 });
 
@@ -139,13 +169,9 @@ describe('basketsCard', () => {
 
 describe('peerTotalCard', () => {
   it('says how much more or less the user spends', () => {
-    expect(peerTotalCard(900, 1000, '25-34')?.sentence).toBe(
-      'You spend 10% less than people your age.',
-    );
-    expect(peerTotalCard(1250, 1000, '25-34')?.sentence).toBe(
-      'You spend 25% more than people your age.',
-    );
-    expect(peerTotalCard(1030, 1000, '25-34')?.sentence).toBe(
+    expect(peerTotalCard(900, 1000)?.sentence).toBe('You spend 10% less than people your age.');
+    expect(peerTotalCard(1250, 1000)?.sentence).toBe('You spend 25% more than people your age.');
+    expect(peerTotalCard(1030, 1000)?.sentence).toBe(
       'You spend about the same as people your age.',
     );
   });

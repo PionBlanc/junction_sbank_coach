@@ -27,7 +27,6 @@ export function basketsCard(yearTotals: Map<string, number>): DeckCard | null {
       })),
     },
     sentence: `Everyday spending is ${pctText(everyday / total)} of what you spend: the easiest part to change.`,
-    sourceNote: 'Monthly average · last 12 months',
     questions: ['What are the three spending baskets?', 'What counts as my everyday spending?'],
   };
 }

@@ -32,7 +32,6 @@ export function biggestGapCard(peers: PeerComparison): DeckCard | null {
     sentence:
       `You spend ${eurText(best.youMonthlyAvgEur)} a month on ${name}. ` +
       `People your age: ${eurText(best.peerMedianMonthlyEur)}.`,
-    sourceNote: 'Monthly average · last 12 months · people your age',
     questions: [
       `Why is my ${name} spending higher than people my age?`,
       category.basket === 'everyday'

@@ -7,7 +7,7 @@ import { LAST_MONTH, MONTHS_IN_YEAR, YEAR_FROM_MONTH, round2 } from './helpers.t
  * Example yearly returns for the "invested" line and its range. Assumptions shown as such in the UI.
  * TODO(team): placeholders, agree on the rates and write down the source.
  */
-const RETURN_PCT = 0.05;
+export const RETURN_PCT = 0.05;
 const RETURN_LOW_PCT = 0.03;
 const RETURN_HIGH_PCT = 0.07;
 

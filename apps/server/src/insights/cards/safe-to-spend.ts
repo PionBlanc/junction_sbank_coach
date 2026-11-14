@@ -1,5 +1,5 @@
-import { DATA_END_DATE, type DeckCard, type SafeToSpend } from '@coach/shared';
-import { dayText, eurText } from './text.ts';
+import type { DeckCard, SafeToSpend } from '@coach/shared';
+import { eurText } from './text.ts';
 
 /** The one number a person needs every day. Always shown, first in the deck. */
 export function safeToSpendCard(data: SafeToSpend): DeckCard {
@@ -12,9 +12,8 @@ export function safeToSpendCard(data: SafeToSpend): DeckCard {
       ? `The bills due before payday are ${eurText(-data.availableEur)} more than your balance.`
       : `You can spend ${eurText(data.safeThisWeekEur)} this week, ` +
         `${eurText(data.perDayEur)} a day until payday.`,
-    sourceNote: `Balance on ${dayText(DATA_END_DATE)} minus bills due before payday`,
     questions: short
-      ? ['How can I make my money last until payday?']
+      ? ['How can I make my money last until payday?', 'Where did my money go this month?']
       : ['What is safe for me to spend this week?', 'How is my safe-to-spend calculated?'],
   };
 }

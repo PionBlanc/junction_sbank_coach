@@ -19,7 +19,6 @@ const SHORT_MONTHS = [
   'Nov',
   'Dec',
 ] as const;
-const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
 
 /** 1234.5 → "1 235 €". */
 export function eurText(value: number): string {
@@ -42,9 +41,4 @@ export function periodText(fromMonth: string, toMonth: string): string {
   const toYear = toMonth.slice(0, 4);
   const from = shortMonthText(fromMonth) + (fromYear === toYear ? '' : ` ${fromYear}`);
   return `${from}–${shortMonthText(toMonth)} ${toYear}`;
-}
-
-/** "2026-09-30" → "30 September". */
-export function dayText(date: string): string {
-  return DAY.format(new Date(`${date}T00:00:00Z`));
 }

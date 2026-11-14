@@ -8,7 +8,6 @@ const SAME_PCT = 0.05;
 export function peerTotalCard(
   youMonthlyEur: number,
   peerMedianMonthlyEur: number,
-  ageBand: string,
 ): DeckCard | null {
   if (peerMedianMonthlyEur <= 0) return null;
 
@@ -28,7 +27,6 @@ export function peerTotalCard(
       ],
     },
     sentence,
-    sourceNote: `Monthly average · last 12 months · people aged ${ageBand}`,
     questions: [
       'Where do I spend more than people my age?',
       'How do I compare with people my age?',

@@ -119,3 +119,47 @@ export async function getIncomeAndSpendingByMonth(
     spendingEur: Number(r.spending_eur),
   }));
 }
+
+export type DayPurchases = { date: string; totalEur: number; daysSincePayday: number };
+
+/**
+ * Card purchases per calendar day (zero on days without any), with the days since the last salary.
+ * Purchases only, so housing and utility bills on fixed dates do not skew the pattern.
+ */
+export async function getDailyPurchases(
+  db: DuckDBConnection,
+  customerId: string,
+  fromDate: string,
+  toDate: string,
+): Promise<DayPurchases[]> {
+  const rows = await queryRows(
+    db,
+    `WITH pay AS (
+       SELECT DISTINCT tx_date AS pay_date FROM transactions
+       WHERE customer_id = $customerId AND category_id = 'salary'
+     ),
+     calendar AS (
+       SELECT CAST(d AS DATE) AS day
+       FROM range(CAST($fromDate AS DATE), CAST($toDate AS DATE) + 1, INTERVAL 1 DAY) t(d)
+     ),
+     spend AS (
+       SELECT tx_date, sum(abs_amount_eur) AS total_eur FROM transactions
+       WHERE customer_id = $customerId AND transaction_type = 'purchase'
+         AND basket IN (${SPENDING_BASKETS_SQL})
+         AND tx_date BETWEEN CAST($fromDate AS DATE) AND CAST($toDate AS DATE)
+       GROUP BY tx_date
+     )
+     SELECT CAST(c.day AS VARCHAR) AS day, coalesce(s.total_eur, 0) AS total_eur,
+            date_diff('day', p.pay_date, c.day) AS days_since_payday
+     FROM calendar c
+     ASOF JOIN pay p ON c.day >= p.pay_date
+     LEFT JOIN spend s ON s.tx_date = c.day
+     ORDER BY c.day`,
+    { customerId, fromDate, toDate },
+  );
+  return rows.map((r) => ({
+    date: String(r.day),
+    totalEur: Number(r.total_eur),
+    daysSincePayday: Number(r.days_since_payday),
+  }));
+}

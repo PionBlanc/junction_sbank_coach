@@ -10,11 +10,11 @@ export function App() {
     <div className="min-h-screen bg-surface text-ink">
       <UserProvider>
         <ChatProvider>
-          <main className="mx-auto flex max-w-[390px] flex-col gap-4 p-4 pb-40">
+          <main className="mx-auto flex max-w-[390px] flex-col gap-4 p-4">
             <UserSwitcher />
             <CardDeck />
+            <Chat />
           </main>
-          <Chat />
         </ChatProvider>
       </UserProvider>
     </div>
