@@ -89,6 +89,29 @@
   --radius-sm: 2px;
   --radius-md: 12px;
   --radius-lg: 24px;
+
+  /* The swipe intro card nudging right, then left, to show that the cards are swiped. */
+  --animate-swipe-hint: swipe-hint 3.2s ease-in-out 0.8s infinite;
+  @keyframes swipe-hint {
+    0%,
+    12%,
+    100% {
+      transform: none;
+    }
+    27% {
+      transform: translateX(22%) rotate(5deg);
+    }
+    42%,
+    52% {
+      transform: none;
+    }
+    67% {
+      transform: translateX(-22%) rotate(-5deg);
+    }
+    82% {
+      transform: none;
+    }
+  }
 }
 
 @layer base {

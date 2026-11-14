@@ -62,16 +62,21 @@ export function SwipeDeck() {
   const next = remaining[1];
 
   function decide(liked: boolean) {
-    if (!top || leaving || !introSeen) return;
+    if (!top || leaving) return;
     setLeaving(liked ? 'right' : 'left');
     setDragging(false);
     setTimeout(() => {
+      setLeaving(null);
+      setDragX(0);
+      // While the intro is up, any swipe only sends the intro away.
+      if (!introSeen) {
+        setIntroSeen(true);
+        return;
+      }
       swipe(top.id, liked);
       if (liked) setMatch(top);
       // The last card leads to the results, which have no total to fly to.
       if (liked && next) launchCoin(top.savingPerMonthEur);
-      setLeaving(null);
-      setDragX(0);
     }, LEAVE_MS);
   }
 
@@ -195,7 +200,19 @@ export function SwipeDeck() {
   if (leaving === 'left') topTransform = 'translateX(-150%) rotate(-20deg)';
   const stamp = Math.min(1, Math.abs(dragX) / STAMP_FULL_PX);
   // The card underneath grows as the top one is dragged away, and is full size once it has left.
-  const nextScale = leaving ? 1 : NEXT_SCALE + (1 - NEXT_SCALE) * stamp * 0.5;
+  // While the intro is up, the drag moves the intro and the idea cards wait in place.
+  let nextScale = leaving ? 1 : NEXT_SCALE + (1 - NEXT_SCALE) * stamp * 0.5;
+  if (!introSeen) nextScale = NEXT_SCALE;
+  const dragHandlers = {
+    onPointerDown,
+    onPointerMove,
+    onPointerUp: onPointerEnd,
+    onPointerCancel: onPointerEnd,
+  };
+  const dragStyle = {
+    transform: topTransform,
+    transition: dragging ? 'none' : `transform ${LEAVE_MS}ms ease-out`,
+  };
 
   return (
     <div className="flex flex-1 flex-col gap-4">
@@ -256,23 +273,28 @@ export function SwipeDeck() {
         <div
           key={top.id}
           className="absolute inset-0 touch-pan-y select-none"
-          style={{
-            transform: topTransform,
-            transition: dragging ? 'none' : `transform ${LEAVE_MS}ms ease-out`,
-          }}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerEnd}
-          onPointerCancel={onPointerEnd}
+          {...(introSeen ? { style: dragStyle, ...dragHandlers } : {})}
         >
           <OpportunityCard
             action={top}
             index={all.indexOf(top)}
-            likeOpacity={leaving === 'right' ? 1 : dragX > 0 ? stamp : 0}
-            passOpacity={leaving === 'left' ? 1 : dragX < 0 ? stamp : 0}
+            likeOpacity={!introSeen ? 0 : leaving === 'right' ? 1 : dragX > 0 ? stamp : 0}
+            passOpacity={!introSeen ? 0 : leaving === 'left' ? 1 : dragX < 0 ? stamp : 0}
           />
         </div>
-        {!introSeen && <SwipeIntro count={all.length} onStart={() => setIntroSeen(true)} />}
+        {!introSeen && (
+          <div
+            className="absolute inset-0 touch-pan-y select-none"
+            style={dragStyle}
+            {...dragHandlers}
+          >
+            <SwipeIntro
+              count={all.length}
+              hint={!dragging && !leaving && dragX === 0}
+              onStart={() => decide(true)}
+            />
+          </div>
+        )}
         {match && (
           <div
             className="pointer-events-none absolute inset-x-4 top-1/2 flex -translate-y-1/2 -rotate-2 items-center gap-4 rounded-md border-2 border-ink bg-card p-4 text-ink"

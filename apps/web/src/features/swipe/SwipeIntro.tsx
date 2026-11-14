@@ -1,17 +1,20 @@
 type SwipeIntroProps = {
   /** How many saving ideas wait in the deck. */
   count: number;
+  /** Nudge the card right and left to show that it can be swiped. Off while the user drags it. */
+  hint: boolean;
   onStart: () => void;
 };
 
 /**
- * How swiping works, shown as the first card of the deck before the first swipe.
- * It covers only the deck, so the demo customer picker above stays usable.
+ * How swiping works, shown as the first card of the deck before the first swipe. The deck lets the
+ * user swipe it away like any other card. It covers only the deck, so the demo customer picker above
+ * stays usable.
  */
 export function SwipeIntro(props: SwipeIntroProps) {
   return (
     <div
-      className="absolute inset-0 flex touch-none flex-col justify-between gap-4 rounded-lg bg-ink p-6 text-card"
+      className={`flex h-full flex-col justify-between gap-4 rounded-lg bg-ink p-6 text-card ${props.hint ? 'motion-safe:animate-swipe-hint' : ''}`}
       role="dialog"
       aria-label="How swiping works"
     >
