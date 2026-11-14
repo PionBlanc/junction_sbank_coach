@@ -1,4 +1,4 @@
-# S-Bank Money Coach (working title)
+# Transactions to actions
 
 Junction 2026 hackathon project for the S-Pankki challenge: **turn personal banking data into a trusted financial coach for everyday life.**
 

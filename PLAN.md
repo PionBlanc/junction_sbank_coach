@@ -51,8 +51,7 @@ Tasks:
 
 - [x] **Hosting platform.** Decided: Railway, as a new service next to the existing one in the team's project. Auto-deploy on every push to `main` is fine. Steps in [docs/railway-deploy.md](docs/railway-deploy.md)
 - [ ] **Subscriptions.** The dataset has none, so the "three streaming services" example cannot come from real data. Recommendation: skip the recurring-payment detector (it would find nothing in the demo) and do not fake subscriptions. Mention it as a next step in the pitch
-- [ ] **Groceries basket.** Currently `mandatory_regular` (needs, recurring). Alternative: `everyday`. One-line change in [taxonomy.ts](packages/shared/src/taxonomy.ts), then rerun `npm run data:prepare`
-- [ ] **App name.** Replace the working title in the README
+- [x] **App name.** Decided: "Transactions to actions"
 
 ### Setup
 
