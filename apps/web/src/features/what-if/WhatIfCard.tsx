@@ -2,6 +2,7 @@ import { CATEGORIES, type CategoryId } from '@coach/shared';
 import { useState } from 'react';
 import { useWhatIf } from '../../api/useWhatIf.ts';
 import { Card } from '../../components/Card.tsx';
+import { LoadError } from '../../components/LoadError.tsx';
 import { formatEur, formatNumber, formatPct } from '../../lib/format.ts';
 import { useUser } from '../../lib/user-context.ts';
 import { GrowthChart } from '../charts/GrowthChart.tsx';
@@ -27,14 +28,14 @@ export function WhatIfCard(props: WhatIfCardProps) {
   if (whatIf.isPending) {
     return (
       <Card title="What if">
-        <p className="text-muted">Loading…</p>
+        <div className="h-40 animate-pulse rounded-sm bg-fill" aria-busy aria-label="Loading" />
       </Card>
     );
   }
   if (whatIf.isError) {
     return (
       <Card title="What if">
-        <p className="text-negative">Could not load: {whatIf.error.message}</p>
+        <LoadError message={whatIf.error.message} onRetry={() => void whatIf.refetch()} />
       </Card>
     );
   }
@@ -53,8 +54,8 @@ export function WhatIfCard(props: WhatIfCardProps) {
             <button
               key={option}
               type="button"
-              className={`h-11 flex-1 rounded-lg text-sm ${
-                option === cutPct ? 'bg-brand text-card' : 'bg-surface'
+              className={`h-11 flex-1 rounded-md border text-small ${
+                option === cutPct ? 'border-ink bg-fill font-semibold' : 'border-line'
               }`}
               onClick={() => setCutPct(option)}
             >
@@ -64,20 +65,27 @@ export function WhatIfCard(props: WhatIfCardProps) {
         </div>
       )}
       <p>
-        Frees up <span className="text-2xl font-semibold">{formatEur(data.monthlyEur)}</span> a
+        Frees up <span className="text-title font-semibold">{formatEur(data.monthlyEur)}</span> a
         month
         {data.baseMonthlyEur !== null && (
-          <span className="text-sm text-muted">
+          <span className="text-small text-muted">
             {' '}
             (you spend {formatEur(data.baseMonthlyEur)} a month, 12-month average)
           </span>
         )}
       </p>
       <GrowthChart series={data.series} />
-      <p className="text-xs text-muted">
-        <span className="text-brand">■</span> invested · ■ saved
+      <p className="flex gap-4 text-caption text-muted">
+        <span className="flex items-center gap-2">
+          <span className="size-2 rounded-sm bg-chart-focus" />
+          invested
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="size-2 rounded-sm bg-chart-rest-2" />
+          saved
+        </span>
       </p>
-      <p className="text-sm">
+      <p className="text-small">
         In 5 years: <span className="font-semibold">{formatEur(data.fiveYearSavedEur)}</span> saved
         {data.fiveYearHousingMonths !== null && (
           <>. That is {formatNumber(data.fiveYearHousingMonths)} months of your housing cost</>
@@ -85,7 +93,7 @@ export function WhatIfCard(props: WhatIfCardProps) {
         .
       </p>
       {tenYears && (
-        <p className="text-xs text-muted">
+        <p className="text-caption text-muted">
           Invested for 10 years it could be about {formatEur(tenYears.investedEur)} (between{' '}
           {formatEur(tenYears.investedLowEur)} and {formatEur(tenYears.investedHighEur)}). This
           assumes a return of {formatPct(data.returnPct)} a year (range{' '}

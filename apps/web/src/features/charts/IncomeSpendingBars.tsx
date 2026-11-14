@@ -9,13 +9,13 @@ type IncomeSpendingBarsProps = {
 export function IncomeSpendingBars(props: IncomeSpendingBarsProps) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex gap-4 text-xs text-muted">
-        <span className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-full bg-chart-rest" />
+      <div className="flex gap-4 text-caption text-muted">
+        <span className="flex items-center gap-2">
+          <span className="size-2 rounded-sm bg-chart-rest-2" />
           Income
         </span>
-        <span className="flex items-center gap-1.5">
-          <span className="size-2.5 rounded-full bg-brand" />
+        <span className="flex items-center gap-2">
+          <span className="size-2 rounded-sm bg-chart-focus" />
           Spending
         </span>
       </div>
@@ -29,7 +29,7 @@ export function IncomeSpendingBars(props: IncomeSpendingBarsProps) {
           >
             <XAxis
               dataKey="month"
-              axisLine={false}
+              axisLine={{ stroke: 'var(--color-line)' }}
               tickLine={false}
               interval={0}
               fontSize={12}
@@ -38,14 +38,14 @@ export function IncomeSpendingBars(props: IncomeSpendingBarsProps) {
             />
             <Bar
               dataKey="incomeEur"
-              fill="var(--color-chart-rest)"
-              radius={[3, 3, 0, 0]}
+              fill="var(--color-chart-rest-2)"
+              radius={[2, 2, 0, 0]}
               isAnimationActive={false}
             />
             <Bar
               dataKey="spendingEur"
-              fill="var(--color-brand)"
-              radius={[3, 3, 0, 0]}
+              fill="var(--color-chart-focus)"
+              radius={[2, 2, 0, 0]}
               isAnimationActive={false}
             />
           </BarChart>

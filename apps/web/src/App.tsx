@@ -7,10 +7,10 @@ import { UserSwitcher } from './features/user/UserSwitcher.tsx';
 /** Registration only: one line per page section. */
 export function App() {
   return (
-    <div className="min-h-screen bg-surface text-ink">
+    <div className="min-h-dvh bg-card text-ink tabular-nums">
       <UserProvider>
         <ChatProvider>
-          <main className="mx-auto flex max-w-[390px] flex-col gap-4 p-4">
+          <main className="mx-auto flex min-h-dvh max-w-[390px] flex-col gap-4 bg-surface p-4 sm:border-x sm:border-line">
             <UserSwitcher />
             <CardDeck />
             <Chat />

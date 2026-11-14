@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { useCards } from '../../api/useCards.ts';
 import { Card } from '../../components/Card.tsx';
+import { LoadError } from '../../components/LoadError.tsx';
 import { useUser } from '../../lib/user-context.ts';
 import { ActionList } from '../actions/ActionList.tsx';
 import { ArrowButton } from './ArrowButton.tsx';
+import { DeckSkeleton } from './DeckSkeleton.tsx';
 import { InsightCard } from './InsightCard.tsx';
 
 /** A swipe longer than this share of the card width moves to the next card... */
@@ -93,16 +95,12 @@ export function CardDeck() {
   }
 
   if (cards.isPending) {
-    return (
-      <Card>
-        <p className="text-muted">Loading…</p>
-      </Card>
-    );
+    return <DeckSkeleton />;
   }
   if (cards.isError) {
     return (
       <Card>
-        <p className="text-negative">Could not load: {cards.error.message}</p>
+        <LoadError message={cards.error.message} onRetry={() => void cards.refetch()} />
       </Card>
     );
   }
@@ -114,13 +112,13 @@ export function CardDeck() {
 
   return (
     <div className="flex flex-col gap-2">
-      <nav className="flex items-center justify-between" aria-label="Cards">
+      <nav className="flex items-center gap-2" aria-label="Cards">
         <ArrowButton direction="previous" disabled={index === 0} onClick={() => go(-1)} />
-        <div className="flex gap-1.5">
+        <div className="flex flex-1 gap-1">
           {slides.map((slide, i) => (
             <span
               key={slide.key}
-              className={`size-2 rounded-full ${i === index ? 'bg-brand' : 'bg-line'}`}
+              className={`h-0.5 flex-1 ${i === index ? 'bg-ink' : 'bg-line'}`}
             />
           ))}
         </div>

@@ -10,7 +10,7 @@ export function ArrowButton(props: ArrowButtonProps) {
     <button
       type="button"
       aria-label={props.direction === 'next' ? 'Next card' : 'Previous card'}
-      className="flex size-11 items-center justify-center rounded-full text-muted hover:bg-card disabled:opacity-30"
+      className="flex size-11 items-center justify-center rounded-md text-muted hover:bg-fill disabled:opacity-30"
       disabled={props.disabled}
       onClick={props.onClick}
     >

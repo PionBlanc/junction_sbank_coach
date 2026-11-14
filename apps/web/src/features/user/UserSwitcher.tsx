@@ -5,11 +5,11 @@ import { useUser } from '../../lib/user-context.ts';
 export function UserSwitcher() {
   const { userId, setUserId } = useUser();
   return (
-    <header className="flex flex-col gap-2">
-      <h1 className="text-xl font-semibold">Coach</h1>
+    <header className="flex items-center justify-between gap-4">
+      <h1 className="text-title font-semibold">Coach</h1>
       <select
         aria-label="Demo customer"
-        className="h-11 rounded-lg bg-card px-3 text-sm shadow-sm"
+        className="h-11 max-w-[70%] min-w-0 truncate rounded-md text-small text-muted"
         value={userId}
         onChange={(event) => {
           const customer = DEMO_CUSTOMERS.find((c) => c.customerId === event.target.value);

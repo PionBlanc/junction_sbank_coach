@@ -6,7 +6,7 @@ import { CoachAvatar } from './CoachAvatar.tsx';
 import { ToolCard } from './ToolCard.tsx';
 import { TypingIndicator } from './TypingIndicator.tsx';
 
-/** The coach. A text field under the cards; the conversation opens above it, below the card. */
+/** The coach. A text field at the bottom of the screen; the conversation opens below the card. */
 export function Chat() {
   const { messages, status, error, busy, open, setOpen, ask } = useCoachChat();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -27,13 +27,13 @@ export function Chat() {
   }, [open]);
 
   return (
-    <div ref={panelRef} className="flex flex-col gap-3">
+    <>
       {open && (
-        <div className="flex flex-col gap-1">
+        <div ref={panelRef} className="flex scroll-mb-24 flex-col gap-1">
           <button
             type="button"
             aria-label="Close chat"
-            className="flex size-11 items-center justify-center self-end rounded-full text-muted hover:bg-card"
+            className="flex size-11 items-center justify-center self-end rounded-md text-muted hover:bg-fill"
             onClick={() => setOpen(false)}
           >
             <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>
@@ -41,11 +41,11 @@ export function Chat() {
             </svg>
           </button>
 
-          <div ref={listRef} className="flex max-h-96 flex-col gap-3 overflow-y-auto p-1">
+          <div ref={listRef} className="flex max-h-96 flex-col gap-4 overflow-y-auto p-1">
             {messages.length === 0 && (
-              <div className="flex items-end gap-2">
+              <div className="flex items-start gap-2">
                 <CoachAvatar />
-                <p className="max-w-[80%] rounded-2xl rounded-bl-md bg-card px-4 py-3 text-sm shadow-sm">
+                <p className="pt-1 text-small">
                   Hi! Ask me anything about your money. I look at your own transactions and show you
                   the numbers.
                 </p>
@@ -59,7 +59,7 @@ export function Chat() {
                   return (
                     <p
                       key={key}
-                      className="max-w-[80%] self-end rounded-2xl rounded-br-md bg-brand px-4 py-2 text-sm whitespace-pre-wrap text-card"
+                      className="max-w-[80%] self-end rounded-lg bg-fill px-4 py-2 text-small whitespace-pre-wrap"
                     >
                       {part.text}
                     </p>
@@ -67,11 +67,9 @@ export function Chat() {
                 }
                 if (part.type === 'text' && part.text.trim() !== '') {
                   return (
-                    <div key={key} className="flex items-end gap-2">
+                    <div key={key} className="flex items-start gap-2">
                       <CoachAvatar />
-                      <p className="max-w-[80%] rounded-2xl rounded-bl-md bg-card px-4 py-3 text-sm whitespace-pre-wrap shadow-sm">
-                        {part.text}
-                      </p>
+                      <p className="pt-1 text-small whitespace-pre-wrap">{part.text}</p>
                     </div>
                   );
                 }
@@ -91,16 +89,17 @@ export function Chat() {
 
             {waiting && <TypingIndicator />}
             {error && (
-              <p className="rounded-xl bg-card px-4 py-3 text-sm text-negative shadow-sm">
+              <p className="rounded-md border border-line bg-card px-4 py-2 text-small">
                 The coach could not answer just now. Please try again.
               </p>
             )}
           </div>
         </div>
       )}
-      <div className="rounded-xl bg-card p-3 shadow-sm">
+      {/* Docked to the bottom of the screen, like the text field of a phone app. */}
+      <div className="sticky bottom-0 -mx-4 mt-auto -mb-4 border-t border-line bg-surface px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <ChatComposer disabled={busy} onSend={ask} onFocus={() => setOpen(true)} />
       </div>
-    </div>
+    </>
   );
 }

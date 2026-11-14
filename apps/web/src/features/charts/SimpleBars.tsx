@@ -11,23 +11,24 @@ export function SimpleBars(props: SimpleBarsProps) {
         <BarChart data={props.bars} margin={{ top: 24, right: 4, bottom: 0, left: 4 }}>
           <XAxis
             dataKey="label"
-            axisLine={false}
+            axisLine={{ stroke: 'var(--color-line)' }}
             tickLine={false}
             interval={0}
             fontSize={12}
             tick={{ fill: 'var(--color-muted)' }}
           />
-          <Bar dataKey="valueEur" radius={[6, 6, 0, 0]} maxBarSize={72} isAnimationActive={false}>
+          <Bar dataKey="valueEur" radius={[2, 2, 0, 0]} maxBarSize={40} isAnimationActive={false}>
             {props.bars.map((bar) => (
               <Cell
                 key={bar.label}
-                fill={bar.highlight ? 'var(--color-brand)' : 'var(--color-chart-rest)'}
+                fill={bar.highlight ? 'var(--color-chart-focus)' : 'var(--color-chart-rest-2)'}
               />
             ))}
             <LabelList
               dataKey="valueEur"
               position="top"
-              fontSize={12}
+              fontSize={14}
+              fontWeight={600}
               fill="var(--color-ink)"
               formatter={(value) => formatEur(Number(value))}
             />

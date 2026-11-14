@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useActions } from '../../api/useActions.ts';
 import { Card } from '../../components/Card.tsx';
+import { LoadError } from '../../components/LoadError.tsx';
 import { formatEur } from '../../lib/format.ts';
 import { useUser } from '../../lib/user-context.ts';
 import { WhatIfCard } from '../what-if/WhatIfCard.tsx';
@@ -17,21 +18,21 @@ export function ActionList() {
   if (actions.isPending) {
     return (
       <Card title={TITLE}>
-        <p className="text-muted">Loading…</p>
+        <div className="h-40 animate-pulse rounded-sm bg-fill" aria-busy aria-label="Loading" />
       </Card>
     );
   }
   if (actions.isError) {
     return (
       <Card title={TITLE}>
-        <p className="text-negative">Could not load: {actions.error.message}</p>
+        <LoadError message={actions.error.message} onRetry={() => void actions.refetch()} />
       </Card>
     );
   }
   if (actions.data.length === 0) {
     return (
       <Card title={TITLE}>
-        <p className="text-sm">
+        <p className="text-small">
           Your everyday spending is in line with people your age. Nothing stands out to change.
         </p>
       </Card>
@@ -49,40 +50,45 @@ export function ActionList() {
 
   return (
     <Card title={TITLE}>
-      {actions.data.map((action) => (
-        <label key={action.id} className="flex min-h-11 cursor-pointer gap-3">
-          <input
-            type="checkbox"
-            className="mt-1 size-5 accent-brand"
-            checked={selectedIds.includes(action.id)}
-            onChange={() => toggle(action.id)}
-          />
-          <span className="flex flex-1 flex-col gap-1">
-            <span className="flex justify-between gap-2 text-sm font-semibold">
-              <span>{action.title}</span>
-              <span className="whitespace-nowrap text-positive">
-                ~{formatEur(action.savingPerMonthEur)}/month
+      <div className="flex flex-col divide-y divide-line">
+        {actions.data.map((action) => (
+          <label key={action.id} className="flex min-h-11 cursor-pointer gap-4 py-4 first:pt-0">
+            <input
+              type="checkbox"
+              className="size-5 shrink-0 accent-brand"
+              checked={selectedIds.includes(action.id)}
+              onChange={() => toggle(action.id)}
+            />
+            <span className="flex flex-1 flex-col gap-1">
+              <span className="flex justify-between gap-4 text-small">
+                <span>{action.title}</span>
+                <span className="font-semibold whitespace-nowrap text-positive">
+                  ~{formatEur(action.savingPerMonthEur)}/month
+                </span>
               </span>
+              <span className="text-caption text-muted">{action.explanation}</span>
             </span>
-            <span className="text-xs text-muted">{action.explanation}</span>
-          </span>
-        </label>
-      ))}
-      <p className="border-t border-surface pt-3 text-sm">
-        Selected: <span className="font-semibold">{formatEur(monthlyEur)}/month</span>
+          </label>
+        ))}
+      </div>
+      {/* Stays at the bottom of the card while the list scrolls. It sits on the card border. */}
+      <div className="sticky bottom-0 -mx-[calc(1rem+1px)] -mb-[calc(1rem+1px)] flex flex-col gap-4 rounded-b-md border border-line bg-card p-4">
+        <p className="text-small">
+          Selected: <span className="font-semibold">{formatEur(monthlyEur)}/month</span>
+          {selected.length > 0 && (
+            <>. That is +{formatEur(weeklyEur)} a week on your safe to spend.</>
+          )}
+        </p>
         {selected.length > 0 && (
-          <>. That is +{formatEur(weeklyEur)} a week on your safe to spend.</>
+          <button
+            type="button"
+            className="h-11 rounded-md bg-brand text-small font-semibold text-card"
+            onClick={() => setShowWhatIf(!showWhatIf)}
+          >
+            {showWhatIf ? 'Hide' : 'See what this becomes'}
+          </button>
         )}
-      </p>
-      {selected.length > 0 && (
-        <button
-          type="button"
-          className="h-11 rounded-lg bg-brand text-sm font-semibold text-card"
-          onClick={() => setShowWhatIf(!showWhatIf)}
-        >
-          {showWhatIf ? 'Hide' : 'See what this becomes'}
-        </button>
-      )}
+      </div>
       {showWhatIf && selected.length > 0 && (
         <WhatIfCard key={monthlyEur} monthlyEur={Math.round(monthlyEur * 100) / 100} />
       )}

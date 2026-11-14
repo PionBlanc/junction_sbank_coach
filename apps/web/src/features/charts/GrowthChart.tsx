@@ -14,19 +14,29 @@ export function GrowthChart(props: GrowthChartProps) {
             dataKey="years"
             ticks={[1, 5, 10]}
             tickFormatter={(years: number) => `${years} yr`}
+            axisLine={{ stroke: 'var(--color-line)' }}
+            tickLine={false}
             fontSize={12}
+            tick={{ fill: 'var(--color-muted)' }}
           />
-          <YAxis width={64} tickFormatter={(value: number) => formatEur(value)} fontSize={12} />
+          <YAxis
+            width={64}
+            tickFormatter={(value: number) => formatEur(value)}
+            axisLine={false}
+            tickLine={false}
+            fontSize={12}
+            tick={{ fill: 'var(--color-muted)' }}
+          />
           <Line
             dataKey="savedEur"
-            stroke="var(--color-muted)"
+            stroke="var(--color-chart-rest-2)"
             strokeWidth={2}
             dot={false}
             isAnimationActive={false}
           />
           <Line
             dataKey="investedEur"
-            stroke="var(--color-brand)"
+            stroke="var(--color-chart-focus)"
             strokeWidth={2}
             dot={false}
             isAnimationActive={false}

@@ -6,7 +6,7 @@ type ChatComposerProps = {
   onFocus: () => void;
 };
 
-/** Pill-shaped input with a round send button. */
+/** Text field with a send button. */
 export function ChatComposer(props: ChatComposerProps) {
   const [input, setInput] = useState('');
   const canSend = !props.disabled && input.trim() !== '';
@@ -22,7 +22,7 @@ export function ChatComposer(props: ChatComposerProps) {
     <form className="flex items-center gap-2" onSubmit={handleSubmit}>
       <input
         aria-label="Ask about your money"
-        className="h-11 flex-1 rounded-full border border-line bg-surface px-4 text-sm outline-none focus:border-brand"
+        className="h-11 min-w-0 flex-1 rounded-md border border-line bg-card px-4 text-body placeholder:text-subtle focus-visible:-outline-offset-1"
         placeholder="Ask about your money…"
         value={input}
         onChange={(event) => setInput(event.target.value)}
@@ -31,7 +31,7 @@ export function ChatComposer(props: ChatComposerProps) {
       <button
         type="submit"
         aria-label="Send"
-        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-card transition-opacity disabled:opacity-40"
+        className="flex size-11 shrink-0 items-center justify-center rounded-md bg-brand text-card transition-opacity disabled:opacity-40"
         disabled={!canSend}
       >
         <svg viewBox="0 0 20 20" fill="currentColor" className="size-5" aria-hidden>

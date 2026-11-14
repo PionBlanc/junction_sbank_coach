@@ -24,17 +24,25 @@ export function InsightCard(props: InsightCardProps) {
         <BigNumber text={formatNumber(card.chart.years)} caption={card.chart.caption} />
       )}
       {card.chart.type === 'incomeVsSpending' && <IncomeSpendingBars months={card.chart.months} />}
-      <p className="text-lg leading-snug font-semibold">{card.sentence}</p>
-      <div className="mt-auto flex flex-col gap-2 pt-2">
+      <p className="text-title font-semibold">{card.sentence}</p>
+      <div className="mt-auto flex flex-col divide-y divide-line border-t border-line">
         {card.questions.map((question) => (
           <button
             key={question}
             type="button"
-            className="min-h-11 rounded-full border border-line px-4 py-2 text-left text-sm text-brand disabled:opacity-40"
+            className="flex min-h-11 items-center justify-between gap-4 py-2 text-left text-small disabled:opacity-40"
             disabled={busy}
             onClick={() => ask(question)}
           >
             {question}
+            <svg
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="size-4 shrink-0 text-subtle"
+              aria-hidden
+            >
+              <path d="M7.3 4.3a1 1 0 0 1 1.4 0l5 5a1 1 0 0 1 0 1.4l-5 5a1 1 0 0 1-1.4-1.4L11.6 10 7.3 5.7a1 1 0 0 1 0-1.4Z" />
+            </svg>
           </button>
         ))}
       </div>

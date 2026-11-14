@@ -3,6 +3,7 @@ const EUR = new Intl.NumberFormat('fi-FI', {
   currency: 'EUR',
   maximumFractionDigits: 0,
 });
+const EUR_CENTS = new Intl.NumberFormat('fi-FI', { style: 'currency', currency: 'EUR' });
 const PCT = new Intl.NumberFormat('fi-FI', { style: 'percent', maximumFractionDigits: 0 });
 const NUMBER = new Intl.NumberFormat('fi-FI', { maximumFractionDigits: 1 });
 const MONTH = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -12,6 +13,11 @@ const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', ti
 /** 1234.5 → "1 235 €". */
 export function formatEur(value: number): string {
   return EUR.format(value);
+}
+
+/** 1234.5 → "1 234,50 €". For breakdown rows, where the cents matter. */
+export function formatEurCents(value: number): string {
+  return EUR_CENTS.format(value);
 }
 
 /** 0.2 → "20 %". */
