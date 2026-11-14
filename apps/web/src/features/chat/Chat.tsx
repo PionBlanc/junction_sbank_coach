@@ -48,11 +48,25 @@ export function Chat() {
     if (list) list.scrollTop = list.scrollHeight;
   }, [messages, open, waiting]);
 
+  // While the sheet is open, the page behind it must not scroll.
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    root.style.overflow = 'hidden';
+    return () => {
+      root.style.overflow = '';
+    };
+  }, [open]);
+
   return (
     <>
       {/* Tapping anywhere outside the conversation slides it back down. */}
       {open && (
-        <div aria-hidden className="fixed inset-0 z-30 bg-ink/40" onClick={() => setOpen(false)} />
+        <div
+          aria-hidden
+          className="fixed inset-0 z-30 touch-none bg-ink/40"
+          onClick={() => setOpen(false)}
+        />
       )}
       {/*
         One container for both states, so the text field keeps its focus and text: closed, it is
@@ -79,7 +93,7 @@ export function Chat() {
             </button>
             <div
               ref={listRef}
-              className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1 pb-4"
+              className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain p-1 pb-4"
             >
               {messages.length === 0 && <CoachGreeting onAsk={ask} />}
 
