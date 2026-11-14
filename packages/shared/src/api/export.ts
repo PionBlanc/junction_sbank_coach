@@ -5,6 +5,11 @@ import { monthSchema } from './common.ts';
 export const excelExportQuerySchema = z.object({ fromMonth: monthSchema, toMonth: monthSchema });
 export type ExcelExportQuery = z.infer<typeof excelExportQuerySchema>;
 
+/** The downloaded file's name. The server sends it and the chat card shows it. */
+export function excelExportFileName(query: ExcelExportQuery): string {
+  return `my-data-${query.fromMonth}-to-${query.toMonth}.xlsx`;
+}
+
 /** Result of the coach's exportToExcel tool: what the download card links to. */
 export const excelExportSchema = z.object({
   fromMonth: monthSchema,
