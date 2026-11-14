@@ -16,6 +16,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { CATEGORIES, SUBCATEGORIES, AGE_BANDS, DATA_END_DATE, DATA_START_DATE } from '@coach/shared';
+import { demoProfilesSql } from './demo-profiles.ts';
 
 const ROOT = join(import.meta.dirname, '..', '..');
 const RAW = join(ROOT, 'data', 'raw');
@@ -125,6 +126,9 @@ if (unmapped.getRows().length > 0) {
       'Add them to packages/shared/src/taxonomy.ts.',
   );
 }
+
+// The demo customers get a hand-made subcategory mix. Must run before anything is aggregated.
+await step(con, 'demo profiles', demoProfilesSql());
 
 await step(
   con,

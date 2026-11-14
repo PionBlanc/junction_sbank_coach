@@ -32,27 +32,29 @@ These are real figures from the running server. Some of this customer's cards:
 
 | id                    | card                                                               | €/mo freed |
 | --------------------- | ------------------------------------------------------------------ | ---------- |
-| habit-restaurant      | Cook one in four restaurant meals at home (359 €/mo, 52 purchases) | 89.66      |
-| habit-fast_food       | Make every third coffee or quick lunch at home (247 €/mo)          | 82.46      |
-| habit-recreation      | Swap every fourth paid activity for a free one                     | 51.42      |
+| habit-electronics     | Skip every fourth gadget or software buy                           | 101.54     |
+| habit-fast_food       | Make every third coffee or quick lunch at home (248 €/mo)          | 82.63      |
+| habit-bar             | Skip every fourth bar tab                                          | 60.33      |
+| habit-games           | Wait for a sale on every third game                                | 52.81      |
+| habit-events          | Skip every fourth event ticket                                     | 50.60      |
+| taxis                 | Swap half your taxi rides for public transport                     | 37.68      |
+| habit-restaurant      | Cook one in four restaurant meals at home (148 €/mo, 26 purchases) | 36.91      |
 | above-peers-lifestyle | Shopping: spend a fifth less (162 € vs 76 € median for their age)  | 32.43      |
-| habit-grocery_store   | Trim 5% off groceries                                              | 23.62      |
-| taxis                 | Swap half your taxi rides for public transport                     | 13.19      |
 
 Suppose they swipe like this, which is a made-up set of swipes:
 
-- **Right:** fast_food, grocery_store, taxis
-- **Left:** restaurant, recreation
+- **Right:** fast_food, games, taxis
+- **Left:** restaurant, events
 
 The browser shows:
 
-- **Down to try:** 3 ideas, 82.46 + 23.62 + 13.19 = **119.27 €/mo**.
+- **Down to try:** 3 ideas, 82.63 + 52.81 + 37.68 = **173.12 €/mo**.
 
 The chat request then carries this:
 
 ```json
-{ "messages": [...], "acceptedIds": ["habit-fast_food","habit-grocery_store","taxis"],
-  "rejectedIds": ["habit-restaurant","habit-recreation"] }
+{ "messages": [...], "acceptedIds": ["habit-fast_food","habit-games","taxis"],
+  "rejectedIds": ["habit-restaurant","habit-events"] }
 ```
 
 And the server adds this to the coach's system prompt:
@@ -61,17 +63,17 @@ And the server adds this to the coach's system prompt:
 The customer's swipes:
 The app showed the customer saving ideas as cards. ... The numbers below come from the app, so you may state them.
 Down to try:
-- Make every third coffee or quick lunch at home (frees up about 82 € a month)
-- Trim 5% off groceries with a weekly meal plan (frees up about 24 € a month)
-- Swap half your taxi rides for public transport (frees up about 13 € a month)
-Together these free up about 119 € a month.
+- Make every third coffee or quick lunch at home (frees up about 83 € a month)
+- Wait for a sale on every third game (frees up about 53 € a month)
+- Swap half your taxi rides for public transport (frees up about 38 € a month)
+Together these free up about 173 € a month.
 Worth it to them:
 - Cook one in four restaurant meals at home
-- Swap every fourth paid activity for a free one
+- Skip every fourth event ticket
 - Build your suggestions on the ideas they are down to try. Make them concrete and small.
 - Never suggest changing the spending that is worth it to them, and say it is a fine choice if it comes up.
 ```
 
-If they now tap "Plan my first week", the coach should plan around coffee, groceries and taxis, and leave their restaurant meals and activities alone.
+If they now tap "Plan my first week", the coach should plan around coffee, games and taxis, and leave their restaurant meals and event tickets alone.
 
-**A caveat from [docs/data.md](docs/data.md):** subcategories are random in this dataset. So the habit and taxi cards, which are most of this deck, are correct sums but say nothing about this person. The "above peers" shopping card is the only one built on real signal, because it works at the category level.
+**A caveat from [docs/data.md](docs/data.md):** subcategories are random in the raw dataset, so habit and taxi cards say nothing personal for an ordinary customer. This demo customer's subcategory mix is hand-made in [scripts/data/demo-profiles.ts](scripts/data/demo-profiles.ts) (no car, nights out, quick food, games), which is why the deck fits the persona. The "above peers" shopping card is the only one built on signal from the original data, because it works at the category level.

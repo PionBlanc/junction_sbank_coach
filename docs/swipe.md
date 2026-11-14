@@ -46,6 +46,23 @@ Each habit belongs to one subcategory from `taxonomy.ts`. The share is a fixed n
 | Attractions        | Skip every fourth attraction or park visit            | 1/4   |
 | Recreation         | Swap every fourth paid activity for a free one        | 1/4   |
 | Hotels             | Skip one hotel night in four                          | 1/4   |
+| Bakeries           | Bake at home instead of every third bakery visit      | 1/3   |
+| Wine & spirits     | Skip every fourth trip to the wine shop               | 1/4   |
+| Trains             | Book train tickets early and save about 15%           | 15%   |
+| E-scooters         | Walk instead of every third e-scooter ride            | 1/3   |
+| Car washes         | Wash the car yourself every other time                | 1/2   |
+| Streaming          | Keep two streaming services out of three              | 1/3   |
+| Video games        | Wait for a sale on every third game                   | 1/3   |
+| Betting & lottery  | Halve your betting and lottery budget                 | 1/2   |
+| Garden centres     | Skip every fourth garden-centre buy                   | 1/4   |
+| Shoes              | Skip every fourth pair of shoes                       | 1/4   |
+| Cosmetics          | Skip every fourth cosmetics buy                       | 1/4   |
+| Hairdressers       | Stretch the time between salon visits by a quarter    | 1/4   |
+| Gyms               | Swap every fourth paid class for a free workout       | 1/4   |
+| Flowers & gifts    | Make every fourth gift yourself                       | 1/4   |
+| Ferries & cruises  | Skip one ferry trip or cruise in four                 | 1/4   |
+
+The habits from bakeries down belong to subcategories that only the demo customers have, see "Demo customers" below.
 
 The calculation for one habit:
 
@@ -103,6 +120,8 @@ Chosen on the server from the last 12 months of spending, not from the swipes, s
 ## Demo customers
 
 Demo customers are real rows from the dataset, listed in `DEMO_CUSTOMERS` in [packages/shared/src/dataset.ts](../packages/shared/src/dataset.ts). To add one, add a line with the customer id and a short persona. Pick customers without salary sweeps and with a housing payment every month, see [data.md](data.md).
+
+In the raw data every customer has the same subcategory mix, so every deck would hold the same cards. The demo customers therefore get a hand-made mix per category in [scripts/data/demo-profiles.ts](../scripts/data/demo-profiles.ts): for example the young diner has no car, and the traveller takes taxis and stays in hotels. The mix can use subcategories that the raw data lacks, such as trains, streaming, gyms and ferries. These are defined in `taxonomy.ts` with their standard MCC codes and marked "demo only". `npm run data:prepare` applies it by moving their purchases to other merchants inside the same category. Amounts, dates, balances and category totals do not change. To change a persona, edit the shares in that file and rerun `npm run data:prepare`.
 
 ## What changed outside the swipe feature
 
