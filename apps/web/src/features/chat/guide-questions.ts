@@ -7,6 +7,11 @@ export const GUIDE_QUESTIONS = [
   },
   { label: 'How much I can spend this week', question: 'How much can I safely spend this week?' },
   { label: 'What kind of spender am I?', question: 'What kind of spender am I?' },
+  { label: 'What changed last month?', question: 'What changed in my spending last month?' },
+  {
+    label: 'My biggest purchases',
+    question: 'What were my biggest purchases in the last 12 months?',
+  },
   {
     label: 'My data as an Excel file',
     question: 'Can I get my data from the last 12 months as an Excel file?',
