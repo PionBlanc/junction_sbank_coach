@@ -291,8 +291,13 @@ export function SwipeDeck() {
         )}
       </div>
 
-      {/* Named buttons under the thumb, for those who would rather tap than swipe. */}
-      <div className="flex items-center gap-2">
+      {/*
+        Named buttons under the thumb, for those who would rather tap than swipe. Hidden behind the
+        intro, so "Start swiping" and the chat bar are what stand out; the space stays so nothing jumps.
+      */}
+      <div
+        className={`flex items-center gap-2 transition-opacity duration-200 ${introSeen ? '' : 'invisible opacity-0'}`}
+      >
         <button
           type="button"
           aria-label="Take back the last swipe"
