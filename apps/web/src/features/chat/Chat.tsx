@@ -123,7 +123,18 @@ export function Chat() {
                     );
                   }
                   // Data tool results stay hidden. A drawChart call shows the one it points to.
+                  // The Excel download is the exception: its card is the whole point of the call.
                   if (isToolUIPart(part) && part.state === 'output-available') {
+                    if (getToolName(part) === 'exportToExcel') {
+                      return (
+                        <ToolCard
+                          key={key}
+                          toolName="exportToExcel"
+                          input={part.input}
+                          output={part.output}
+                        />
+                      );
+                    }
                     if (getToolName(part) !== 'drawChart') return null;
                     const parsed = drawChartInputSchema.safeParse(part.input);
                     if (!parsed.success) return null;

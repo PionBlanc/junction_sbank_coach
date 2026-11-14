@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { actionRoutes } from './actions.ts';
 import { cardRoutes } from './cards.ts';
 import { chatRoutes } from './chat.ts';
+import { exportRoutes } from './export.ts';
 import { healthRoutes } from './health.ts';
 import { overviewRoutes } from './overview.ts';
 import { safeToSpendRoutes } from './safe-to-spend.ts';
@@ -19,5 +20,6 @@ export function apiRoutes(db: DuckDBConnection) {
     .route('/', actionRoutes(db))
     .route('/', cardRoutes(db))
     .route('/', spenderGroupRoutes(db))
+    .route('/', exportRoutes(db))
     .route('/', chatRoutes(db));
 }

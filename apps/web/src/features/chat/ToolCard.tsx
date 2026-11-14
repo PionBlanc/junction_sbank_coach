@@ -1,5 +1,6 @@
 import {
   CATEGORIES,
+  excelExportSchema,
   balanceHistorySchema,
   categorySplitSchema,
   incomeVsSpendingSchema,
@@ -21,6 +22,7 @@ import { PeerCompare } from '../benchmark/PeerCompare.tsx';
 import { MonthlyBars } from '../charts/MonthlyBars.tsx';
 import { SimplePie } from '../charts/SimplePie.tsx';
 import { YearOverYearBars } from '../charts/YearOverYearBars.tsx';
+import { ExcelExportCard } from '../export/ExcelExportCard.tsx';
 import { SafeToSpendCard } from '../safe-to-spend/SafeToSpendCard.tsx';
 import { SpenderGroupCard } from '../spender-group/SpenderGroupCard.tsx';
 import { WhatIfCard } from '../what-if/WhatIfCard.tsx';
@@ -121,6 +123,11 @@ export function ToolCard(props: ToolCardProps) {
         <BalanceLine days={parsed.data.days} />
       </Card>
     );
+  }
+
+  if (props.toolName === 'exportToExcel') {
+    const parsed = excelExportSchema.safeParse(props.output);
+    return parsed.success ? <ExcelExportCard data={parsed.data} /> : unreadable;
   }
 
   if (props.toolName === 'getSpenderGroup') {
