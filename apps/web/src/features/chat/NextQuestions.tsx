@@ -15,7 +15,12 @@ export function NextQuestions(props: NextQuestionsProps) {
         <button
           key={q.question}
           type="button"
-          className="min-h-11 rounded-full border border-brand px-4 text-small text-brand hover:bg-fill"
+          className={`min-h-11 rounded-full border border-brand px-4 text-small ${
+            // A yes to the coach's offer is the likely next tap, so it stands out.
+            /^yes\b/i.test(q.label)
+              ? 'bg-brand text-card hover:opacity-90'
+              : 'text-brand hover:bg-fill'
+          }`}
           onClick={() => props.onAsk(q.question)}
         >
           {q.label}
