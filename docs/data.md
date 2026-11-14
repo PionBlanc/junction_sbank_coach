@@ -80,6 +80,7 @@ Median monthly spending of all customers (peer benchmark, `age_band = 'all'`): h
 
 - **"Today" is `DATA_END_DATE` (2026-09-30)** from `@coach/shared`. Never use the real clock for "this week" or "last month". "Last month" in the demo is 2026-09.
 - Spending queries filter on `basket IN ('mandatory_regular', 'mandatory_irregular', 'everyday')`. This excludes income, investments, and salary sweeps.
+- **Salary-sweep customers look like they barely spend.** Their salary moves to another own account the day after payday, so most of their spending is invisible here and many have no housing payment. Leave them out of examples and demo picks.
 - **Transportation has two rows per month** in `monthly_category`: taxis are overridden to the `everyday` basket, the rest stays `mandatory_regular`. Per-category totals must sum across baskets (`GROUP BY category_id`), or taxis go missing.
 - **`peer_benchmarks` are averages over all 24 months.** Comparing one user month against them flags lumpy categories (travel, home & tech) unfairly. Compare the user's own monthly average over a longer period (for example the last 12 months), or say clearly what is compared.
 - Two kinds of benchmark exist, and the UI must name the one it shows:

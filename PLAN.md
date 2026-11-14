@@ -10,39 +10,46 @@ This is a 48-hour demo: build what the demo shows, nothing "for later". See the 
 
 ### Stack (TypeScript everywhere, Gemini for AI)
 
-| Area            | Recommendation                                                                                                                                                                           | Why                                                                                                                                             |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Repo            | npm workspaces: `apps/web`, `apps/server`, `packages/shared`                                                                                                                             | One install, one lockfile, shared types without publishing anything                                                                             |
-| App type        | Mobile-first web app                                                                                                                                                                     | S-Pankki accepts a web app embeddable in a mobile app. Fastest to build and demo by link                                                        |
-| Frontend        | React + TypeScript + Vite                                                                                                                                                                | Everyone and every AI agent knows it                                                                                                            |
-| Styling         | Tailwind CSS                                                                                                                                                                             | No arguments over CSS structure                                                                                                                 |
-| Charts          | Recharts                                                                                                                                                                                 | Covers bars, pie, and comparison charts with little code                                                                                        |
-| Server state    | TanStack Query                                                                                                                                                                           | Caching and loading states for free                                                                                                             |
-| Server          | Hono on Node.js                                                                                                                                                                          | Small and fast. **Hono RPC** gives the frontend a typed client generated from the route definitions, so request and response types cannot drift |
-| Validation      | Zod, schemas in `packages/shared`                                                                                                                                                        | One schema validates on the server and types the client                                                                                         |
-| Data engine     | DuckDB (`@duckdb/node-api`) over `data/processed/coach.duckdb`                                                                                                                           | Already built and tested: 3.6M rows, per-user queries in about 30 ms                                                                            |
-| AI              | Gemini through the Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/react`)                                                                                                               | Streaming chat, typed tool calling, and the `useChat` hook for the frontend. Gemini has built-in Google Search grounding for the deal finder    |
-| Lint and format | ESLint (typescript-eslint) + Prettier. TypeScript pinned to 6.0: typescript-eslint cannot run on TypeScript 7                                                                            | Prettier is already configured                                                                                                                  |
-| Tests           | Vitest                                                                                                                                                                                   | Same config style as Vite                                                                                                                       |
-| Hosting         | One Node service that serves the API and the built frontend. Platform to be decided (Railway is the candidate). The processed database is uploaded to the host once, not built at deploy | One deploy, and the 105 MB database file stays next to the server                                                                               |
+| Area            | Recommendation                                                                                                                                                                                   | Why                                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repo            | npm workspaces: `apps/web`, `apps/server`, `packages/shared`                                                                                                                                     | One install, one lockfile, shared types without publishing anything                                                                             |
+| App type        | Mobile-first web app                                                                                                                                                                             | S-Pankki accepts a web app embeddable in a mobile app. Fastest to build and demo by link                                                        |
+| Frontend        | React + TypeScript + Vite                                                                                                                                                                        | Everyone and every AI agent knows it                                                                                                            |
+| Styling         | Tailwind CSS                                                                                                                                                                                     | No arguments over CSS structure                                                                                                                 |
+| Charts          | Recharts                                                                                                                                                                                         | Covers bars, pie, and comparison charts with little code                                                                                        |
+| Server state    | TanStack Query                                                                                                                                                                                   | Caching and loading states for free                                                                                                             |
+| Server          | Hono on Node.js                                                                                                                                                                                  | Small and fast. **Hono RPC** gives the frontend a typed client generated from the route definitions, so request and response types cannot drift |
+| Validation      | Zod, schemas in `packages/shared`                                                                                                                                                                | One schema validates on the server and types the client                                                                                         |
+| Data engine     | DuckDB (`@duckdb/node-api`) over `data/processed/coach.duckdb`                                                                                                                                   | Already built and tested: 3.6M rows, per-user queries in about 30 ms                                                                            |
+| AI              | Gemini through the Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/react`)                                                                                                                       | Streaming chat, typed tool calling, and the `useChat` hook for the frontend. Gemini has built-in Google Search grounding for the deal finder    |
+| Lint and format | ESLint (typescript-eslint) + Prettier. TypeScript pinned to 6.0: typescript-eslint cannot run on TypeScript 7                                                                                    | Prettier is already configured                                                                                                                  |
+| Tests           | Vitest                                                                                                                                                                                           | Same config style as Vite                                                                                                                       |
+| Hosting         | Railway: one service in the team's existing project, linked to this repo, redeploys on every push to `main`. Serves the API and the built frontend. The database sits on a volume, uploaded once | One deploy, and the 105 MB database file stays next to the server                                                                               |
 
-Gemini notes, to check in the setup spike below:
+Gemini notes (spike done 2026-11-14, results below):
 
-- **Model:** use the current Gemini Flash model for chat (fast, generous free tier). Look up the exact model id and free-tier rate limits in Google AI Studio. Keep the id in one config constant.
-- **Search plus tools:** some Gemini models do not allow Google Search grounding and our own function tools in the same request. If that is the case, wrap search in our own `searchDeals` tool that makes a separate Gemini call with grounding enabled.
+- **Model:** `gemini-3.8-flash`, the newest Flash model on our key. About 3–5 s per call. Keep the id in one constant (`coach/model.ts`). Older ids such as `gemini-2.5-flash` return 404 for new users. Free-tier rate limits are not visible through the API: check them in Google AI Studio.
+- **Search plus tools: works.** One request can carry our function tools and Google Search together. The raw API needs `toolConfig.includeServerSideToolInvocations: true`. `@ai-sdk/google` (4.0.121) sets it automatically for Gemini 3+ models when both kinds of tool are present, so no separate `searchDeals` call is needed. Tested: the model called our function, then searched (in Finnish and English) and answered with the function's number plus 6 web sources.
 - **Free-tier terms:** Google may use free-tier prompts to improve its products. That is acceptable because the data is synthetic, but never send real personal data.
 - **Rate limits:** cache the page summary per user and month so the demo does not burn requests.
 
 Tasks:
 
 - [ ] Confirm the stack. Update this file and [AGENTS.md](AGENTS.md) if anything changes
-- [ ] Spike (30 min, one person): one Gemini call with one function tool and Google Search in the same request. Write the result in this file
+- [x] Spike (30 min, one person): one Gemini call with one function tool and Google Search in the same request. Write the result in this file
 
 ### Decide: other open questions
 
-- [ ] **UI language.** Recommendation: English UI and code, since judging is in English. The coach answers in the language the user writes in, so a Finnish demo also works
-- [ ] **Demo users.** Recommendation: pick 2–3 customers with clearly different profiles (a young restaurant-heavy spender, a family with high housing costs, someone who often overdraws) and add a user switcher. No login. Query `docs/data.md` tables to find them
-- [ ] **Hosting platform.** Railway is the candidate. Decide before the first deploy
+- [x] **Language.** Decided: English everywhere: UI, code, docs, and the coach's answers (the system prompt says so)
+- [x] **Demo users.** Decided: three customers, in `DEMO_CUSTOMERS` in [dataset.ts](packages/shared/src/dataset.ts). User switcher, no login. Monthly averages over the last 12 months:
+
+  | Customer    | Persona       | Age | Income | Spending | Story for the demo                                                                     |
+  | ----------- | ------------- | --- | ------ | -------- | -------------------------------------------------------------------------------------- |
+  | `CUST00164` | Young diner   | 23  | 2 501  | 3 395    | Restaurants 638 €/month (a quarter of income), 8 taxi rides a year, spends over income |
+  | `CUST03802` | Housing-heavy | 41  | 3 198  | 3 683    | Housing 1 419 €/month (44% of income), groceries 845 €, never overdrawn                |
+  | `CUST04092` | Tight budget  | 26  | 1 821  | 1 869    | Overdrawn on 62 days in the last year, lowest balance −416 €: safe-to-spend and buffer |
+
+- [x] **Hosting platform.** Decided: Railway, as a new service next to the existing one in the team's project. Auto-deploy on every push to `main` is fine. Steps in [docs/railway-deploy.md](docs/railway-deploy.md)
 - [ ] **Subscriptions.** The dataset has none, so the "three streaming services" example cannot come from real data. Recommendation: skip the recurring-payment detector (it would find nothing in the demo) and do not fake subscriptions. Mention it as a next step in the pitch
 - [ ] **Groceries basket.** Currently `mandatory_regular` (needs, recurring). Alternative: `everyday`. One-line change in [taxonomy.ts](packages/shared/src/taxonomy.ts), then rerun `npm run data:prepare`
 - [ ] **App name.** Replace the working title in the README
@@ -54,10 +61,10 @@ Tasks:
 - [x] Scaffold `apps/web` (Vite React TS, Tailwind, TanStack Query, Recharts)
 - [x] Scaffold `apps/server` (Hono, `@hono/node-server`, DuckDB connection, `/api/health` route, serves the built web app)
 - [x] Add ESLint at the root and the `lint`, `dev`, and `test` scripts. Update the README commands table
-- [ ] Deploy the skeleton manually on the chosen platform (`npm install && npm run build`, start with `npm start`). Upload `coach.duckdb` to the host once and point `COACH_DB_PATH` at it. Open the URL on a phone
+- [ ] Deploy the skeleton to Railway following [docs/railway-deploy.md](docs/railway-deploy.md). Open the URL on a phone
 - [ ] Optional: GitHub Action that runs `format:check`, `lint`, `typecheck`, and `test` on every push to `main`
 
-Deploy early and again whenever something demo-worthy lands, manually. No deploy per push.
+Deploy early. After that, every push to `main` redeploys, which is one more reason to keep `main` working.
 
 ## Phase 1: API contract
 

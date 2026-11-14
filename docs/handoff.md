@@ -28,12 +28,12 @@ Keep these as the core of the pitch:
 Deployment is a hard requirement (peer review and commenting), and the plan currently leaves it to the end. Instead:
 
 - [ ] As soon as the two scaffolds are on `main`, deploy a walking skeleton: server with `/api/health`, built web app served by the same server. The scaffold supports this: `npm run build`, then `npm start`
-- [ ] Deploy manually through the hosting service's dashboard or CLI. No automatic deploy on every push: we push often, and a deploy per push is too heavy
+- [x] ~~Deploy manually.~~ Changed: Railway redeploys on every push to `main`, and that is fine
 - [ ] Everyone tests on their own phone from day one
 
 ### 2. Hosting and the database
 
-Hosting platform: **decided by the team tomorrow.** Railway is the current candidate, and it can also host the database.
+Hosting platform: **Railway** (decided), as a new service in the team's existing project. Steps in [railway-deploy.md](railway-deploy.md).
 
 Agreed: do not run `npm run data` in the hosting build step. Every deploy would download 362 MB from GitHub's LFS media host, and building DuckDB over 3.6M rows on a small instance risks running out of memory.
 
@@ -81,7 +81,7 @@ Simplified after review, and already updated in [AGENTS.md](../AGENTS.md):
 
 ### 5. Technical points to fix early
 
-- [ ] **Run the Gemini spike first.** Whether function tools and Google Search work in one request decides the coach design. Do it in the first hour.
+- [x] **Run the Gemini spike first.** Done: they work together with `gemini-3.8-flash`, and the AI SDK handles the required flag. Details in PLAN.md.
 - [x] **TypeScript 7 and ESLint.** Verified: `typescript-eslint` supports TypeScript `<6.1` only, and TypeScript 7 ships no JavaScript API, so even lint rules without type information cannot run. TypeScript is now pinned to `~6.0.3`.
 - [x] **Compare like with like.** `peer_benchmarks` is each customer's average month over 24 months. Comparing one user month against it creates false "you overspend" flags for lumpy categories like travel and home & tech. Recorded as a convention in [data.md](data.md). Apply it when building the benchmark endpoint.
 - [x] **Transportation has two rows per month.** In `monthly_category`, taxis are overridden to the `everyday` basket, so transportation appears once under `mandatory_regular` and once under `everyday`. Recorded in [data.md](data.md).
@@ -96,5 +96,6 @@ Simplified after review, and already updated in [AGENTS.md](../AGENTS.md):
 
 1. ~~Move accepted items into PLAN.md as tasks.~~ Done.
 2. ~~Scaffold `apps/server` and `apps/web`, ESLint, Vitest.~~ Done.
-3. Team picks the hosting platform.
-4. Gemini spike, then the walking-skeleton deploy.
+3. ~~Team picks the hosting platform.~~ Railway.
+4. ~~Gemini spike.~~ Done: function tools and Google Search work in one request (see PLAN.md).
+5. Walking-skeleton deploy: follow [railway-deploy.md](railway-deploy.md).

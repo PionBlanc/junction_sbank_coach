@@ -12,6 +12,17 @@ export const DATA_START_DATE = '2024-10-01';
 export const AGE_BANDS = ['18-24', '25-34', '35-44', '45-54', '55-64', '65+'] as const;
 export type AgeBand = (typeof AGE_BANDS)[number];
 
+/**
+ * The customers the demo shows, in user-switcher order. Picked from 12-month profiles
+ * (2025-10 to 2026-09), see PLAN.md. None of them has salary sweeps.
+ */
+export const DEMO_CUSTOMERS = [
+  { customerId: 'CUST00164', persona: 'Young diner: 23, restaurants a quarter of income' },
+  { customerId: 'CUST03802', persona: 'Housing-heavy: 41, housing 44% of income, never overdrawn' },
+  { customerId: 'CUST04092', persona: 'Tight budget: 26, overdrawn on 62 days in the last year' },
+] as const;
+export type DemoCustomerId = (typeof DEMO_CUSTOMERS)[number]['customerId'];
+
 export function ageBandOf(age: number): AgeBand {
   if (age < 25) return '18-24';
   if (age < 35) return '25-34';
