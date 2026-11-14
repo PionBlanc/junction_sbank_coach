@@ -75,3 +75,21 @@ export async function getSpendingByMonth(
     txCount: Number(r.tx_count),
   }));
 }
+
+/** Spending per basket over a month range. Taxis count towards everyday spending. */
+export async function getBasketTotals(
+  db: DuckDBConnection,
+  customerId: string,
+  fromMonth: string,
+  toMonth: string,
+): Promise<Map<string, number>> {
+  const rows = await queryRows(
+    db,
+    `SELECT basket, sum(total_eur) AS total_eur FROM monthly_category
+     WHERE customer_id = $customerId AND month BETWEEN $fromMonth AND $toMonth
+       AND basket IN (${SPENDING_BASKETS_SQL})
+     GROUP BY basket`,
+    { customerId, fromMonth, toMonth },
+  );
+  return new Map(rows.map((r) => [String(r.basket), Number(r.total_eur)]));
+}

@@ -121,14 +121,14 @@ If the hand-made swipe feels bad on a real phone, the fallback is CSS `scroll-sn
 
 Split so three people can work in parallel after step 1.
 
-1. [ ] **Together, 30 min:** agree on the `Card` schema in `packages/shared/src/api/cards.ts`. Server returns two hard-coded cards so the frontend is unblocked
-2. [ ] **Frontend A:** `CardDeck` with swipe, buttons, dots. Test on a real phone early
-3. [ ] **Frontend A:** `InsightCard` and the three chart components
-4. [ ] **Server B:** card rules 1–3 (trend, peers, where it goes) with tests
-5. [ ] **Server B:** card rules 4–6 (biggest gap, baskets, biggest change) with tests
-6. [ ] **Coach C:** expose the chat's `ask` through a small context so card question chips can start a conversation. Check every card's questions get a good answer from the existing tools
-7. [ ] **C or whoever is free:** safe-to-spend card (7, wraps the existing insight), then the average-Finn benchmark and card (8)
-8. [ ] Check all three demo users get a deck that tells a different story, and that no card is false or awkward for any of them
+1. [x] **Together, 30 min:** agree on the `Card` schema in `packages/shared/src/api/cards.ts`. Server returns two hard-coded cards so the frontend is unblocked
+2. [x] **Frontend A:** `CardDeck` with swipe, buttons, dots. Test on a real phone early
+3. [x] **Frontend A:** `InsightCard` and the three chart components
+4. [x] **Server B:** card rules 1–3 (trend, peers, where it goes) with tests
+5. [x] **Server B:** card rules 4–6 (biggest gap, baskets, biggest change) with tests
+6. [ ] **Coach C:** expose the chat's `ask` through a small context so card question chips can start a conversation: done. Still open: check every card's questions get a good answer from the existing tools
+7. [ ] **C or whoever is free:** safe-to-spend card (7, wraps the existing insight): done. Still open: the average-Finn benchmark and card (8)
+8. [x] Check all three demo users get a deck that tells a different story, and that no card is false or awkward for any of them
 
 ## Open questions
 

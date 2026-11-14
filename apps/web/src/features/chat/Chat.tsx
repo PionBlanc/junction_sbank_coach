@@ -1,7 +1,6 @@
-import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport, getToolName, isToolUIPart } from 'ai';
-import { useEffect, useRef, useState } from 'react';
-import { useUser } from '../../lib/user-context.ts';
+import { getToolName, isToolUIPart } from 'ai';
+import { useEffect, useRef } from 'react';
+import { useCoachChat } from '../../lib/chat-context.ts';
 import { ChatComposer } from './ChatComposer.tsx';
 import { CoachAvatar } from './CoachAvatar.tsx';
 import { ToolCard } from './ToolCard.tsx';
@@ -16,14 +15,8 @@ const SUGGESTED_QUESTIONS = [
 
 /** The coach. A bar docked at the bottom of the screen that opens into a full-screen chat. */
 export function Chat() {
-  const { userId } = useUser();
-  const [transport] = useState(
-    () => new DefaultChatTransport({ api: `/api/users/${userId}/chat` }),
-  );
-  const { messages, sendMessage, status, error } = useChat({ transport });
-  const [open, setOpen] = useState(false);
+  const { messages, status, error, busy, open, setOpen, ask } = useCoachChat();
   const endRef = useRef<HTMLDivElement>(null);
-  const busy = status === 'submitted' || status === 'streaming';
   const lastMessage = messages.at(-1);
   // Show dots until the coach's reply has something on screen.
   const waiting = busy && (lastMessage?.role !== 'assistant' || status === 'submitted');
@@ -31,12 +24,6 @@ export function Chat() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
   }, [messages, open, waiting]);
-
-  function ask(question: string) {
-    if (busy || question.trim() === '') return;
-    setOpen(true);
-    void sendMessage({ text: question });
-  }
 
   const chips = (
     <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
