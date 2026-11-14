@@ -21,6 +21,7 @@ export const GUIDE_QUESTIONS = [
     question: 'Show me my income and spending month by month for the last 12 months.',
   },
   { label: 'Am I spending more than last year?', question: 'Am I spending more than last year?' },
+  { label: 'Is my spending going up?', question: 'Is my spending going up?' },
   { label: 'My balance over time', question: 'Show me how my balance has changed.' },
   {
     label: 'Needs and wants over the year',
