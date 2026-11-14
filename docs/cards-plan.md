@@ -4,7 +4,7 @@ New direction for the UI. This replaces the current scrolling home screen (`Safe
 
 ## The idea in one paragraph
 
-The app is a deck of cards. Each card makes one point about the user's money, with one simple chart and one sentence under it. The user swipes left for the next card and right to go back. Every card has an "Ask about this" button that opens the chat with that card's data already in context. Simple beats complete: a card that needs a legend, a second axis, or a paragraph has too much on it.
+The app is a deck of cards. Each card makes one point about the user's money, with one simple chart and one sentence under it. The user swipes left for the next card and right to go back. Each card has one or two ready-made questions the user can tap to start a conversation with the coach. The chat itself stays as it is: the text field docked at the bottom of the screen. Simple beats complete: a card that needs a legend, a second axis, or a paragraph has too much on it.
 
 ## Card anatomy
 
@@ -25,7 +25,8 @@ The app is a deck of cards. Each card makes one point about the user's money, wi
 │  │ than the average Finn.     │  │
 │  │ Last 12 months · Stat. Fin.│  │  period and source, small grey
 │  │                            │  │
-│  │  [ Ask about this ]        │  │  opens chat
+│  │ (Why is it higher?)        │  │  1–2 tappable questions,
+│  │ (What if I cut it by 20%?) │  │  sent to the existing chat
 │  └────────────────────────────┘  │
 │           ● ○ ○ ○ ○ ○            │  position dots
 └──────────────────────────────────┘
@@ -37,6 +38,7 @@ Rules for every card:
 - **Numbers printed on the chart.** No axes or tooltips needed to read it.
 - **One sentence**, at most about 90 characters. It names the comparison and the direction. Numbers in it come from the server.
 - **Source line** under the sentence: period ("last 12 months") and benchmark ("people your age" or "average Finn"), as AGENTS.md requires.
+- **One or two questions** under the source line, as tappable chips. Short, specific to the card, and answerable by the coach's existing tools.
 - **Only true and relevant cards are shown.** A card rule returns nothing when its story does not hold for this user (no "your taxis" card for someone with no taxi rides).
 
 ## Card catalogue
@@ -82,7 +84,7 @@ Card = {
     | { type: 'bars'; bars: { label: string; valueEur: number; highlight: boolean }[] }
     | { type: 'donut'; slices: { categoryId: CategoryId | 'other'; valueEur: number; sharePct: number }[] }
     | { type: 'stat'; valueEur: number; caption: string },
-  askPrompt: string,        // starter question for chat, "Why is my food spending higher?"
+  questions: string[],      // 1–2 tappable starter questions, "Why is my food spending higher?"
 }
 ```
 
@@ -91,7 +93,7 @@ Three chart types cover every card in the catalogue. Monthly trend is `bars` wit
 ### Frontend (`apps/web/src/features/cards/`)
 
 - `CardDeck.tsx`: holds the current index, renders the current card, handles swipe.
-- `InsightCard.tsx`: topic, chart, sentence, source line, "Ask about this".
+- `InsightCard.tsx`: topic, chart, sentence, source line, question chips.
 - Chart components in `features/charts/`: `SimpleBars.tsx`, `SimpleDonut.tsx`, `BigNumber.tsx`. Recharts with axes, grid, and tooltips turned off, labels on the marks. Start from the existing `MonthlyBars.tsx` and `components/Card.tsx`.
 - `useCards.ts` in `src/api/`: TanStack Query hook.
 - `App.tsx` registers the deck instead of `SafeToSpendHero`, `BasketBar`, and `ActionList`. Those components are reused inside cards where they fit, not deleted straight away.
@@ -100,12 +102,13 @@ Three chart types cover every card in the catalogue. Monthly trend is `bars` wit
 
 If the hand-made swipe feels bad on a real phone, the fallback is CSS `scroll-snap` on a horizontal row of cards, which gives native swiping for free (but less of the card-flick feel). Adding `framer-motion` is the third option and is a new dependency, so team decision.
 
-### Chat from a card
+### Questions on a card
 
-- "Ask about this" opens the chat as a full-screen sheet over the deck. Closing it returns to the same card.
-- The chat request carries the `cardId` (one new optional field on `chatBodySchema` in `routes/chat.ts`). The server looks up that card's data and adds it to the system context ("The user is looking at this card: …"), so the first answer is about the right thing without the model having to search.
-- The sheet shows the card's `askPrompt` plus two or three suggested follow-ups as chips, so the demo needs no typing.
-- Everything else about the existing chat (`features/chat/`, `coach/`) stays: tools, numbers only from tools, Gemini.
+- No "Ask about this" button. The existing chat (`features/chat/Chat.tsx`: docked text field, opens full screen) is good and stays as it is.
+- Each card carries one or two questions in `questions`, written by the card rule next to its sentence, so they always match what the card shows (for example "Why is my restaurant spending higher?" and "What if I ate out 20% less?").
+- Tapping a question sends it to the existing chat exactly as if the user had typed it: the chat opens and the coach answers with its usual tools. To make that possible, `Chat.tsx` exposes its `ask` function through a small context (for example `useAsk()`), and `InsightCard` calls it. No server change is needed.
+- Questions are written in full, with the category and period, so the coach needs no extra context about the card.
+- The static `SUGGESTED_QUESTIONS` chips in `Chat.tsx` can stay for the open chat, or be replaced with the current card's questions. Team choice, small either way.
 
 ## What changes in PLAN.md
 
@@ -123,7 +126,7 @@ Split so three people can work in parallel after step 1.
 3. [ ] **Frontend A:** `InsightCard` and the three chart components
 4. [ ] **Server B:** card rules 1–3 (trend, peers, where it goes) with tests
 5. [ ] **Server B:** card rules 4–6 (biggest gap, baskets, biggest change) with tests
-6. [ ] **Coach C:** chat accepts `cardId` and adds the card's data to the context. Chat sheet with suggested questions
+6. [ ] **Coach C:** expose the chat's `ask` through a small context so card question chips can start a conversation. Check every card's questions get a good answer from the existing tools
 7. [ ] **C or whoever is free:** safe-to-spend card (7, wraps the existing insight), then the average-Finn benchmark and card (8)
 8. [ ] Check all three demo users get a deck that tells a different story, and that no card is false or awkward for any of them
 
