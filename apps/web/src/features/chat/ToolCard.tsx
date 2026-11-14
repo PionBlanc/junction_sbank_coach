@@ -1,5 +1,7 @@
 import {
   CATEGORIES,
+  categoryChangesSchema,
+  largestPurchasesSchema,
   excelExportSchema,
   balanceHistorySchema,
   categorySplitSchema,
@@ -14,12 +16,13 @@ import {
 } from '@coach/shared';
 import { Card } from '../../components/Card.tsx';
 import { categorySliceColour } from '../../lib/chart-colours.ts';
-import { formatEur, formatMonth, formatPct } from '../../lib/format.ts';
+import { formatEur, formatMonth, formatPct, formatShortDay } from '../../lib/format.ts';
 import { BalanceLine } from '../charts/BalanceLine.tsx';
 import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
 import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
 import { MonthlyBars } from '../charts/MonthlyBars.tsx';
+import { RowBars } from '../charts/RowBars.tsx';
 import { SimplePie } from '../charts/SimplePie.tsx';
 import { YearOverYearBars } from '../charts/YearOverYearBars.tsx';
 import { ExcelExportCard } from '../export/ExcelExportCard.tsx';
@@ -121,6 +124,45 @@ export function ToolCard(props: ToolCardProps) {
     return (
       <Card title={`Your balance · ${period}`}>
         <BalanceLine days={parsed.data.days} />
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'getCategoryChanges') {
+    const parsed = categoryChangesSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    // The five biggest changes. The server sorts them, the card only picks the top.
+    const rows = parsed.data.categories
+      .slice(0, 5)
+      .map((c) => ({ label: c.label, valueEur: c.changeEur }));
+    return (
+      <Card title={`${formatMonth(parsed.data.month)} against your usual month`}>
+        <RowBars rows={rows} signed />
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'getLargestPurchases') {
+    const parsed = largestPurchasesSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const { fromMonth, toMonth, label, purchases } = parsed.data;
+    const period =
+      fromMonth === toMonth
+        ? formatMonth(fromMonth)
+        : `${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`;
+    const rows = purchases.map((p) => ({
+      label: `${p.label}, ${formatShortDay(p.date)}`,
+      valueEur: p.amountEur,
+    }));
+    return (
+      <Card
+        title={`Largest purchases · ${label === 'All spending' ? period : `${label}, ${period}`}`}
+      >
+        {rows.length > 0 ? (
+          <RowBars rows={rows} />
+        ) : (
+          <p className="text-small text-muted">No purchases in this period.</p>
+        )}
       </Card>
     );
   }

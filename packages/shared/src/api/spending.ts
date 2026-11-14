@@ -85,3 +85,56 @@ export const categorySplitSchema = z.object({
   slices: z.array(categorySliceSchema),
 });
 export type CategorySplit = z.infer<typeof categorySplitSchema>;
+
+export const categoryChangesInputSchema = z.object({ month: monthSchema });
+
+/** Result of the coach's getCategoryChanges tool: one month against the 12 months before it. */
+export const categoryChangesSchema = z.object({
+  month: monthSchema,
+  /** The 12 months the average is taken over. */
+  averageFromMonth: monthSchema,
+  averageToMonth: monthSchema,
+  monthTotalEur: z.number(),
+  averageTotalEur: z.number(),
+  /** Month minus average. Positive means more spending than usual. */
+  changeEur: z.number(),
+  /** Every spending category, the largest change (up or down) first. */
+  categories: z.array(
+    z.object({
+      categoryId: categoryIdSchema,
+      label: z.string(),
+      monthEur: z.number(),
+      averageEur: z.number(),
+      changeEur: z.number(),
+      /** Change as a fraction of the average. Null when the average is 0. */
+      changePct: z.number().nullable(),
+    }),
+  ),
+});
+export type CategoryChanges = z.infer<typeof categoryChangesSchema>;
+
+export const largestPurchasesInputSchema = z.object({
+  fromMonth: monthSchema,
+  toMonth: monthSchema,
+  categoryId: categoryIdSchema.optional(),
+});
+
+/** Result of the coach's getLargestPurchases tool. */
+export const largestPurchasesSchema = z.object({
+  fromMonth: monthSchema,
+  toMonth: monthSchema,
+  /** "All spending" or the category label. */
+  label: z.string(),
+  /** All purchases in the range, for context. */
+  purchaseCount: z.number(),
+  /** The largest purchases, largest first. */
+  purchases: z.array(
+    z.object({
+      date: z.string(),
+      categoryId: categoryIdSchema,
+      label: z.string(),
+      amountEur: z.number(),
+    }),
+  ),
+});
+export type LargestPurchases = z.infer<typeof largestPurchasesSchema>;

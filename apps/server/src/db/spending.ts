@@ -190,3 +190,45 @@ export async function getDailyPurchases(
     daysSincePayday: Number(r.days_since_payday),
   }));
 }
+
+export type Purchase = { date: string; categoryId: string; amountEur: number };
+
+/**
+ * The largest card purchases over a month range, optionally in one category. Purchases only, so
+ * rent and bills, which are the same every month, do not crowd them out.
+ */
+export async function getLargestPurchases(
+  db: DuckDBConnection,
+  customerId: string,
+  filter: { categoryId: string | null; fromMonth: string; toMonth: string; limit: number },
+): Promise<{ purchases: Purchase[]; purchaseCount: number }> {
+  const params = {
+    customerId,
+    categoryId: filter.categoryId,
+    fromMonth: filter.fromMonth,
+    toMonth: filter.toMonth,
+  };
+  const where = `customer_id = $customerId AND month BETWEEN $fromMonth AND $toMonth
+       AND transaction_type = 'purchase' AND basket IN (${SPENDING_BASKETS_SQL})
+       AND (CAST($categoryId AS VARCHAR) IS NULL OR category_id = $categoryId)`;
+  const rows = await queryRows(
+    db,
+    `SELECT CAST(tx_date AS VARCHAR) AS tx_date, category_id, abs_amount_eur FROM transactions
+     WHERE ${where}
+     ORDER BY abs_amount_eur DESC, tx_timestamp LIMIT ${filter.limit}`,
+    params,
+  );
+  const [count] = await queryRows(
+    db,
+    `SELECT count(*) AS n FROM transactions WHERE ${where}`,
+    params,
+  );
+  return {
+    purchases: rows.map((r) => ({
+      date: String(r.tx_date),
+      categoryId: String(r.category_id),
+      amountEur: Number(r.abs_amount_eur),
+    })),
+    purchaseCount: Number(count?.n ?? 0),
+  };
+}

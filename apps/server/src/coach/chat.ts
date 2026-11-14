@@ -15,6 +15,8 @@ import { swipeProfilePrompt } from './prompts/swipe-profile.ts';
 import { SYSTEM_PROMPT } from './prompts/system.ts';
 import { compareToPeersTool } from './tools/compare-to-peers.ts';
 import { exportToExcelTool } from './tools/export-to-excel.ts';
+import { getCategoryChangesTool } from './tools/get-category-changes.ts';
+import { getLargestPurchasesTool } from './tools/get-largest-purchases.ts';
 import { getBalanceHistoryTool } from './tools/get-balance-history.ts';
 import { getCategorySplitTool } from './tools/get-category-split.ts';
 import { getIncomeVsSpendingTool } from './tools/get-income-vs-spending.ts';
@@ -55,6 +57,8 @@ export async function streamCoachReply(
       getYearOverYear: getYearOverYearTool(db, customerId),
       getCategorySplit: getCategorySplitTool(db, customerId),
       getBalanceHistory: getBalanceHistoryTool(db, customerId),
+      getCategoryChanges: getCategoryChangesTool(db, customerId),
+      getLargestPurchases: getLargestPurchasesTool(db, customerId),
       exportToExcel: exportToExcelTool(db, customerId),
       getSpenderGroup: getSpenderGroupTool(db, customerId),
       getSpendingSummary: getSpendingSummaryTool(db, customerId),

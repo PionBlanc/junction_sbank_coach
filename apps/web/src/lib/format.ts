@@ -9,6 +9,11 @@ const NUMBER = new Intl.NumberFormat('fi-FI', { maximumFractionDigits: 1 });
 const MONTH = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 const SHORT_MONTH = new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' });
 const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+const SHORT_DAY = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  timeZone: 'UTC',
+});
 
 /** 1234.5 → "1 235 €". */
 export function formatEur(value: number): string {
@@ -48,4 +53,9 @@ export function formatShortMonth(month: string): string {
 /** "2026-10-15" → "15 October". */
 export function formatDay(date: string): string {
   return DAY.format(new Date(`${date}T00:00:00Z`));
+}
+
+/** "2026-10-15" → "15 Oct". For chart labels. */
+export function formatShortDay(date: string): string {
+  return SHORT_DAY.format(new Date(`${date}T00:00:00Z`));
 }
