@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { useCards } from '../../api/useCards.ts';
 import { Card } from '../../components/Card.tsx';
-import { useCoachChat } from '../../lib/chat-context.ts';
 import { useUser } from '../../lib/user-context.ts';
 import { ActionList } from '../actions/ActionList.tsx';
 import { ArrowButton } from './ArrowButton.tsx';
@@ -27,7 +26,6 @@ type Drag = {
 export function CardDeck() {
   const { userId } = useUser();
   const cards = useCards(userId);
-  const chat = useCoachChat();
   const [index, setIndex] = useState(0);
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
@@ -36,7 +34,6 @@ export function CardDeck() {
 
   // The cards, plus the action list as the last slide.
   const slideCount = (cards.data?.length ?? 0) + 1;
-  const chatOpen = chat.open;
 
   function go(step: number) {
     setIndex((i) => Math.min(slideCount - 1, Math.max(0, i + step)));
@@ -44,14 +41,14 @@ export function CardDeck() {
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (chatOpen || event.target instanceof HTMLInputElement) return;
+      if (event.target instanceof HTMLInputElement) return;
       if (event.target instanceof HTMLTextAreaElement) return;
       if (event.key === 'ArrowRight') setIndex((i) => Math.min(slideCount - 1, i + 1));
       if (event.key === 'ArrowLeft') setIndex((i) => Math.max(0, i - 1));
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [chatOpen, slideCount]);
+  }, [slideCount]);
 
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
     drag.current = {
