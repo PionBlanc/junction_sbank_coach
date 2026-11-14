@@ -77,6 +77,8 @@ describe('buildSwipeProfile', () => {
     expect(profile.downToTry.map((a) => a.id)).toEqual(['taxis']);
     expect(profile.worthIt.map((a) => a.id)).toEqual(['habit-bar']);
     expect(profile.downToTryPerMonthEur).toBe(13);
+    expect(profile.planIdeas.map((a) => a.id)).toEqual(['taxis']);
+    expect(profile.planPerMonthEur).toBe(13);
   });
 });
 
