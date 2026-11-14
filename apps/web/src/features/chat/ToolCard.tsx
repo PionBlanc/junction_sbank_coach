@@ -1,17 +1,21 @@
 import {
   CATEGORIES,
+  incomeVsSpendingSchema,
   overviewSchema,
   peerComparisonSchema,
   safeToSpendSchema,
   spenderGroupSchema,
   spendingSummarySchema,
   whatIfQuerySchema,
+  yearOverYearSchema,
 } from '@coach/shared';
 import { Card } from '../../components/Card.tsx';
-import { formatEur, formatMonth } from '../../lib/format.ts';
+import { formatEur, formatMonth, formatPct } from '../../lib/format.ts';
+import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
 import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
 import { MonthlyBars } from '../charts/MonthlyBars.tsx';
+import { YearOverYearBars } from '../charts/YearOverYearBars.tsx';
 import { SafeToSpendCard } from '../safe-to-spend/SafeToSpendCard.tsx';
 import { SpenderGroupCard } from '../spender-group/SpenderGroupCard.tsx';
 import { WhatIfCard } from '../what-if/WhatIfCard.tsx';
@@ -25,6 +29,46 @@ export function ToolCard(props: ToolCardProps) {
   if (props.toolName === 'getMonthlyBreakdown') {
     const parsed = overviewSchema.safeParse(props.output);
     return parsed.success ? <BasketBreakdown data={parsed.data} /> : unreadable;
+  }
+
+  if (props.toolName === 'getIncomeVsSpending') {
+    const parsed = incomeVsSpendingSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const { fromMonth, toMonth, months, totalLeftEur, monthsOverspent } = parsed.data;
+    return (
+      <Card title={`Income and spending · ${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`}>
+        <IncomeSpendingBars months={months} />
+        <p className="text-small">
+          {totalLeftEur >= 0
+            ? `Left over in total: ${formatEur(totalLeftEur)}.`
+            : `In total ${formatEur(-totalLeftEur)} more went out than came in.`}{' '}
+          Spending was larger than income in {monthsOverspent} of {months.length} months.
+        </p>
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'getYearOverYear') {
+    const parsed = yearOverYearSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const { label, months, thisYearTotalEur, lastYearTotalEur, changeEur, changePct } = parsed.data;
+    const first = months[0];
+    const last = months.at(-1);
+    const period =
+      first && last ? ` · ${formatMonth(first.month)} to ${formatMonth(last.month)}` : '';
+    return (
+      <Card title={`${label}: this year against last year${period}`}>
+        <YearOverYearBars months={months} />
+        <p className="text-small">
+          This year {formatEur(thisYearTotalEur)}, last year {formatEur(lastYearTotalEur)}:{' '}
+          <span className="font-semibold">
+            {changeEur >= 0 ? `${formatEur(changeEur)} more` : `${formatEur(-changeEur)} less`}
+            {changePct !== null && ` (${formatPct(Math.abs(changePct))})`}
+          </span>
+          .
+        </p>
+      </Card>
+    );
   }
 
   if (props.toolName === 'getSpenderGroup') {

@@ -1,22 +1,22 @@
-import { GUIDE_QUESTIONS } from './guide-questions.ts';
+type NextQuestionsProps = {
+  questions: readonly { label: string; question: string }[];
+  onAsk: (question: string) => void;
+};
 
-type NextQuestionsProps = { asked: string[]; onAsk: (question: string) => void };
-
-/** Tappable next steps on the guided path, leaving out what was already asked. */
+/** Tap-to-send replies under the coach's latest message. */
 export function NextQuestions(props: NextQuestionsProps) {
-  const next = GUIDE_QUESTIONS.filter((g) => !props.asked.includes(g.question));
-  if (next.length === 0) return null;
+  if (props.questions.length === 0) return null;
 
   return (
     <div className="flex flex-wrap gap-2 pl-9">
-      {next.map((g) => (
+      {props.questions.map((q) => (
         <button
-          key={g.question}
+          key={q.question}
           type="button"
           className="min-h-11 rounded-full border border-brand px-4 text-small text-brand hover:bg-fill"
-          onClick={() => props.onAsk(g.question)}
+          onClick={() => props.onAsk(q.question)}
         >
-          {g.label}
+          {q.label}
         </button>
       ))}
     </div>

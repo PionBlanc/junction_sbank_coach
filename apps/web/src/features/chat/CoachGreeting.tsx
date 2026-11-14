@@ -1,6 +1,7 @@
 import { DATA_END_DATE } from '@coach/shared';
 import { formatMonth } from '../../lib/format.ts';
 import { CoachAvatar } from './CoachAvatar.tsx';
+import { GUIDE_QUESTIONS } from './guide-questions.ts';
 import { NextQuestions } from './NextQuestions.tsx';
 
 const LAST_MONTH = DATA_END_DATE.slice(0, 7);
@@ -18,7 +19,7 @@ export function CoachGreeting(props: CoachGreetingProps) {
           {formatMonth(LAST_MONTH)}? Or pick something else below.
         </p>
       </div>
-      <NextQuestions asked={[]} onAsk={props.onAsk} />
+      <NextQuestions questions={GUIDE_QUESTIONS} onAsk={props.onAsk} />
     </>
   );
 }
