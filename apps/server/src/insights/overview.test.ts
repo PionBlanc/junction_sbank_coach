@@ -52,10 +52,10 @@ describe('getOverview', () => {
   it('splits the month into baskets and shows taxis as their own everyday row', async () => {
     const overview = await getOverview(await fixture(), 'c1', '2026-09');
     expect(overview).toMatchObject({ incomeEur: 2000, spendingEur: 1000, leftEur: 1000 });
-    expect(overview.baskets.map((b) => [b.basket, b.totalEur])).toEqual([
-      ['mandatory_regular', 600],
-      ['mandatory_irregular', 0],
-      ['everyday', 400],
+    expect(overview.baskets.map((b) => [b.basket, b.totalEur, b.sharePct])).toEqual([
+      ['mandatory_regular', 600, 0.6],
+      ['mandatory_irregular', 0, 0],
+      ['everyday', 400, 0.4],
     ]);
     expect(overview.baskets[2]?.categories).toEqual([
       {

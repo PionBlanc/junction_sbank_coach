@@ -26,6 +26,8 @@ export const overviewSchema = z.object({
     z.object({
       basket: spendingBasketSchema,
       totalEur: z.number(),
+      /** Share of the month's spending. */
+      sharePct: z.number(),
       categories: z.array(basketCategorySchema),
     }),
   ),

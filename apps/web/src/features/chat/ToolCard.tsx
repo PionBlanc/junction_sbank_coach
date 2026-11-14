@@ -11,12 +11,13 @@ import {
   yearOverYearSchema,
 } from '@coach/shared';
 import { Card } from '../../components/Card.tsx';
+import { categorySliceColour } from '../../lib/chart-colours.ts';
 import { formatEur, formatMonth, formatPct } from '../../lib/format.ts';
 import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
 import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
 import { MonthlyBars } from '../charts/MonthlyBars.tsx';
-import { SimpleDonut } from '../charts/SimpleDonut.tsx';
+import { SimplePie } from '../charts/SimplePie.tsx';
 import { YearOverYearBars } from '../charts/YearOverYearBars.tsx';
 import { SafeToSpendCard } from '../safe-to-spend/SafeToSpendCard.tsx';
 import { SpenderGroupCard } from '../spender-group/SpenderGroupCard.tsx';
@@ -87,11 +88,12 @@ export function ToolCard(props: ToolCardProps) {
           <p className="text-small text-muted">No spending in this period.</p>
         ) : (
           <>
-            <SimpleDonut
-              slices={slices.map((s) => ({
+            <SimplePie
+              slices={slices.map((s, index) => ({
                 label: s.label,
                 valueEur: s.totalEur,
                 sharePct: s.sharePct,
+                ...categorySliceColour(index, s.categoryId),
               }))}
             />
             <p className="text-small">

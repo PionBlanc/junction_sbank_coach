@@ -21,6 +21,12 @@
   --color-chart-rest-3: #cdd2d9;
   --color-chart-rest-4: #e3e6eb;
 
+  /* Pie slices by size, biggest first. Checked for colour blindness and for dark text on top. */
+  --color-chart-slice-1: #2a78d6;
+  --color-chart-slice-2: #eb6834;
+  --color-chart-slice-3: #1baf7a;
+  --color-chart-slice-4: #eda100;
+
   --color-basket-regular: #3b5b92;
   --color-basket-irregular: #d39b2a;
   --color-basket-everyday: #2a9d8f;

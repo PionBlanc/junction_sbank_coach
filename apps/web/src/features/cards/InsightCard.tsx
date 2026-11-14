@@ -1,11 +1,12 @@
 import type { DeckCard } from '@coach/shared';
 import { Card } from '../../components/Card.tsx';
+import { categorySliceColour } from '../../lib/chart-colours.ts';
 import { useCoachChat } from '../../lib/chat-context.ts';
 import { formatEur, formatNumber } from '../../lib/format.ts';
 import { BigNumber } from '../charts/BigNumber.tsx';
 import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
 import { SimpleBars } from '../charts/SimpleBars.tsx';
-import { SimpleDonut } from '../charts/SimpleDonut.tsx';
+import { SimplePie } from '../charts/SimplePie.tsx';
 
 type InsightCardProps = { card: DeckCard };
 
@@ -16,7 +17,14 @@ export function InsightCard(props: InsightCardProps) {
   return (
     <Card title={card.topic}>
       {card.chart.type === 'bars' && <SimpleBars bars={card.chart.bars} />}
-      {card.chart.type === 'donut' && <SimpleDonut slices={card.chart.slices} />}
+      {card.chart.type === 'donut' && (
+        <SimplePie
+          slices={card.chart.slices.map((s, index) => ({
+            ...s,
+            ...categorySliceColour(index, s.categoryId),
+          }))}
+        />
+      )}
       {card.chart.type === 'stat' && (
         <BigNumber text={formatEur(card.chart.valueEur)} caption={card.chart.caption} />
       )}

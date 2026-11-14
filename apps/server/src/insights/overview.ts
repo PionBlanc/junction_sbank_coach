@@ -45,6 +45,10 @@ export async function getOverview(
   });
 
   const spendingEur = round2(baskets.reduce((sum, b) => sum + b.totalEur, 0));
+  const basketsWithShare = baskets.map((b) => ({
+    ...b,
+    sharePct: spendingEur > 0 ? round2(b.totalEur / spendingEur) : 0,
+  }));
   const split = await getCategorySplit(db, customerId, month, month);
   return {
     month,
@@ -52,7 +56,7 @@ export async function getOverview(
     incomeEur,
     spendingEur,
     leftEur: round2(incomeEur - spendingEur),
-    baskets,
+    baskets: basketsWithShare,
     categorySplit: split.slices,
   };
 }
