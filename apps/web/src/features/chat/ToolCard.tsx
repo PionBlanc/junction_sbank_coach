@@ -8,6 +8,7 @@ import {
   categorySplitSchema,
   categoryTrendSchema,
   incomeVsSpendingSchema,
+  investmentsSchema,
   overviewSchema,
   peerComparisonSchema,
   purchaseSizesSchema,
@@ -26,6 +27,7 @@ import { BalanceLine } from '../charts/BalanceLine.tsx';
 import { BasketTrendBars } from '../charts/BasketTrendBars.tsx';
 import { CategoryTrendBars } from '../charts/CategoryTrendBars.tsx';
 import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
+import { InvestmentBars } from '../charts/InvestmentBars.tsx';
 import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
 import { MonthlyBars } from '../charts/MonthlyBars.tsx';
@@ -160,6 +162,21 @@ export function ToolCard(props: ToolCardProps) {
           <CategoryTrendBars series={series} months={months} />
         ) : (
           <p className="text-small text-muted">No spending in this period.</p>
+        )}
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'getInvestments') {
+    const parsed = investmentsSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const { fromMonth, toMonth, months, depositedEur, withdrawnEur } = parsed.data;
+    return (
+      <Card title={`Investments · ${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`}>
+        {depositedEur > 0 || withdrawnEur > 0 ? (
+          <InvestmentBars months={months} showWithdrawals={withdrawnEur > 0} />
+        ) : (
+          <p className="text-small text-muted">No investments in this period.</p>
         )}
       </Card>
     );

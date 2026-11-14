@@ -22,6 +22,7 @@ import { getBalanceHistoryTool } from './tools/get-balance-history.ts';
 import { getCategorySplitTool } from './tools/get-category-split.ts';
 import { getCategoryTrendTool } from './tools/get-category-trend.ts';
 import { getIncomeVsSpendingTool } from './tools/get-income-vs-spending.ts';
+import { getInvestmentsTool } from './tools/get-investments.ts';
 import { getMonthlyBreakdownTool } from './tools/get-monthly-breakdown.ts';
 import { getPurchaseSizesTool } from './tools/get-purchase-sizes.ts';
 import { drawChartTool } from './tools/draw-chart.ts';
@@ -67,6 +68,7 @@ export async function streamCoachReply(
       getBasketTrend: getBasketTrendTool(db, customerId),
       getPurchaseSizes: getPurchaseSizesTool(db, customerId),
       getSavingIdeas: getSavingIdeasTool(db, customerId),
+      getInvestments: getInvestmentsTool(db, customerId),
       exportToExcel: exportToExcelTool(db, customerId),
       getSpenderGroup: getSpenderGroupTool(db, customerId),
       getSpendingSummary: getSpendingSummaryTool(db, customerId),

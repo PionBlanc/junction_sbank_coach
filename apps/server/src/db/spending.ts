@@ -309,3 +309,30 @@ export async function getCategoryTotalsByMonth(
     totalEur: Number(r.total_eur),
   }));
 }
+
+export type MonthInvestments = { month: string; depositedEur: number; withdrawnEur: number };
+
+/** Money put into and taken out of investments per month. Months without either are absent. */
+export async function getInvestmentsByMonth(
+  db: DuckDBConnection,
+  customerId: string,
+  fromMonth: string,
+  toMonth: string,
+): Promise<MonthInvestments[]> {
+  const rows = await queryRows(
+    db,
+    `SELECT month,
+       coalesce(sum(total_eur) FILTER (WHERE category_id = 'investment_deposit'), 0) AS deposited_eur,
+       coalesce(sum(total_eur) FILTER (WHERE category_id = 'investment_withdrawal'), 0) AS withdrawn_eur
+     FROM monthly_category
+     WHERE customer_id = $customerId AND month BETWEEN $fromMonth AND $toMonth
+       AND category_id IN ('investment_deposit', 'investment_withdrawal')
+     GROUP BY month ORDER BY month`,
+    { customerId, fromMonth, toMonth },
+  );
+  return rows.map((r) => ({
+    month: String(r.month),
+    depositedEur: Number(r.deposited_eur),
+    withdrawnEur: Number(r.withdrawn_eur),
+  }));
+}
