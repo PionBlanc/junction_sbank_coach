@@ -73,5 +73,11 @@ describe('getOverview', () => {
         peerMedianMonthlyEur: null,
       },
     ]);
+    // The pie chart counts taxis towards transportation: 100 + 40.
+    expect(overview.categorySplit.map((s) => [s.label, s.totalEur, s.sharePct])).toEqual([
+      ['Housing', 500, 0.5],
+      ['Restaurants & cafés', 360, 0.36],
+      ['Transportation', 140, 0.14],
+    ]);
   });
 });

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { categoryIdSchema, monthSchema, spendingBasketSchema } from './common.ts';
+import { categorySliceSchema } from './spending.ts';
 
 export const overviewQuerySchema = z.object({ month: monthSchema });
 
@@ -28,6 +29,8 @@ export const overviewSchema = z.object({
       categories: z.array(basketCategorySchema),
     }),
   ),
+  /** The month's spending by category, largest first, for the pie chart. The last slice may be "Other". */
+  categorySplit: z.array(categorySliceSchema),
 });
 export type Overview = z.infer<typeof overviewSchema>;
 export type BasketCategory = z.infer<typeof basketCategorySchema>;

@@ -7,6 +7,7 @@ import {
   type Overview,
 } from '@coach/shared';
 import { getMonthTotals } from '../db/spending.ts';
+import { getCategorySplit } from './category-split.ts';
 import { isCategoryId, round2 } from './helpers.ts';
 import { getPeerComparison } from './peers.ts';
 
@@ -44,6 +45,7 @@ export async function getOverview(
   });
 
   const spendingEur = round2(baskets.reduce((sum, b) => sum + b.totalEur, 0));
+  const split = await getCategorySplit(db, customerId, month, month);
   return {
     month,
     ageBand: peers.ageBand,
@@ -51,5 +53,6 @@ export async function getOverview(
     spendingEur,
     leftEur: round2(incomeEur - spendingEur),
     baskets,
+    categorySplit: split.slices,
   };
 }

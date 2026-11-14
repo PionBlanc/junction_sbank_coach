@@ -2,6 +2,7 @@ import { BASKET_LABELS, type Overview, type SpendingBasketId } from '@coach/shar
 import { useState } from 'react';
 import { Card } from '../../components/Card.tsx';
 import { formatEur, formatMonth } from '../../lib/format.ts';
+import { SimpleDonut } from '../charts/SimpleDonut.tsx';
 import { BasketDetail } from './BasketDetail.tsx';
 
 const BASKET_COLOURS: Record<SpendingBasketId, string> = {
@@ -63,6 +64,14 @@ export function BasketBreakdown(props: BasketBreakdownProps) {
         Tap a basket to see what is in it.
       </p>
       {selectedBasket && <BasketDetail basket={selectedBasket} />}
+      <h3 className="text-small font-medium text-muted">By category</h3>
+      <SimpleDonut
+        slices={data.categorySplit.map((s) => ({
+          label: s.label,
+          valueEur: s.totalEur,
+          sharePct: s.sharePct,
+        }))}
+      />
     </Card>
   );
 }
