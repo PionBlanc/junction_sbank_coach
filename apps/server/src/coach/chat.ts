@@ -23,7 +23,9 @@ import { getCategorySplitTool } from './tools/get-category-split.ts';
 import { getCategoryTrendTool } from './tools/get-category-trend.ts';
 import { getIncomeVsSpendingTool } from './tools/get-income-vs-spending.ts';
 import { getInvestmentsTool } from './tools/get-investments.ts';
+import { getDownPaymentTool } from './tools/get-down-payment.ts';
 import { getMonthlyBreakdownTool } from './tools/get-monthly-breakdown.ts';
+import { getMortgageApplicationTool } from './tools/get-mortgage-application.ts';
 import { getPurchaseSizesTool } from './tools/get-purchase-sizes.ts';
 import { drawChartTool } from './tools/draw-chart.ts';
 import { getSafeToSpendTool } from './tools/get-safe-to-spend.ts';
@@ -77,6 +79,8 @@ export async function streamCoachReply(
       compareToPeers: compareToPeersTool(db, customerId),
       simulateWhatIf: simulateWhatIfTool(db, customerId),
       planGoal: planGoalTool(db, customerId, swipes.acceptedIds),
+      getMortgageApplication: getMortgageApplicationTool(db, customerId),
+      getDownPayment: getDownPaymentTool(db, customerId),
       drawChart: drawChartTool(),
       suggestReplies: suggestRepliesTool(),
     },

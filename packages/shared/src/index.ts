@@ -8,6 +8,7 @@ export * from './api/actions.ts';
 export * from './api/spending.ts';
 export * from './api/investments.ts';
 export * from './api/goal.ts';
+export * from './api/mortgage.ts';
 export * from './api/balance.ts';
 export * from './api/export.ts';
 export * from './api/peers.ts';

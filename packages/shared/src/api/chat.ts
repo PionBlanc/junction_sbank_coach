@@ -20,6 +20,8 @@ export const CHART_TOOLS = [
   'getCategoryTrend',
   'getInvestments',
   'planGoal',
+  'getMortgageApplication',
+  'getDownPayment',
 ] as const;
 
 export type ChartTool = (typeof CHART_TOOLS)[number];

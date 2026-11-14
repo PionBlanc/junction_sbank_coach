@@ -2,12 +2,14 @@ import {
   CATEGORIES,
   categoryChangesSchema,
   largestPurchasesSchema,
+  mortgageApplicationSchema,
   excelExportSchema,
   goalPlanSchema,
   balanceHistorySchema,
   basketTrendSchema,
   categorySplitSchema,
   categoryTrendSchema,
+  downPaymentSchema,
   incomeVsSpendingSchema,
   investmentsSchema,
   overviewSchema,
@@ -37,6 +39,8 @@ import { RowBars } from '../charts/RowBars.tsx';
 import { SimplePie } from '../charts/SimplePie.tsx';
 import { YearOverYearBars } from '../charts/YearOverYearBars.tsx';
 import { ExcelExportCard } from '../export/ExcelExportCard.tsx';
+import { DownPaymentCard } from '../mortgage/DownPaymentCard.tsx';
+import { MortgageApplicationCard } from '../mortgage/MortgageApplicationCard.tsx';
 import { SafeToSpendCard } from '../safe-to-spend/SafeToSpendCard.tsx';
 import { SpenderGroupCard } from '../spender-group/SpenderGroupCard.tsx';
 import { WhatIfCard } from '../what-if/WhatIfCard.tsx';
@@ -167,6 +171,20 @@ export function ToolCard(props: ToolCardProps) {
         )}
       </Card>
     );
+  }
+
+  if (props.toolName === 'getMortgageApplication') {
+    const parsed = mortgageApplicationSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    // No application: the coach says so in words.
+    return parsed.data.application ? (
+      <MortgageApplicationCard application={parsed.data.application} />
+    ) : null;
+  }
+
+  if (props.toolName === 'getDownPayment') {
+    const parsed = downPaymentSchema.safeParse(props.output);
+    return parsed.success ? <DownPaymentCard data={parsed.data} /> : unreadable;
   }
 
   if (props.toolName === 'planGoal') {
