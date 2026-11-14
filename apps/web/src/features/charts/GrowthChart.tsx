@@ -11,7 +11,11 @@ import {
 } from 'recharts';
 import { formatEur, formatEurShort } from '../../lib/format.ts';
 
-type GrowthChartProps = { series: WhatIf['series'] };
+type GrowthChartProps = {
+  series: WhatIf['series'];
+  /** Only the key's names, no end values or captions: in chat the coach gives the numbers. */
+  chartOnly?: boolean | undefined;
+};
 
 /** Point of the chart (invested) in dark, the comparison (saved) in grey. */
 const INVESTED = 'var(--color-chart-focus)';
@@ -33,21 +37,29 @@ export function GrowthChart(props: GrowthChartProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-caption text-muted">After {yearLabel(last.years).toLowerCase()}</p>
+      {!props.chartOnly && (
+        <p className="text-caption text-muted">After {yearLabel(last.years).toLowerCase()}</p>
+      )}
       <div className="flex gap-6">
         <p className="flex flex-col">
           <span className="flex items-center gap-2 text-caption text-muted">
             <span className="h-0.5 w-3 rounded-sm" style={{ background: INVESTED }} />
             Invested
           </span>
-          <span className="text-title font-semibold text-ink">~{formatEur(last.investedEur)}</span>
+          {!props.chartOnly && (
+            <span className="text-title font-semibold text-ink">
+              ~{formatEur(last.investedEur)}
+            </span>
+          )}
         </p>
         <p className="flex flex-col">
           <span className="flex items-center gap-2 text-caption text-muted">
             <span className="h-0.5 w-3 rounded-sm" style={{ background: SAVED }} />
             Saved
           </span>
-          <span className="text-title font-semibold text-ink">{formatEur(last.savedEur)}</span>
+          {!props.chartOnly && (
+            <span className="text-title font-semibold text-ink">{formatEur(last.savedEur)}</span>
+          )}
         </p>
       </div>
 
@@ -123,10 +135,12 @@ export function GrowthChart(props: GrowthChartProps) {
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-      <p className="flex items-center gap-2 text-caption text-muted">
-        <span className="size-3 rounded-sm" style={{ background: INVESTED, opacity: 0.15 }} />
-        Shaded: where invested money could likely end up
-      </p>
+      {!props.chartOnly && (
+        <p className="flex items-center gap-2 text-caption text-muted">
+          <span className="size-3 rounded-sm" style={{ background: INVESTED, opacity: 0.15 }} />
+          Shaded: where invested money could likely end up
+        </p>
+      )}
     </div>
   );
 }

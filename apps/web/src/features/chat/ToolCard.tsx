@@ -135,7 +135,7 @@ export function ToolCard(props: ToolCardProps) {
 
   if (props.toolName === 'simulateWhatIf') {
     const parsed = whatIfQuerySchema.safeParse(props.input);
-    return parsed.success ? <WhatIfCard {...parsed.data} /> : unreadable;
+    return parsed.success ? <WhatIfCard {...parsed.data} chartOnly /> : unreadable;
   }
 
   if (props.toolName === 'getSpendingSummary') {

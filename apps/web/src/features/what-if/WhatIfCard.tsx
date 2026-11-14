@@ -14,6 +14,8 @@ type WhatIfCardProps = {
   categoryId?: CategoryId;
   cutPct?: number;
   monthlyEur?: number;
+  /** Chart only, no explaining text: in chat the coach does the explaining. */
+  chartOnly?: boolean;
 };
 
 /** The one what-if card: used in chat, on the action list, and on categories. */
@@ -64,7 +66,7 @@ export function WhatIfCard(props: WhatIfCardProps) {
         </div>
       )}
       {/* Without a category, the title already names the amount. */}
-      {props.categoryId && (
+      {props.categoryId && !props.chartOnly && (
         <p>
           Frees up <span className="text-title font-semibold">{formatEur(data.monthlyEur)}</span> a
           month
@@ -76,23 +78,30 @@ export function WhatIfCard(props: WhatIfCardProps) {
           )}
         </p>
       )}
-      <p className="text-small">
-        Money you save grows only by what you add. Invested money also earns returns, and those
-        returns earn more over time.
-      </p>
-      <GrowthChart series={data.series} />
-      <p className="text-small">
-        In 5 years: <span className="font-semibold">{formatEur(data.fiveYearSavedEur)}</span> saved
-        {data.fiveYearHousingMonths !== null && (
-          <>. That is {formatNumber(data.fiveYearHousingMonths)} months of your housing cost</>
-        )}
-        .
-      </p>
-      <p className="text-caption text-muted">
-        Invested assumes a return of {formatPct(data.returnPct)} a year. The shaded band is{' '}
-        {formatPct(data.returnLowPct)} to {formatPct(data.returnHighPct)}. An example, not a
-        promise.
-      </p>
+      {!props.chartOnly && (
+        <p className="text-small">
+          Money you save grows only by what you add. Invested money also earns returns, and those
+          returns earn more over time.
+        </p>
+      )}
+      <GrowthChart series={data.series} chartOnly={props.chartOnly} />
+      {!props.chartOnly && (
+        <p className="text-small">
+          In 5 years: <span className="font-semibold">{formatEur(data.fiveYearSavedEur)}</span>{' '}
+          saved
+          {data.fiveYearHousingMonths !== null && (
+            <>. That is {formatNumber(data.fiveYearHousingMonths)} months of your housing cost</>
+          )}
+          .
+        </p>
+      )}
+      {!props.chartOnly && (
+        <p className="text-caption text-muted">
+          Invested assumes a return of {formatPct(data.returnPct)} a year. The shaded band is{' '}
+          {formatPct(data.returnLowPct)} to {formatPct(data.returnHighPct)}. An example, not a
+          promise.
+        </p>
+      )}
     </Card>
   );
 }
