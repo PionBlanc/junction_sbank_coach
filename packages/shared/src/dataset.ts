@@ -14,10 +14,15 @@ export type AgeBand = (typeof AGE_BANDS)[number];
 
 /**
  * The customers the demo shows, in user-switcher order. Picked from 12-month profiles
- * (2025-10 to 2026-09), see PLAN.md. None of them has salary sweeps. All but CUST05039 have a
- * hand-made subcategory mix, see scripts/data/demo-profiles.ts.
+ * (2025-10 to 2026-09), see PLAN.md. None of them has salary sweeps. The first is the default and
+ * the one who invests, so the investment questions have an answer. All but CUST04270 and
+ * CUST05039 have a hand-made subcategory mix, see scripts/data/demo-profiles.ts.
  */
 export const DEMO_CUSTOMERS = [
+  {
+    customerId: 'CUST04270',
+    persona: 'Steady investor: 38, invests a tenth of income every month',
+  },
   { customerId: 'CUST00164', persona: 'Young diner: 23, restaurants a quarter of income' },
   { customerId: 'CUST03802', persona: 'Housing-heavy: 41, housing 44% of income, never overdrawn' },
   { customerId: 'CUST04092', persona: 'Tight budget: 26, overdrawn on 62 days in the last year' },
