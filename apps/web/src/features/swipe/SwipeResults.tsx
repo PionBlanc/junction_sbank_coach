@@ -16,7 +16,7 @@ export function SwipeResults(props: SwipeResultsProps) {
 
   const likedIds = swipes.filter((s) => s.liked).map((s) => s.id);
   const matches = props.actions.filter((a) => likedIds.includes(a.id));
-  const worthIt = props.actions.filter((a) => !likedIds.includes(a.id));
+  const swipedNo = props.actions.filter((a) => !likedIds.includes(a.id));
 
   // The one sum the frontend is allowed to do: the selected action points.
   const monthlyEur = matches.reduce((sum, a) => sum + a.savingPerMonthEur, 0);
@@ -67,20 +67,24 @@ export function SwipeResults(props: SwipeResultsProps) {
         </Card>
       )}
 
-      {worthIt.length > 0 && (
-        <Card title="Worth it to you">
+      {/* Collapsed: the matches are the point. The rest is there if the user wants to look. */}
+      {swipedNo.length > 0 && (
+        <details className="rounded-md border border-line bg-card px-4">
+          <summary className="flex min-h-11 cursor-pointer items-center text-small text-brand">
+            You swiped no on these ({swipedNo.length})
+          </summary>
           <div className="flex flex-col divide-y divide-line">
-            {worthIt.map((action) => (
+            {swipedNo.map((action) => (
               <p key={action.id} className="flex gap-4 py-2 text-small first:pt-0">
                 <span aria-hidden>{action.emoji}</span>
                 <span className="flex-1">{action.title}</span>
               </p>
             ))}
           </div>
-          <p className="text-caption text-muted">
-            You swiped left on these. Your advisor will not ask you to change them.
+          <p className="pt-2 pb-4 text-caption text-muted">
+            Your advisor will not ask you to change them.
           </p>
-        </Card>
+        </details>
       )}
 
       <button type="button" className="h-11 rounded-md text-small text-muted" onClick={reset}>

@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-/** One swiped saving idea: right is liked ("down to try"), left is not ("worth it to me"). */
+/** One swiped saving idea: right is liked ("down to try"), left is not ("no thanks"). */
 export type Swipe = { id: string; liked: boolean };
 
 export type SwipeContextValue = {

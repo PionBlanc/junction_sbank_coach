@@ -3,7 +3,7 @@ import { formatEur } from '../../lib/format.ts';
 
 type OpportunityCardProps = {
   action: Action;
-  /** 0 to 1: how far the card is dragged towards "down to try" and "worth it". */
+  /** 0 to 1: how far the card is dragged towards "down to try" and "no thanks". */
   likeOpacity: number;
   passOpacity: number;
 };
@@ -27,7 +27,7 @@ export function OpportunityCard(props: OpportunityCardProps) {
           className="absolute top-4 right-4 rotate-12 rounded-md border-2 border-muted px-2 text-title font-semibold text-muted"
           style={{ opacity: props.passOpacity }}
         >
-          WORTH IT
+          NO THANKS
         </span>
       </div>
       <div className="flex flex-col gap-2">
