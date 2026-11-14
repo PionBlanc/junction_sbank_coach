@@ -6,4 +6,5 @@ export const GUIDE_QUESTIONS = [
     question: 'How does my spending compare to people my age?',
   },
   { label: 'How much I can spend this week', question: 'How much can I safely spend this week?' },
+  { label: 'What kind of spender am I?', question: 'What kind of spender am I?' },
 ] as const;

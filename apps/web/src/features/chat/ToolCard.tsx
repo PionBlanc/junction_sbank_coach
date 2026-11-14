@@ -3,6 +3,7 @@ import {
   overviewSchema,
   peerComparisonSchema,
   safeToSpendSchema,
+  spenderGroupSchema,
   spendingSummarySchema,
   whatIfQuerySchema,
 } from '@coach/shared';
@@ -12,6 +13,7 @@ import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
 import { MonthlyBars } from '../charts/MonthlyBars.tsx';
 import { SafeToSpendCard } from '../safe-to-spend/SafeToSpendCard.tsx';
+import { SpenderGroupCard } from '../spender-group/SpenderGroupCard.tsx';
 import { WhatIfCard } from '../what-if/WhatIfCard.tsx';
 
 type ToolCardProps = { toolName: string; input: unknown; output: unknown };
@@ -23,6 +25,11 @@ export function ToolCard(props: ToolCardProps) {
   if (props.toolName === 'getMonthlyBreakdown') {
     const parsed = overviewSchema.safeParse(props.output);
     return parsed.success ? <BasketBreakdown data={parsed.data} /> : unreadable;
+  }
+
+  if (props.toolName === 'getSpenderGroup') {
+    const parsed = spenderGroupSchema.safeParse(props.output);
+    return parsed.success ? <SpenderGroupCard group={parsed.data} /> : unreadable;
   }
 
   if (props.toolName === 'getSafeToSpend') {

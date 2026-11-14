@@ -1,16 +1,21 @@
 import type { Action } from '@coach/shared';
 import { useState } from 'react';
+import { useSpenderGroup } from '../../api/useSpenderGroup.ts';
 import { Card } from '../../components/Card.tsx';
+import { LoadError } from '../../components/LoadError.tsx';
 import { useCoachChat } from '../../lib/chat-context.ts';
 import { formatEur } from '../../lib/format.ts';
-import { moneyType } from '../../lib/money-type.ts';
 import { useSwipes } from '../../lib/swipe-context.ts';
+import { useUser } from '../../lib/user-context.ts';
+import { SpenderGroupCard } from '../spender-group/SpenderGroupCard.tsx';
 import { WhatIfCard } from '../what-if/WhatIfCard.tsx';
 
 type SwipeResultsProps = { actions: Action[] };
 
-/** The view after the last swipe: the user's money type, their matches, and what they keep. */
+/** The view after the last swipe: the user's spender group, their matches, and what they keep. */
 export function SwipeResults(props: SwipeResultsProps) {
+  const { userId } = useUser();
+  const group = useSpenderGroup(userId);
   const { swipes, reset } = useSwipes();
   const { ask, busy } = useCoachChat();
   const [showWhatIf, setShowWhatIf] = useState(false);
@@ -18,27 +23,29 @@ export function SwipeResults(props: SwipeResultsProps) {
   const likedIds = swipes.filter((s) => s.liked).map((s) => s.id);
   const matches = props.actions.filter((a) => likedIds.includes(a.id));
   const worthIt = props.actions.filter((a) => !likedIds.includes(a.id));
-  const type = moneyType(matches, worthIt);
 
   // The one sum the frontend is allowed to do: the selected action points.
   const monthlyEur = matches.reduce((sum, a) => sum + a.savingPerMonthEur, 0);
 
   return (
     <div className="flex flex-col gap-4">
-      <Card title="Your money type">
-        <div className="flex items-center gap-4">
-          <span className="text-display" aria-hidden>
-            {type.emoji}
-          </span>
-          <div className="flex flex-col gap-1">
-            <p className="text-title font-semibold">{type.label}</p>
-            <p className="text-small text-muted">{type.line}</p>
-          </div>
-        </div>
-        <p className="text-small">
-          You matched with {matches.length} of {props.actions.length} ideas.
-        </p>
-      </Card>
+      {group.isPending && (
+        <Card title="What kind of spender you are">
+          <p className="text-small text-muted">Loading…</p>
+        </Card>
+      )}
+      {group.isError && (
+        <Card title="What kind of spender you are">
+          <LoadError message={group.error.message} onRetry={() => void group.refetch()} />
+        </Card>
+      )}
+      {group.data && (
+        <SpenderGroupCard group={group.data}>
+          <p className="text-small">
+            You matched with {matches.length} of {props.actions.length} saving ideas.
+          </p>
+        </SpenderGroupCard>
+      )}
 
       {matches.length > 0 && (
         <Card title="Your matches">

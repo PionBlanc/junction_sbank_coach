@@ -6,6 +6,7 @@ const CHART_PROMPTS: Record<ChartTool, string> = {
   compareToPeers: 'Draw a chart comparing me to people my age.',
   getSafeToSpend: 'Show my safe to spend as a card.',
   simulateWhatIf: 'Draw a chart of this what-if.',
+  getSpenderGroup: 'Show my spender group as a card.',
 };
 
 type ChartSuggestionsProps = { tools: ChartTool[]; onPick: (prompt: string) => void };

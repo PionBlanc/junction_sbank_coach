@@ -76,20 +76,20 @@ The profile is only the list of swipes: for each card, its id and whether it was
 
 From that list the app derives:
 
-| Part          | Meaning                                                   |
-| ------------- | --------------------------------------------------------- |
-| Down to try   | Cards swiped right                                        |
-| Worth it      | Cards swiped left                                         |
-| Monthly total | Sum of the amounts freed up by the "down to try" cards    |
-| Money type    | A label named after what the customer protects, see below |
+| Part          | Meaning                                                  |
+| ------------- | -------------------------------------------------------- |
+| Down to try   | Cards swiped right                                       |
+| Worth it      | Cards swiped left                                        |
+| Monthly total | Sum of the amounts freed up by the "down to try" cards   |
+| Spender group | The customer's group from their spending data, see below |
 
-### Money type
+### Spender group
 
-Chosen in [money-type.ts](../apps/web/src/lib/money-type.ts) with fixed rules, no AI:
+Chosen on the server from the last 12 months of spending, not from the swipes, so it can be counted over all customers ([spender-group.ts](../apps/server/src/insights/spender-group.ts)). The groups are defined in [spender-groups.ts](../packages/shared/src/spender-groups.ts):
 
-- Nothing swiped left: "Open to anything".
-- Nothing swiped right: "Happy as you are".
-- Otherwise the label comes from the category of the largest idea the customer swiped left on: restaurants give "Foodie at heart", transportation "Door-to-door traveller", shopping "Treat collector", entertainment "Front-row regular", travel "Window-seat dreamer". Any other category gives "Picky in a good way".
+- Among restaurants, transportation, shopping, entertainment and travel, take the categories where the customer's monthly average is above the top quarter of their age band. The one furthest above the age-band median names the group: "Foodie at heart", "Door-to-door traveller", "Treat collector", "Front-row regular" or "Window-seat dreamer".
+- No category above the top quarter: "Picky in a good way".
+- The count is over all customers except salary-sweep customers (see [data.md](data.md)). The coach tells it with `getSpenderGroup`, and the profile view shows the same group.
 
 ### How the coach uses it
 

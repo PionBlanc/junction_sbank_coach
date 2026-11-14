@@ -1,4 +1,4 @@
-The swipe profile is built entirely from the user's swipes. The cards, the amounts and the money-type label all come from fixed rules, and the AI is not involved until the coach chat.
+The swipe profile is built entirely from the user's swipes. The cards, the amounts and the spender group all come from fixed rules, and the AI is not involved until the coach chat.
 
 ## 1. The cards (the input)
 
@@ -17,7 +17,7 @@ The profile is just a list of card ids, each marked right or left. It lives only
 - **Down to try:** the cards swiped right.
 - **Worth it:** the cards swiped left.
 - **Monthly total:** the sum of the "down to try" amounts.
-- **Money type:** a label from [money-type.ts](apps/web/src/lib/money-type.ts), named after the category of the largest card swiped left.
+- **Spender group:** not from the swipes but from the last 12 months of spending, so it can be counted over all customers. See "Spender group" in [swipe.md](swipe.md).
 
 ## 3. How it reaches the coach LLM
 
@@ -30,30 +30,33 @@ The profile is just a list of card ids, each marked right or left. It lives only
 
 These are real figures from the running server. Some of this customer's cards:
 
-| id | card | €/mo freed |
-|---|---|---|
-| habit-restaurant | Cook one in four restaurant meals at home (359 €/mo, 52 purchases) | 89.66 |
-| habit-fast_food | Make every third coffee or quick lunch at home (247 €/mo) | 82.46 |
-| habit-recreation | Swap every fourth paid activity for a free one | 51.42 |
-| above-peers-lifestyle | Shopping: spend a fifth less (162 € vs 76 € median for their age) | 32.43 |
-| habit-grocery_store | Trim 5% off groceries | 23.62 |
-| taxis | Swap half your taxi rides for public transport | 13.19 |
+| id                    | card                                                               | €/mo freed |
+| --------------------- | ------------------------------------------------------------------ | ---------- |
+| habit-restaurant      | Cook one in four restaurant meals at home (359 €/mo, 52 purchases) | 89.66      |
+| habit-fast_food       | Make every third coffee or quick lunch at home (247 €/mo)          | 82.46      |
+| habit-recreation      | Swap every fourth paid activity for a free one                     | 51.42      |
+| above-peers-lifestyle | Shopping: spend a fifth less (162 € vs 76 € median for their age)  | 32.43      |
+| habit-grocery_store   | Trim 5% off groceries                                              | 23.62      |
+| taxis                 | Swap half your taxi rides for public transport                     | 13.19      |
 
 Suppose they swipe like this, which is a made-up set of swipes:
+
 - **Right:** fast_food, grocery_store, taxis
 - **Left:** restaurant, recreation
 
 The browser shows:
+
 - **Down to try:** 3 ideas, 82.46 + 23.62 + 13.19 = **119.27 €/mo**.
-- **Money type:** the largest card swiped left is restaurants (89.66), so the label is **"Foodie at heart"**.
 
 The chat request then carries this:
+
 ```json
 { "messages": [...], "acceptedIds": ["habit-fast_food","habit-grocery_store","taxis"],
   "rejectedIds": ["habit-restaurant","habit-recreation"] }
 ```
 
 And the server adds this to the coach's system prompt:
+
 ```
 The customer's swipes:
 The app showed the customer saving ideas as cards. ... The numbers below come from the app, so you may state them.
