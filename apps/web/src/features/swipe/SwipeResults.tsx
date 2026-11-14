@@ -31,7 +31,7 @@ export function SwipeResults(props: SwipeResultsProps) {
         {matches.length > 0 ? (
           <>
             <p className="text-title font-semibold text-ink">
-              You could free up <span className="text-positive">+{formatEur(monthlyEur)}</span> a
+              You could save up to <span className="text-positive">{formatEur(monthlyEur)}</span> a
               month
             </p>
           </>
