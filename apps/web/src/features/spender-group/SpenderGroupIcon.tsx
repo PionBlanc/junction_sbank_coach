@@ -41,12 +41,12 @@ const ICONS: Record<SpenderGroupId, { stroke: string[]; fill: string[] }> = {
   },
 };
 
-type SpenderGroupIconProps = { groupId: SpenderGroupId; size?: 'sm' | 'md' | 'lg' };
+type SpenderGroupIconProps = { groupId: SpenderGroupId; size?: 'md' | 'lg' };
 
 /** The badge of a spender group. */
 export function SpenderGroupIcon(props: SpenderGroupIconProps) {
   const icon = ICONS[props.groupId];
-  const size = props.size === 'lg' ? 'size-16' : props.size === 'sm' ? 'size-9' : 'size-11';
+  const size = props.size === 'lg' ? 'size-16' : 'size-11';
   return (
     <span aria-hidden className={`flex shrink-0 rounded-full bg-ink ${size}`}>
       <svg viewBox="0 0 24 24" className="size-full">

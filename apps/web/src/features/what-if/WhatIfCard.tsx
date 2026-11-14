@@ -95,13 +95,6 @@ export function WhatIfCard(props: WhatIfCardProps) {
           .
         </p>
       )}
-      {!props.chartOnly && (
-        <p className="text-caption text-muted">
-          Invested assumes a return of {formatPct(data.returnPct)} a year. The shaded band is{' '}
-          {formatPct(data.returnLowPct)} to {formatPct(data.returnHighPct)}. An example, not a
-          promise.
-        </p>
-      )}
     </Card>
   );
 }
