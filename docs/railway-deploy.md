@@ -1,6 +1,6 @@
 # Railway deployment
 
-How the app is deployed on Railway, and how to update the database or redo the setup. Status: **deployed** (2026-11-14) at https://money-coach-production-bcb14bb8.up.railway.app. It runs for the hackathon weekend only.
+How the app is deployed on Railway, and how to update the database or redo the setup. Status: **deployed** (2026-11-14) at https://tx-to-actions.up.railway.app. It runs for the hackathon weekend only.
 
 ## Current setup
 
@@ -18,7 +18,7 @@ The service `money-coach` lives in the existing Railway project **Personal Finan
 | `COACH_DB_PATH`                | `/data/coach.duckdb`                                                                     |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | The team's Gemini key. Service variable, never committed. Visible to all project members |
 | `PORT`                         | Not set. Railway provides it                                                             |
-| Public domain                  | https://money-coach-production-bcb14bb8.up.railway.app                                   |
+| Public domain                  | https://tx-to-actions.up.railway.app                                                     |
 
 Verified on the first deploy: Node 22.23 is used, the Vite build finds its dev dependencies, the Linux DuckDB binary loads, and `GET /api/health` returns `{"status":"ok","customers":5100}`. The app uses about 220 MB of memory, so it costs a few dollars a month on usage pricing.
 
