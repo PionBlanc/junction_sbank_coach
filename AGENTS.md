@@ -9,6 +9,16 @@ More specific rules live next to the code and add to this file:
 
 Project context: [README.md](README.md). Tasks and decisions: [PLAN.md](PLAN.md). Dataset facts: [docs/data.md](docs/data.md).
 
+## Mindset: a 48-hour demo
+
+This is a hackathon demo built in 48 hours, not a product. **Simplicity is king.** A grug-brained developer mindset is welcome here.
+
+- Write the simplest code that makes the demo work. Plain functions, plain data, obvious names. A bit of duplication beats a clever abstraction.
+- Do not build for an imagined future: no generic frameworks, extra config options, plugin systems, or layers that nothing uses today.
+- The skeleton (folder structure, shared taxonomy, API types, data pipeline) is the one part that plans ahead, so features slot in without a fight. Feature code does not.
+- Before adding something, ask: would the demo be worse without it? If not, skip it.
+- If a rule in these files slows the demo down for no real gain, say so in team chat rather than silently working around it.
+
 ## Golden rules
 
 1. **The tools decide style.** Prettier formats, ESLint lints, TypeScript strict mode types. Run them before every commit. Never hand-format around them, and never change their config without the whole team agreeing.
@@ -24,11 +34,18 @@ Run from the repo root.
 ```
 npm install           # install everything (all workspaces)
 npm run data          # download and preprocess the dataset
+npm run dev           # server (port 8787) and web app (port 5173) with reload
+npm run build         # build the web app into apps/web/dist
+npm start             # production: the server also serves apps/web/dist
 npm run format        # Prettier, write
+npm run lint          # ESLint, whole repo
 npm run typecheck     # TypeScript, whole repo
+npm test              # Vitest, whole repo
 ```
 
-`lint`, `dev`, and `test` are added when the apps are scaffolded (PLAN.md Phase 0). Before every commit: `npm run format && npm run lint && npm run typecheck`.
+Before every commit: `npm run format && npm run lint && npm run typecheck && npm test`.
+
+TypeScript is pinned to 6.0 because `typescript-eslint` cannot run on TypeScript 7 (it has no JavaScript API). Do not upgrade it.
 
 ## Repository structure
 

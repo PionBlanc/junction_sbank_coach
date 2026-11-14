@@ -27,7 +27,7 @@ Keep these as the core of the pitch:
 
 Deployment is a hard requirement (peer review and commenting), and the plan currently leaves it to the end. Instead:
 
-- [ ] As soon as the two scaffolds are on `main`, deploy a walking skeleton: server with `/health`, built web app served by the same server
+- [ ] As soon as the two scaffolds are on `main`, deploy a walking skeleton: server with `/api/health`, built web app served by the same server. The scaffold supports this: `npm run build`, then `npm start`
 - [ ] Deploy manually through the hosting service's dashboard or CLI. No automatic deploy on every push: we push often, and a deploy per push is too heavy
 - [ ] Everyone tests on their own phone from day one
 
@@ -41,12 +41,12 @@ Instead:
 
 - [ ] Build `data/processed/coach.duckdb` locally once, as today
 - [ ] After the backend is deployed, upload the processed database to the host once (for example a Railway volume) and open it read-only from there
-- [ ] The server reads the database path from an env variable, so local dev and the deployed server can point to different files
-- [ ] The database stays out of git, in line with the data rules
+- [x] The server reads the database path from an env variable (`COACH_DB_PATH`), so local dev and the deployed server can point to different files
+- [x] The database stays out of git, in line with the data rules
 
 ### 3. Draw an explicit MVP line
 
-Phases 2 and 3 hold about 30 tasks, which is too many for three people in one hackathon. Proposed cut:
+Phases 2 and 3 hold about 30 tasks, which is too many for three people in one hackathon. Accepted and copied into PLAN.md:
 
 **Must have (demo breaks without it)**
 
@@ -82,10 +82,10 @@ Simplified after review, and already updated in [AGENTS.md](../AGENTS.md):
 ### 5. Technical points to fix early
 
 - [ ] **Run the Gemini spike first.** Whether function tools and Google Search work in one request decides the coach design. Do it in the first hour.
-- [ ] **TypeScript 7 and ESLint.** `package.json` uses `typescript ^7.0.2`. Check that `typescript-eslint` supports TS 7 before the ESLint setup task. If not, pin TypeScript 5.x or use lint rules that do not need type information. Not verified yet.
-- [ ] **Compare like with like.** `peer_benchmarks` is each customer's average month over 24 months. Comparing one user month against it creates false "you overspend" flags for lumpy categories like travel and home & tech. Compare the user's trailing 12-month average against peers, or label clearly what is compared.
-- [ ] **Transportation has two rows per month.** In `monthly_category`, taxis are overridden to the `everyday` basket, so transportation appears once under `mandatory_regular` and once under `everyday`. That is intended, but per-category charts must sum across baskets. Add a line to [data.md](data.md).
-- [ ] **Age bands are defined twice.** The SQL `CASE` in [prepare.ts](../scripts/data/prepare.ts) repeats `ageBandOf` from `dataset.ts`. Generate it from `AGE_BANDS` so there is one source. Low priority.
+- [x] **TypeScript 7 and ESLint.** Verified: `typescript-eslint` supports TypeScript `<6.1` only, and TypeScript 7 ships no JavaScript API, so even lint rules without type information cannot run. TypeScript is now pinned to `~6.0.3`.
+- [x] **Compare like with like.** `peer_benchmarks` is each customer's average month over 24 months. Comparing one user month against it creates false "you overspend" flags for lumpy categories like travel and home & tech. Recorded as a convention in [data.md](data.md). Apply it when building the benchmark endpoint.
+- [x] **Transportation has two rows per month.** In `monthly_category`, taxis are overridden to the `everyday` basket, so transportation appears once under `mandatory_regular` and once under `everyday`. Recorded in [data.md](data.md).
+- [x] **Age bands are defined twice.** The SQL `CASE` in [prepare.ts](../scripts/data/prepare.ts) is now generated from `AGE_BANDS`. Verified: identical bands for all 5,100 customers.
 
 ### 6. Pitch and demo
 
@@ -94,6 +94,7 @@ Simplified after review, and already updated in [AGENTS.md](../AGENTS.md):
 
 ## Next steps
 
-1. Team picks the hosting platform and agrees on the MVP line (15 minutes).
-2. Move accepted items into PLAN.md as tasks.
-3. Start Phase 0: Gemini spike, scaffolds, walking-skeleton deploy.
+1. ~~Move accepted items into PLAN.md as tasks.~~ Done.
+2. ~~Scaffold `apps/server` and `apps/web`, ESLint, Vitest.~~ Done.
+3. Team picks the hosting platform.
+4. Gemini spike, then the walking-skeleton deploy.

@@ -4,7 +4,7 @@ Junction 2026 hackathon project for the S-Pankki challenge: **turn personal bank
 
 A mobile-first prototype that reads a user's transaction history, shows where the money really goes, compares it with other Finns, proposes concrete saving actions with euro amounts, and lets the user chat with their own data.
 
-> Status: repo skeleton with a working data pipeline. The app itself is not built yet. Start with [PLAN.md](PLAN.md). Coding rules for humans and AI agents are in [AGENTS.md](AGENTS.md). Dataset facts are in [docs/data.md](docs/data.md).
+> Status: skeleton. Data pipeline, server, and web app are scaffolded and run end to end. No features yet. Start with [PLAN.md](PLAN.md). Coding rules for humans and AI agents are in [AGENTS.md](AGENTS.md). Dataset facts are in [docs/data.md](docs/data.md).
 
 ## The idea
 
@@ -48,6 +48,7 @@ Example chat questions (from the challenge brief):
 
 ## Principles
 
+- **A 48-hour demo.** Simplicity over generality. We build what the demo shows and nothing "for later". See [AGENTS.md](AGENTS.md).
 - **The AI never does the maths.** All numbers come from deterministic code over the transaction data. The model picks which tool to call and explains the result. This is what makes the advice trustworthy.
 - **MyData spirit.** The user explores their own data freely. The chat can draw charts on request instead of only showing charts we picked.
 - **Concrete over generic.** Every piece of advice names an amount, a category, and a next step.
@@ -80,23 +81,30 @@ data/               Raw and processed data. Never committed
 docs/data.md        What is in the dataset and how it is processed
 ```
 
-`apps/` is created in PLAN.md Phase 0. Everything else exists now.
-
 ## Getting started
 
-Requires Node.js 22 or newer.
+Requires Node.js 22.12 or newer.
 
 ```
 npm install
 npm run data        # downloads the dataset (~365 MB) and builds data/processed/coach.duckdb
+npm run dev         # open http://localhost:5173
 ```
 
 Copy `.env.example` to `.env` and add your Gemini API key. Never commit `.env`.
 
-Commands to run the web app and server will be added here when they are scaffolded.
+| Command             | What it does                                                         |
+| ------------------- | -------------------------------------------------------------------- |
+| `npm run data`      | Fetch and preprocess the dataset                                     |
+| `npm run dev`       | Server on port 8787 and web app on port 5173, both reload on changes |
+| `npm run build`     | Build the web app into `apps/web/dist`                               |
+| `npm start`         | Run the server, which also serves the built web app (production)     |
+| `npm run format`    | Format everything with Prettier                                      |
+| `npm run lint`      | Lint the whole repo                                                  |
+| `npm run typecheck` | Type-check the whole repo                                            |
+| `npm test`          | Run all tests                                                        |
 
-| Command             | What it does                     |
-| ------------------- | -------------------------------- |
-| `npm run data`      | Fetch and preprocess the dataset |
-| `npm run format`    | Format everything with Prettier  |
-| `npm run typecheck` | Type-check the whole repo        |
+Troubleshooting:
+
+- **Server hangs at startup or cannot open the database:** another process (for example a second server you forgot) may hold `coach.duckdb` open. Stop it and restart. Always stop the server before `npm run data:prepare`.
+- **Vitest says "failed to find the current suite" on Windows:** the terminal is in `c:\...` with a lowercase drive letter. Open it in `C:\...` (for example `cd C:\Users\...`) and rerun.

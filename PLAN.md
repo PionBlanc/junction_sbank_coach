@@ -2,7 +2,9 @@
 
 Actionable steps, in order. Tick boxes as you go. Items marked **Decide** need a team decision. Each has a recommendation, so if nobody objects, take the recommendation and move on.
 
-Done so far: dataset download and preprocessing pipeline (`npm run data`), shared taxonomy, repo conventions. See [docs/data.md](docs/data.md) for what the data contains.
+Done so far: dataset download and preprocessing pipeline (`npm run data`), shared taxonomy, repo conventions, server and web scaffolds (`npm run dev` runs both end to end), ESLint, Vitest. See [docs/data.md](docs/data.md) for what the data contains and [docs/handoff.md](docs/handoff.md) for the skeleton review.
+
+This is a 48-hour demo: build what the demo shows, nothing "for later". See the mindset section in [AGENTS.md](AGENTS.md).
 
 ## Phase 0: Decisions and setup (first 1–2 hours, together)
 
@@ -20,7 +22,7 @@ Done so far: dataset download and preprocessing pipeline (`npm run data`), share
 | Validation      | Zod, schemas in `packages/shared`                                                                                                                                                        | One schema validates on the server and types the client                                                                                         |
 | Data engine     | DuckDB (`@duckdb/node-api`) over `data/processed/coach.duckdb`                                                                                                                           | Already built and tested: 3.6M rows, per-user queries in about 30 ms                                                                            |
 | AI              | Gemini through the Vercel AI SDK (`ai`, `@ai-sdk/google`, `@ai-sdk/react`)                                                                                                               | Streaming chat, typed tool calling, and the `useChat` hook for the frontend. Gemini has built-in Google Search grounding for the deal finder    |
-| Lint and format | ESLint (typescript-eslint) + Prettier                                                                                                                                                    | Prettier is already configured                                                                                                                  |
+| Lint and format | ESLint (typescript-eslint) + Prettier. TypeScript pinned to 6.0: typescript-eslint cannot run on TypeScript 7                                                                            | Prettier is already configured                                                                                                                  |
 | Tests           | Vitest                                                                                                                                                                                   | Same config style as Vite                                                                                                                       |
 | Hosting         | One Node service that serves the API and the built frontend. Platform to be decided (Railway is the candidate). The processed database is uploaded to the host once, not built at deploy | One deploy, and the 105 MB database file stays next to the server                                                                               |
 
@@ -40,7 +42,8 @@ Tasks:
 
 - [ ] **UI language.** Recommendation: English UI and code, since judging is in English. The coach answers in the language the user writes in, so a Finnish demo also works
 - [ ] **Demo users.** Recommendation: pick 2–3 customers with clearly different profiles (a young restaurant-heavy spender, a family with high housing costs, someone who often overdraws) and add a user switcher. No login. Query `docs/data.md` tables to find them
-- [ ] **Subscriptions.** The dataset has none, so the "three streaming services" example cannot come from real data. Recommendation: build the recurring-payment detector anyway (it finds nothing today but works on real data), and do not fake subscriptions in the demo. If the team wants the example anyway, add a clearly labelled demo-only fixture for one demo user and say so in the pitch
+- [ ] **Hosting platform.** Railway is the candidate. Decide before the first deploy
+- [ ] **Subscriptions.** The dataset has none, so the "three streaming services" example cannot come from real data. Recommendation: skip the recurring-payment detector (it would find nothing in the demo) and do not fake subscriptions. Mention it as a next step in the pitch
 - [ ] **Groceries basket.** Currently `mandatory_regular` (needs, recurring). Alternative: `everyday`. One-line change in [taxonomy.ts](packages/shared/src/taxonomy.ts), then rerun `npm run data:prepare`
 - [ ] **App name.** Replace the working title in the README
 
@@ -48,12 +51,13 @@ Tasks:
 
 - [ ] Create the GitHub repo, push this skeleton, add everyone as collaborators, protect `main` against force pushes
 - [ ] Each person: `npm install`, `npm run data`, copy `.env.example` to `.env` and add a key
-- [ ] Scaffold `apps/web` (Vite React TS, Tailwind, TanStack Query, Recharts) in one commit
-- [ ] Scaffold `apps/server` (Hono, `@hono/node-server`, DuckDB connection, `/health` route) in one commit
-- [ ] Add ESLint at the root and the `lint`, `dev`, and `test` scripts. Update the README commands table
+- [x] Scaffold `apps/web` (Vite React TS, Tailwind, TanStack Query, Recharts)
+- [x] Scaffold `apps/server` (Hono, `@hono/node-server`, DuckDB connection, `/api/health` route, serves the built web app)
+- [x] Add ESLint at the root and the `lint`, `dev`, and `test` scripts. Update the README commands table
+- [ ] Deploy the skeleton manually on the chosen platform (`npm install && npm run build`, start with `npm start`). Upload `coach.duckdb` to the host once and point `COACH_DB_PATH` at it. Open the URL on a phone
 - [ ] Optional: GitHub Action that runs `format:check`, `lint`, `typecheck`, and `test` on every push to `main`
 
-Do the two scaffolds first and push them before parallel feature work starts. Most merge conflicts in hackathons come from three people scaffolding at once.
+Deploy early and again whenever something demo-worthy lands, manually. No deploy per push.
 
 ## Phase 1: API contract
 
@@ -77,6 +81,18 @@ Proposed endpoints:
 
 Pick tasks from the lists below.
 
+**MVP line.** The demo breaks without these, so build them first:
+
+- Overview with income and the three baskets
+- Category pie chart
+- You vs. others (peers)
+- Action list with checkboxes and a running total
+- Chat with `getSpendingSummary`, `queryTransactions`, `compareToPeers`, `simulateWhatIf`, `getSafeToSpend`
+- Safe to spend this week
+- Deployed and working on a phone
+
+Everything else in Phases 2 and 3 is stretch.
+
 ### Insights (server, deterministic)
 
 - [ ] Overview and category aggregates from `monthly_category`
@@ -93,7 +109,6 @@ Action rules in priority order (all supported by the data):
 4. Utility bills above peers → deal finder in chat
 5. Overdraft risk → safe-to-spend and buffer advice
 6. Idle balance → move to savings
-7. Recurring payment detector (subscriptions, for real-world data)
 
 ### AI coach (server)
 

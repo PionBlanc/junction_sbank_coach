@@ -56,10 +56,13 @@ const subcategoryRows = Object.entries(SUBCATEGORIES)
     ),
   )
   .join(',\n');
-const ageBandCase = `CASE
-  WHEN customer_age < 25 THEN '18-24' WHEN customer_age < 35 THEN '25-34'
-  WHEN customer_age < 45 THEN '35-44' WHEN customer_age < 55 THEN '45-54'
-  WHEN customer_age < 65 THEN '55-64' ELSE '65+' END`;
+// Generated from AGE_BANDS ('18-24', ..., '65+'): every band but the last has an upper bound.
+const ageBandCase = `CASE ${AGE_BANDS.map((band) => {
+  const upper = band.split('-')[1];
+  return upper
+    ? `WHEN customer_age <= ${Number(upper)} THEN ${sqlString(band)}`
+    : `ELSE ${sqlString(band)}`;
+}).join(' ')} END`;
 
 await step(
   con,

@@ -7,21 +7,34 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12"
   },
   "scripts": {
+    "dev": "concurrently -n server,web -c blue,green \"npm run dev -w @coach/server\" \"npm run dev -w @coach/web\"",
+    "build": "npm run build -w @coach/web",
+    "start": "npm run start -w @coach/server",
     "data": "npm run data:fetch && npm run data:prepare",
     "data:fetch": "tsx scripts/data/fetch.ts",
     "data:prepare": "tsx scripts/data/prepare.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "lint": "eslint .",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck -w @coach/server -w @coach/web"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.5",
+    "concurrently": "^10.0.7",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.14.0",
     "prettier": "^3.10.1",
     "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.2",
+    "vitest": "^5.1.0"
   },
   "dependencies": {
     "@duckdb/node-api": "^2.0.0-r.1"

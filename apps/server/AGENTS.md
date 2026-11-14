@@ -8,7 +8,9 @@ Stack: Hono on Node.js, Zod, DuckDB (`@duckdb/node-api`), Vercel AI SDK with `@a
 
 ```
 src/
-  index.ts       Starts the server. Exports `AppType` for the web client
+  index.ts       Starts the server and serves the built web app in production
+  app.ts         Builds the Hono app from a DB connection. Exports `AppType` for the web client
+  config.ts      Settings from env variables (PORT, COACH_DB_PATH). The only place reading process.env
   routes/        Thin HTTP handlers, one file per resource. index.ts only registers them
   db/            DuckDB connection and query functions. The only place SQL lives
   insights/      Deterministic logic: aggregates, benchmarks, safe-to-spend, what-if
@@ -26,7 +28,7 @@ Dependencies point one way: `routes` → `coach` → `insights` → `db`. Lower 
 
 ## Data access
 
-- Open `data/processed/coach.duckdb` read-only, once, at startup. Never read the raw CSVs from the server.
+- Open the database read-only, once, at startup (`openDatabase` in `db/connection.ts`), and pass the connection down to route factories. Path from `COACH_DB_PATH`, default `data/processed/coach.duckdb`. Never read the raw CSVs from the server.
 - SQL lives in `db/` only. Always use prepared statements with parameters. Never build SQL by string concatenation with user or model input.
 - Every query takes a `customerId` and an explicit date range or month. No hidden defaults deep in the code. Use `DATA_END_DATE` for "now".
 - Map `snake_case` columns to `camelCase` fields in the query function, and return types that match the shared schemas.
