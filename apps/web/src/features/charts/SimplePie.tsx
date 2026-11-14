@@ -11,11 +11,10 @@ type SimplePieProps = {
   selectedIndex?: number | null;
 };
 
-/** Narrower slices show only their percentage inside, and the narrowest nothing. */
-const NAME_MIN_PCT = 0.12;
+/** Slices narrower than this have no room for their percentage. */
 const PCT_MIN_PCT = 0.04;
 
-/** A full pie with each slice's name and share written on it, and a key with the euros below. */
+/** A full pie with each slice's share written on it, and a key with names and euros below. */
 export function SimplePie(props: SimplePieProps) {
   function renderLabel(label: PieLabelRenderProps) {
     const slice = props.slices[label.index];
@@ -25,7 +24,6 @@ export function SimplePie(props: SimplePieProps) {
     const radius = label.outerRadius * 0.6;
     const x = label.cx + radius * Math.cos(angle);
     const y = label.cy + radius * Math.sin(angle);
-    const showName = slice.sharePct >= NAME_MIN_PCT;
     return (
       <text
         x={x}
@@ -36,14 +34,7 @@ export function SimplePie(props: SimplePieProps) {
         fontSize={12}
         fontWeight={600}
       >
-        {showName && (
-          <tspan x={x} dy="-0.6em">
-            {slice.label}
-          </tspan>
-        )}
-        <tspan x={x} dy={showName ? '1.2em' : 0}>
-          {formatPct(slice.sharePct)}
-        </tspan>
+        {formatPct(slice.sharePct)}
       </text>
     );
   }
