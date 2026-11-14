@@ -31,6 +31,7 @@ import { getSavingIdeasTool } from './tools/get-saving-ideas.ts';
 import { getSpenderGroupTool } from './tools/get-spender-group.ts';
 import { getSpendingSummaryTool } from './tools/get-spending-summary.ts';
 import { getYearOverYearTool } from './tools/get-year-over-year.ts';
+import { planGoalTool } from './tools/plan-goal.ts';
 import { simulateWhatIfTool } from './tools/simulate-what-if.ts';
 import { suggestRepliesTool } from './tools/suggest-replies.ts';
 
@@ -75,6 +76,7 @@ export async function streamCoachReply(
       getSafeToSpend: getSafeToSpendTool(db, customerId),
       compareToPeers: compareToPeersTool(db, customerId),
       simulateWhatIf: simulateWhatIfTool(db, customerId),
+      planGoal: planGoalTool(db, customerId, swipes.acceptedIds),
       drawChart: drawChartTool(),
       suggestReplies: suggestRepliesTool(),
     },

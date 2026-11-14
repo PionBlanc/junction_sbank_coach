@@ -3,6 +3,7 @@ import {
   categoryChangesSchema,
   largestPurchasesSchema,
   excelExportSchema,
+  goalPlanSchema,
   balanceHistorySchema,
   basketTrendSchema,
   categorySplitSchema,
@@ -26,6 +27,7 @@ import { SavingIdeasList } from '../actions/SavingIdeasList.tsx';
 import { BalanceLine } from '../charts/BalanceLine.tsx';
 import { BasketTrendBars } from '../charts/BasketTrendBars.tsx';
 import { CategoryTrendBars } from '../charts/CategoryTrendBars.tsx';
+import { GoalChart } from '../charts/GoalChart.tsx';
 import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
 import { InvestmentBars } from '../charts/InvestmentBars.tsx';
 import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
@@ -162,6 +164,26 @@ export function ToolCard(props: ToolCardProps) {
           <CategoryTrendBars series={series} months={months} />
         ) : (
           <p className="text-small text-muted">No spending in this period.</p>
+        )}
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'planGoal') {
+    const parsed = goalPlanSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const { goalEur, label, path, monthsAtPace, monthsWithIdeas } = parsed.data;
+    return (
+      <Card title={`${label ?? 'Your goal'} · ${formatEur(goalEur)}`}>
+        {path.length > 0 ? (
+          <GoalChart
+            goalEur={goalEur}
+            path={path}
+            showPace={monthsAtPace !== null}
+            showIdeas={monthsWithIdeas !== null}
+          />
+        ) : (
+          <p className="text-small text-muted">Out of reach at the current pace.</p>
         )}
       </Card>
     );
