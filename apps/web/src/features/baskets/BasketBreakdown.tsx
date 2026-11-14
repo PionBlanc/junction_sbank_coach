@@ -9,7 +9,7 @@ import { BasketDetail } from './BasketDetail.tsx';
 
 type BasketBreakdownProps = { data: Overview };
 
-/** A month at a glance: income against spending, the three baskets, and spending by category. */
+/** A month at a glance: income against spending, spending by category, and the three baskets. */
 export function BasketBreakdown(props: BasketBreakdownProps) {
   const { data } = props;
   const [selected, setSelected] = useState<SpendingBasketId | null>(null);
@@ -32,7 +32,16 @@ export function BasketBreakdown(props: BasketBreakdownProps) {
           { label: 'Spending', valueEur: data.spendingEur, highlight: true },
         ]}
       />
-      <h3 className="text-small font-medium text-muted">By basket</h3>
+      <h3 className="text-small font-medium text-muted">Spending by category</h3>
+      <SimplePie
+        slices={data.categorySplit.map((s, index) => ({
+          label: s.label,
+          valueEur: s.totalEur,
+          sharePct: s.sharePct,
+          ...categorySliceColour(index, s.categoryId),
+        }))}
+      />
+      <h3 className="text-small font-medium text-muted">Spending type breakdown</h3>
       <SimplePie
         slices={data.baskets.map((b) => ({
           label: BASKET_LABELS[b.basket],
@@ -47,15 +56,6 @@ export function BasketBreakdown(props: BasketBreakdownProps) {
         }}
       />
       {selectedBasket && <BasketDetail basket={selectedBasket} />}
-      <h3 className="text-small font-medium text-muted">By category</h3>
-      <SimplePie
-        slices={data.categorySplit.map((s, index) => ({
-          label: s.label,
-          valueEur: s.totalEur,
-          sharePct: s.sharePct,
-          ...categorySliceColour(index, s.categoryId),
-        }))}
-      />
     </Card>
   );
 }
