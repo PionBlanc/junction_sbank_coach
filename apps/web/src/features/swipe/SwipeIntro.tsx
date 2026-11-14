@@ -7,7 +7,7 @@ type SwipeIntroProps = { onStart: () => void };
 export function SwipeIntro(props: SwipeIntroProps) {
   return (
     <div
-      className="absolute inset-0 flex items-center justify-center rounded-md bg-ink/70 p-4"
+      className="absolute inset-0 flex touch-none items-center justify-center rounded-md bg-ink/70 p-4"
       role="dialog"
       aria-label="How swiping works"
     >

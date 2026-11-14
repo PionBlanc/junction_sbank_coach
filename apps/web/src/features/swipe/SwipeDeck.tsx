@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { useActions } from '../../api/useActions.ts';
 import { Card } from '../../components/Card.tsx';
 import { LoadError } from '../../components/LoadError.tsx';
+import { useCoachChat } from '../../lib/chat-context.ts';
 import { formatEur } from '../../lib/format.ts';
 import { useSwipes } from '../../lib/swipe-context.ts';
 import { useUser } from '../../lib/user-context.ts';
@@ -40,6 +41,7 @@ export function SwipeDeck() {
   const { userId } = useUser();
   const actions = useActions(userId);
   const { swipes, swipe, undo } = useSwipes();
+  const { open: chatOpen } = useCoachChat();
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [leaving, setLeaving] = useState<'left' | 'right' | null>(null);
@@ -88,6 +90,8 @@ export function SwipeDeck() {
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
+      // The chat sheet covers the deck: arrow keys there must not swipe the card behind it.
+      if (chatOpen) return;
       if (event.target instanceof HTMLInputElement) return;
       if (event.target instanceof HTMLTextAreaElement) return;
       if (event.key === 'ArrowRight') decide(true);

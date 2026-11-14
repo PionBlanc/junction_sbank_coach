@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useLockPageScroll } from '../../lib/useLockPageScroll.ts';
 import { WhatIfCard } from '../what-if/WhatIfCard.tsx';
 
 type WhatIfDialogProps = { monthlyEur: number; onClose: () => void };
@@ -6,6 +7,8 @@ type WhatIfDialogProps = { monthlyEur: number; onClose: () => void };
 /** A small window over the page: what the monthly amount grows into over the years. */
 export function WhatIfDialog(props: WhatIfDialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  // A modal <dialog> blocks clicks behind it, but not scrolling: lock the page ourselves.
+  useLockPageScroll(true);
 
   useEffect(() => {
     ref.current?.showModal();
@@ -15,7 +18,7 @@ export function WhatIfDialog(props: WhatIfDialogProps) {
     <dialog
       ref={ref}
       aria-label="Saved vs. invested"
-      className="m-auto w-[min(358px,calc(100vw-2rem))] bg-transparent p-0 backdrop:bg-ink/60"
+      className="m-auto max-h-[calc(100dvh-2rem)] w-[min(358px,calc(100vw-2rem))] overscroll-contain bg-transparent p-0 backdrop:bg-ink/60"
       onClose={props.onClose}
       // A click on the dimmed backdrop lands on the dialog itself and closes it.
       onClick={(event) => {

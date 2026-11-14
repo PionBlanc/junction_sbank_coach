@@ -2,6 +2,7 @@ import { drawChartInputSchema, suggestRepliesInputSchema } from '@coach/shared';
 import { getToolName, isToolUIPart } from 'ai';
 import { useEffect, useRef } from 'react';
 import { useCoachChat } from '../../lib/chat-context.ts';
+import { useLockPageScroll } from '../../lib/useLockPageScroll.ts';
 import { ChatComposer } from './ChatComposer.tsx';
 import { CoachAvatar } from './CoachAvatar.tsx';
 import { CoachGreeting } from './CoachGreeting.tsx';
@@ -49,14 +50,7 @@ export function Chat() {
   }, [messages, open, waiting]);
 
   // While the sheet is open, the page behind it must not scroll.
-  useEffect(() => {
-    if (!open) return;
-    const root = document.documentElement;
-    root.style.overflow = 'hidden';
-    return () => {
-      root.style.overflow = '';
-    };
-  }, [open]);
+  useLockPageScroll(open);
 
   return (
     <>
