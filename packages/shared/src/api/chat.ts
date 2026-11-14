@@ -10,6 +10,7 @@ export const CHART_TOOLS = [
   'getMonthlyBreakdown',
   'getIncomeVsSpending',
   'getYearOverYear',
+  'getCategorySplit',
 ] as const;
 
 export type ChartTool = (typeof CHART_TOOLS)[number];

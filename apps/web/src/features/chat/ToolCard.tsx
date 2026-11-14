@@ -1,5 +1,6 @@
 import {
   CATEGORIES,
+  categorySplitSchema,
   incomeVsSpendingSchema,
   overviewSchema,
   peerComparisonSchema,
@@ -15,6 +16,7 @@ import { IncomeSpendingBars } from '../charts/IncomeSpendingBars.tsx';
 import { BasketBreakdown } from '../baskets/BasketBreakdown.tsx';
 import { PeerCompare } from '../benchmark/PeerCompare.tsx';
 import { MonthlyBars } from '../charts/MonthlyBars.tsx';
+import { SimpleDonut } from '../charts/SimpleDonut.tsx';
 import { YearOverYearBars } from '../charts/YearOverYearBars.tsx';
 import { SafeToSpendCard } from '../safe-to-spend/SafeToSpendCard.tsx';
 import { SpenderGroupCard } from '../spender-group/SpenderGroupCard.tsx';
@@ -67,6 +69,36 @@ export function ToolCard(props: ToolCardProps) {
           </span>
           .
         </p>
+      </Card>
+    );
+  }
+
+  if (props.toolName === 'getCategorySplit') {
+    const parsed = categorySplitSchema.safeParse(props.output);
+    if (!parsed.success) return unreadable;
+    const { fromMonth, toMonth, totalEur, slices } = parsed.data;
+    const period =
+      fromMonth === toMonth
+        ? formatMonth(fromMonth)
+        : `${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`;
+    return (
+      <Card title={`Where your money went · ${period}`}>
+        {slices.length === 0 ? (
+          <p className="text-small text-muted">No spending in this period.</p>
+        ) : (
+          <>
+            <SimpleDonut
+              slices={slices.map((s) => ({
+                label: s.label,
+                valueEur: s.totalEur,
+                sharePct: s.sharePct,
+              }))}
+            />
+            <p className="text-small">
+              All spending: <span className="font-semibold">{formatEur(totalEur)}</span>.
+            </p>
+          </>
+        )}
       </Card>
     );
   }

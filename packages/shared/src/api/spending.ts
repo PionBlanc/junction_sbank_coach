@@ -65,3 +65,22 @@ export const yearOverYearSchema = z.object({
   changePct: z.number().nullable(),
 });
 export type YearOverYear = z.infer<typeof yearOverYearSchema>;
+
+export const categorySplitInputSchema = z.object({ fromMonth: monthSchema, toMonth: monthSchema });
+
+/** Result of the coach's getCategorySplit tool: where spending went over a range of months. */
+export const categorySplitSchema = z.object({
+  fromMonth: monthSchema,
+  toMonth: monthSchema,
+  totalEur: z.number(),
+  /** Largest first. The last slice may be "Other" (categoryId null). */
+  slices: z.array(
+    z.object({
+      categoryId: categoryIdSchema.nullable(),
+      label: z.string(),
+      totalEur: z.number(),
+      sharePct: z.number(),
+    }),
+  ),
+});
+export type CategorySplit = z.infer<typeof categorySplitSchema>;
