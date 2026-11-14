@@ -2,15 +2,19 @@ import { Bar, BarChart, Cell, ReferenceLine, ResponsiveContainer, XAxis, YAxis }
 import { formatEur } from '../../lib/format.ts';
 
 type RowBarsProps = {
-  rows: { label: string; valueEur: number }[];
+  /** `detail` is a short note after the amount, such as the date of a purchase. */
+  rows: { label: string; valueEur: number; detail?: string }[];
   /** Values can be negative: a + sign on rises and a line at zero. */
   signed?: boolean;
 };
 
-const ROW_HEIGHT = 36;
-const LABEL_WIDTH = 176;
+const ROW_HEIGHT = 44;
+const LABEL_WIDTH = 148;
 
-/** One horizontal bar per row, with its name and amount on the left. No other text. */
+/**
+ * One horizontal bar per row, with its name and amount on the left. No other text.
+ * Name and amount sit on two lines: on one line a long name ran past the card's left edge.
+ */
 export function RowBars(props: RowBarsProps) {
   function valueText(valueEur: number): string {
     return props.signed && valueEur > 0 ? `+${formatEur(valueEur)}` : formatEur(valueEur);
@@ -19,17 +23,15 @@ export function RowBars(props: RowBarsProps) {
   function renderTick(tick: { x?: number | string; y?: number | string; index?: number }) {
     const row = props.rows[tick.index ?? -1];
     if (!row) return <g />;
+    const x = Number(tick.x ?? 0);
     return (
-      <text
-        x={Number(tick.x ?? 0)}
-        y={Number(tick.y ?? 0)}
-        textAnchor="end"
-        dominantBaseline="central"
-        fontSize={12}
-      >
-        <tspan fill="var(--color-muted)">{row.label} </tspan>
-        <tspan fill="var(--color-ink)" fontWeight={600}>
+      <text x={x} y={Number(tick.y ?? 0)} textAnchor="end" dominantBaseline="central" fontSize={12}>
+        <tspan x={x} dy="-0.6em" fill="var(--color-muted)">
+          {row.label}
+        </tspan>
+        <tspan x={x} dy="1.25em" fill="var(--color-ink)" fontWeight={600}>
           {valueText(row.valueEur)}
+          {row.detail && <tspan fontWeight={400}> · {row.detail}</tspan>}
         </tspan>
       </text>
     );

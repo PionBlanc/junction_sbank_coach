@@ -142,8 +142,9 @@ export function ToolCard(props: ToolCardProps) {
         ? formatMonth(fromMonth)
         : `${formatMonth(fromMonth)} to ${formatMonth(toMonth)}`;
     const rows = purchases.map((p) => ({
-      label: `${p.label}, ${formatShortDay(p.date)}`,
+      label: p.label,
       valueEur: p.amountEur,
+      detail: formatShortDay(p.date),
     }));
     return (
       <Card
